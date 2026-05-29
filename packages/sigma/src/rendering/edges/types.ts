@@ -505,31 +505,6 @@ export interface EdgeLabelOptions {
 
 /**
  * Options for creating an edge program via createEdgeProgram().
- *
- * @example
- * ```typescript
- * // Simple line with no extremities
- * createEdgeProgram({
- *   paths: [pathLine()],
- *   layers: [layerPlain()],
- * });
- *
- * // Arrow at head
- * createEdgeProgram({
- *   paths: [pathLine()],
- *   extremities: [extremityArrow()],
- *   layers: [layerPlain()],
- *   defaultHead: "arrow",
- * });
- *
- * // Multi-path: edges select via attributes
- * createEdgeProgram({
- *   paths: [pathLine(), pathCurved()],
- *   extremities: [extremityArrow()],
- *   layers: [layerPlain()],
- * });
- * // Edges select via: { path: "curved", head: "arrow", tail: "none" }
- * ```
  */
 export interface EdgeProgramOptions {
   /**

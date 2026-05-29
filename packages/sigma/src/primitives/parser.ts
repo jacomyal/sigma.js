@@ -20,6 +20,7 @@ import {
   createEdgeProgram,
   createNodeProgram,
 } from "../rendering";
+import type Sigma from "../sigma";
 import {
   DEFAULT_EDGE_PRIMITIVES,
   DEFAULT_NODE_PRIMITIVES,
@@ -302,11 +303,16 @@ export function generateNodeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(nodePrimitives?: NodePrimitives): GeneratedNodeProgram<N, E, G> {
+>(
+  gl: WebGL2RenderingContext,
+  pickingBuffer: WebGLFramebuffer | null,
+  renderer: Sigma<N, E, G>,
+  nodePrimitives?: NodePrimitives,
+): GeneratedNodeProgram<N, E, G> {
   const { shapes, layers } = parseNodePrimitives(nodePrimitives);
   const variables = nodePrimitives?.variables || {};
 
-  const bundle = createNodeProgram<N, E, G>({
+  const bundle = createNodeProgram<N, E, G>(gl, pickingBuffer, renderer, {
     shapes,
     layers,
     rotateWithCamera: nodePrimitives?.rotateWithCamera,
@@ -326,7 +332,12 @@ export function generateEdgeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(edgePrimitives?: EdgePrimitives): GeneratedEdgeProgram<N, E, G> {
+>(
+  gl: WebGL2RenderingContext,
+  pickingBuffer: WebGLFramebuffer | null,
+  renderer: Sigma<N, E, G>,
+  edgePrimitives?: EdgePrimitives,
+): GeneratedEdgeProgram<N, E, G> {
   const { paths, extremities, layers } = parseEdgePrimitives(edgePrimitives);
 
   // Collect variables declared by all paths
@@ -336,7 +347,7 @@ export function generateEdgeProgram<
   }
   Object.assign(variables, edgePrimitives?.variables || {});
 
-  const bundle = createEdgeProgram<N, E, G>({
+  const bundle = createEdgeProgram<N, E, G>(gl, pickingBuffer, renderer, {
     paths,
     extremities,
     layers,

@@ -56,15 +56,6 @@ export interface StepCurvedPathOptions {
  *
  * @param options - Path configuration
  * @returns EdgePath definition for step curved paths
- *
- * @example
- * ```typescript
- * const EdgeStepCurvedProgram = createEdgeProgram({
- *   paths: [pathStepCurved({ orientation: "horizontal" })],
- *   extremities: [extremityNone(), extremityArrow()],
- *   layers: [layerPlain()],
- * });
- * ```
  */
 export function pathStepCurved(options?: StepCurvedPathOptions): EdgePath {
   const { orientation = "automatic", rotateWithCamera = false, offset = 0.5, cornerRadius = 0.4 } = options ?? {};

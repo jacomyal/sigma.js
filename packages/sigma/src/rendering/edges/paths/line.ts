@@ -16,15 +16,6 @@ import { EdgePath } from "../types";
  * All path functions have closed-form solutions.
  *
  * @returns EdgePath definition for straight lines
- *
- * @example
- * ```typescript
- * const EdgeLineProgram = createEdgeProgram({
- *   paths: [pathLine()],
- *   extremities: [extremityNone()],
- *   layers: [layerPlain()],
- * });
- * ```
  */
 export function pathLine(): EdgePath {
   // language=GLSL

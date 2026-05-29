@@ -63,15 +63,6 @@ export interface CurvedSPathOptions {
  *
  * @param options - Path configuration
  * @returns EdgePath definition for S-curve paths
- *
- * @example
- * ```typescript
- * const EdgeCurvedSProgram = createEdgeProgram({
- *   paths: [pathCurvedS({ curveOffset: 0.4 })],
- *   extremities: [extremityNone(), extremityArrow()],
- *   layers: [layerPlain()],
- * });
- * ```
  */
 export function pathCurvedS(options?: CurvedSPathOptions): EdgePath {
   const {

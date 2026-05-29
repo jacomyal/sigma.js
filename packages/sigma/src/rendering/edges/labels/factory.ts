@@ -2,8 +2,8 @@
  * Sigma.js Edge Label Program Factory
  * ====================================
  *
- * Factory function that creates an EdgeLabelProgram class for rendering
- * edge labels along edge paths using WebGL SDF text rendering.
+ * Builds an edge label program instance for rendering edge labels along
+ * edge paths using WebGL SDF text rendering.
  *
  * ## Architecture
  *
@@ -107,59 +107,42 @@ interface EdgeLabelGlyphCache {
 // ============================================================================
 
 /**
- * Creates an edge label program for a specific path type.
+ * Builds an edge label program instance for a specific path type. The
+ * program renders text labels along edge paths using an SDF (Signed
+ * Distance Field) atlas for crisp text at any zoom level.
  *
- * The resulting program renders text labels along edge paths using SDF
- * (Signed Distance Field) atlas for crisp text at any zoom level.
- *
- * `createEdgeProgram` calls this internally and returns the resulting
- * class in its `labelProgram` field.
- *
- * @param options Configuration for the edge label program
- * @returns An EdgeLabelProgram class constructor
+ * `createEdgeProgram` calls this internally and exposes the instance in
+ * its `labelProgram` field.
  */
 export function createEdgeLabelProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: CreateEdgeLabelProgramOptions) {
+>(
+  gl: WebGL2RenderingContext,
+  pickingBuffer: WebGLFramebuffer | null,
+  renderer: Sigma<N, E, G>,
+  options: CreateEdgeLabelProgramOptions,
+): EdgeLabelProgram<N, E, G> {
   const { color: labelColor, margin: labelMargin, textBorder } = options;
   const labelShaderConfig = resolveEdgeLabelShaderConfig(options);
   const { paths, fontSizeMode, minVisibilityThreshold, fullVisibilityThreshold } = labelShaderConfig;
 
   const hasBorder = !!textBorder;
 
-  // Shaders are generated lazily on first instantiation.
-  // This ensures all node shapes are registered before edge label shaders are compiled,
-  // since generateShapeSelectorGLSL() reads from the shape registry.
-  let generated: GeneratedEdgeLabelShaders | null = null;
+  // Generate shaders now — node shapes are registered earlier in the
+  // outer program-suite construction, so the shape registry is ready.
+  const generated: GeneratedEdgeLabelShaders = generateEdgeLabelShaders({
+    paths,
+    hasBorder,
+    fontSizeMode,
+    minVisibilityThreshold,
+    fullVisibilityThreshold,
+  });
 
-  // Uniform type for TypeScript
-  // Note: We use `string` as a fallback to allow path-specific uniforms that aren't known at compile time.
-  // The explicit union members serve as documentation of the standard uniforms used by edge labels.
   type EdgeLabelUniform = string;
 
-  // -------------------------------------------------------------------------
-  // Return the EdgeLabelProgram class
-  // -------------------------------------------------------------------------
-  return class GeneratedEdgeLabelProgram extends LabelProgram<EdgeLabelUniform, N, E, G, EdgeLabelDisplayData> {
-    /** Static reference to the options used to create this program */
-    static readonly programOptions = options;
-
-    /** Static getter for generated shader code (lazy generation) */
-    static get generatedShaders() {
-      if (!generated) {
-        generated = generateEdgeLabelShaders({
-          paths,
-          hasBorder,
-          fontSizeMode,
-          minVisibilityThreshold,
-          fullVisibilityThreshold,
-        });
-      }
-      return generated;
-    }
-
+  class GeneratedEdgeLabelProgram extends LabelProgram<EdgeLabelUniform, N, E, G, EdgeLabelDisplayData> {
     /** Label styling statics read by the renderer to override data-supplied values. */
     static readonly labelColor = labelColor;
     static readonly labelMargin = labelMargin;
@@ -206,17 +189,6 @@ export function createEdgeLabelProgram<
     // -----------------------------------------------------------------------
 
     constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
-      // Generate shaders on first instantiation (after node shapes are registered)
-      if (!generated) {
-        generated = generateEdgeLabelShaders({
-          paths,
-          hasBorder,
-          fontSizeMode,
-          minVisibilityThreshold,
-          fullVisibilityThreshold,
-        });
-      }
-
       super(gl, pickingBuffer, renderer);
 
       // Initialize edge attribute texture for path attributes (curvature, loop geometry, …).
@@ -285,10 +257,10 @@ export function createEdgeLabelProgram<
 
       return {
         VERTICES: 4, // Quad for each character
-        VERTEX_SHADER_SOURCE: generated!.vertexShader,
-        FRAGMENT_SHADER_SOURCE: generated!.fragmentShader,
+        VERTEX_SHADER_SOURCE: generated.vertexShader,
+        FRAGMENT_SHADER_SOURCE: generated.fragmentShader,
         METHOD: TRIANGLE_STRIP,
-        UNIFORMS: generated!.uniforms as EdgeLabelUniform[],
+        UNIFORMS: generated.uniforms as EdgeLabelUniform[],
         ATTRIBUTES: [
           // Edge indices for texture lookup
           { name: "a_edgeIndex", size: 1, type: FLOAT }, // Index into edge data texture (node positions, thickness, etc.)
@@ -703,6 +675,17 @@ export function createEdgeLabelProgram<
       return width;
     }
 
+    /**
+     * CSS-pixel measurement, derived from the atlas measurement. The label
+     * grid never measures edge labels (only node labels), so this exists
+     * mainly to satisfy the `LabelProgram` contract.
+     */
+    measureLabel(text: string, fontSize: number, fontKey?: string): { width: number; height: number } {
+      const atlasWidth = this.measureLabelAtlasWidth(text, fontKey);
+      const scale = fontSize / DEFAULT_SDF_ATLAS_OPTIONS.fontSize;
+      return { width: atlasWidth * scale, height: fontSize };
+    }
+
     // -----------------------------------------------------------------------
     // Cleanup
     // -----------------------------------------------------------------------
@@ -725,17 +708,16 @@ export function createEdgeLabelProgram<
 
       super.kill();
     }
-  };
+  }
+
+  return new GeneratedEdgeLabelProgram(gl, pickingBuffer, renderer);
 }
 
-export type EdgeLabelProgramType<
+export interface EdgeLabelProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = ReturnType<typeof createEdgeLabelProgram<N, E, G>>;
-
-export type EdgeLabelProgram<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = InstanceType<EdgeLabelProgramType<N, E, G>>;
+> extends LabelProgram<string, N, E, G, EdgeLabelDisplayData> {
+  processEdgeLabel(labelKey: string, offset: number, data: EdgeLabelDisplayData): number;
+  measureLabelAtlasWidth(text: string, fontKey?: string): number;
+}

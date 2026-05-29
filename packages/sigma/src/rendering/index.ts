@@ -11,11 +11,9 @@ export * from "./glsl";
 
 // Node and edge program factories + their composable building blocks
 // (shapes, layers, paths, extremities). Sub-indices also re-export the
-// XProgram / XProgramType aliases used internally by sigma; those aren't
-// part of the advertised public API. The base label / label-background
-// classes (LabelProgram, createLabelBackgroundProgram, etc.) are
-// intentionally not re-exported — they're internals reachable only via
-// "sigma/rendering/nodes/labels" for advanced users.
+// program type aliases (NodeProgram, LabelProgram, etc.) that sigma's core
+// consumes internally; they're available to advanced users but aren't a
+// stable public API.
 export * from "./nodes";
 export * from "./edges";
 

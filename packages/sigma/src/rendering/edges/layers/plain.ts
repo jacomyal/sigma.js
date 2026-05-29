@@ -14,15 +14,6 @@ import { EdgeLayer } from "../types";
  * The edge is rendered with its assigned color (from EdgeDisplayData.color).
  *
  * @returns EdgeLayer definition for solid color
- *
- * @example
- * ```typescript
- * const EdgeLineProgram = createEdgeProgram({
- *   paths: [pathLine()],
- *   extremities: [extremityNone()],
- *   layers: [layerPlain()],
- * });
- * ```
  */
 export function layerPlain(): EdgeLayer {
   // language=GLSL

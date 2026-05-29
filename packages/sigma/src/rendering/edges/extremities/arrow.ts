@@ -25,23 +25,6 @@ export interface ArrowExtremityOptions {
  *
  * @param options - Arrow configuration
  * @returns EdgeExtremity definition for arrow
- *
- * @example
- * ```typescript
- * // Arrow with default settings
- * const EdgeArrowProgram = createEdgeProgram({
- *   paths: [pathLine()],
- *   extremities: [extremityNone(), extremityArrow()],
- *   layers: [layerPlain()],
- * });
- *
- * // Custom arrow with margin
- * const EdgeArrowMarginProgram = createEdgeProgram({
- *   paths: [pathLine()],
- *   extremities: [extremityNone(), extremityArrow({ lengthRatio: 3, widthRatio: 2.5, margin: 5 })],
- *   layers: [layerPlain()],
- * });
- * ```
  */
 export function extremityArrow(options?: ArrowExtremityOptions): EdgeExtremity {
   const { lengthRatio = 5, widthRatio = 4.0, margin = 0 } = options ?? {};

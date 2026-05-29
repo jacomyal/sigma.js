@@ -55,7 +55,6 @@ export class LabelRenderer<
   private edgeLabelCandidates: string[] = [];
   private renderedNodeLabels: Set<string> = new Set();
   private labelSizeCache = new Map<string, { width: number; height: number }>();
-  private measureContext: CanvasRenderingContext2D | null = null;
 
   constructor(private internals: SigmaInternals<N, E, G>) {}
 
@@ -76,18 +75,12 @@ export class LabelRenderer<
     this.labelGrid = new LabelGrid();
   }
 
-  /** Release the measurement canvas (called from sigma's kill). */
-  kill(): void {
-    this.measureContext = null;
-  }
-
   /**
    * Pre-generate glyphs for all node labels.
    * Actual label rendering happens per-frame in renderWebGLLabels.
    */
   processWebGLLabels(nodes: string[]): void {
     const { labelProgram, primitives, nodeDataCache } = this.internals;
-    if (!labelProgram?.ensureGlyphsReady) return;
 
     const defaultLabelFont = primitives?.nodes?.label?.font?.family || "sans-serif";
     const textsByFont = new Map<string, string[]>();
@@ -109,7 +102,7 @@ export class LabelRenderer<
 
     for (const [fontString, texts] of textsByFont) {
       const { family, weight, style } = parseFontString(fontString);
-      const fontKey = labelProgram.registerFont?.(family, weight, style);
+      const fontKey = labelProgram.registerFont(family, weight, style);
       labelProgram.ensureGlyphsReady(texts, fontKey);
     }
   }
@@ -127,17 +120,8 @@ export class LabelRenderer<
     if (this.labelSizeCache.has(cacheKey)) return this.labelSizeCache.get(cacheKey)!;
 
     const { family, weight, style } = parseFontString(fontString);
-    let result: { width: number; height: number };
-    if (labelProgram?.measureLabel) {
-      const fontKey = labelProgram.registerFont?.(family, weight, style) || "";
-      result = labelProgram.measureLabel(data.label, labelSize, fontKey);
-    } else {
-      if (!this.measureContext) {
-        this.measureContext = document.createElement("canvas").getContext("2d")!;
-      }
-      this.measureContext.font = `${style} ${weight} ${labelSize}px ${family}`;
-      result = { width: this.measureContext.measureText(data.label).width, height: labelSize };
-    }
+    const fontKey = labelProgram.registerFont(family, weight, style);
+    const result = labelProgram.measureLabel(data.label, labelSize, fontKey);
 
     this.labelSizeCache.set(cacheKey, result);
     return result;
@@ -231,8 +215,6 @@ export class LabelRenderer<
       visibleNodes.push(node);
     }
 
-    if (!labelProgram) return;
-
     let totalCharacters = 0;
     for (let i = 0, l = visibleNodes.length; i < l; i++) {
       const data = nodeDataCache[visibleNodes[i]];
@@ -258,7 +240,7 @@ export class LabelRenderer<
       let fontKey = fontKeyMap.get(fontString);
       if (fontKey === undefined) {
         const { family, weight, style } = parseFontString(fontString);
-        fontKey = labelProgram.registerFont?.(family, weight, style) || "";
+        fontKey = labelProgram.registerFont(family, weight, style);
         fontKeyMap.set(fontString, fontKey);
       }
 
@@ -301,7 +283,6 @@ export class LabelRenderer<
       nodeShapeMap,
       nodeGlobalShapeIds,
     } = this.internals;
-    if (!backdropProgram) return;
 
     const nodes: string[] = [];
     for (const key of nodesWithBackdrop) {
@@ -401,7 +382,6 @@ export class LabelRenderer<
   /** Render label background rectangles (picking + optional visual) for displayed node labels. */
   renderLabelBackgrounds(params: RenderParams, depth?: string): void {
     const { labelBackgroundProgram, nodeDataCache, nodeShapeMap, nodeGlobalShapeIds } = this.internals;
-    if (!labelBackgroundProgram) return;
 
     const eventsEnabled = KIND_REGISTRY.nodeLabel.writesPickingThisFrame(this.internals);
 
@@ -607,8 +587,6 @@ export class LabelRenderer<
     const { graph, nodeDataCache, edgeDataCache, primitives, edgeLabelProgram, nodeDataTexture, edgeDataTexture } =
       this.internals;
 
-    if (!edgeLabelProgram) return;
-
     const edgesToRender = this.filterEdgeLabelsForDepth(depth);
 
     let totalCharacters = 0;
@@ -685,7 +663,7 @@ export class LabelRenderer<
    */
   renderEdgeLabelBackgrounds(params: RenderParams, depth?: string): void {
     const { edgeLabelBackgroundProgram, edgeLabelProgram, edgeDataCache, primitives, edgeDataTexture } = this.internals;
-    if (!edgeLabelBackgroundProgram || !edgeLabelProgram || !edgeDataTexture) return;
+    if (!edgeDataTexture) return;
 
     const eventsEnabled = KIND_REGISTRY.edgeLabel.writesPickingThisFrame(this.internals);
     const defaultEdgeLabelMargin = primitives?.edges?.label?.margin ?? 5;

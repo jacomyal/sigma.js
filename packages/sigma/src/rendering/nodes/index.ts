@@ -9,7 +9,7 @@
 
 // Core factory function and program type aliases
 export { createNodeProgram } from "./factory";
-export type { NodeProgram, NodeProgramType, NodeProgramBundle } from "./factory";
+export type { NodeProgram, NodeProgramBundle } from "./factory";
 
 // Type definitions
 export type {
@@ -48,7 +48,7 @@ export type { CreateLabelProgramOptions } from "./labels";
 // Backdrop program creation
 export { createBackdropProgram } from "./backdrops";
 export type { CreateBackdropProgramOptions } from "./backdrops";
-export type { BackdropProgram, BackdropProgramType, BackdropDisplayData } from "./backdrops";
+export type { BackdropProgram, BackdropDisplayData } from "./backdrops";
 
 // Shader generators (advanced usage)
 export {

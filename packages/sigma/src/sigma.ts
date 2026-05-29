@@ -392,22 +392,18 @@ export default class Sigma<
     const gl = this.webGLContext!;
 
     const {
-      program: NodeProgramClass,
-      labelProgram: NodeLabelProgramClass,
-      backdropProgram: BackdropProgramClass,
-      labelBackgroundProgram: NodeLabelBackgroundProgramClass,
+      nodeProgram,
+      labelProgram,
+      backdropProgram,
+      labelBackgroundProgram,
       shapeSlug: nodeShapeSlug,
       shapeNameToIndex: nodeShapeMap,
       shapeGlobalIds: nodeGlobalShapeIds,
       variables: nodeVariables,
-    } = generateNodeProgram<N, E, G>(resolvedPrimitives?.nodes);
+    } = generateNodeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, resolvedPrimitives?.nodes);
+    this.nodeProgram = nodeProgram;
     this.nodeVariableEntries = Object.entries(nodeVariables) as [string, { type: string; default: unknown }][];
-    this.nodeProgram = new NodeProgramClass(gl, null, sigma);
     if (nodeShapeSlug) this.nodeShapeSlug = nodeShapeSlug;
-
-    const labelProgram = new NodeLabelProgramClass(gl, null, sigma);
-    const backdropProgram = new BackdropProgramClass(gl, null, sigma);
-    const labelBackgroundProgram = new NodeLabelBackgroundProgramClass(gl, this.pickingFrameBuffer, sigma);
 
     // Create label attachment system if attachments are declared
     const labelAttachments = resolvedPrimitives?.nodes?.labelAttachments;
@@ -419,20 +415,15 @@ export default class Sigma<
     }
 
     const {
-      program: EdgeProgramClass,
-      labelProgram: EdgeLabelProgramClass,
-      labelBackgroundProgram: EdgeLabelBackgroundProgramClass,
+      edgeProgram,
+      labelProgram: edgeLabelProgram,
+      labelBackgroundProgram: edgeLabelBackgroundProgram,
       variables: edgeVariables,
       paths: edgePaths,
-    } = generateEdgeProgram<N, E, G>(resolvedPrimitives?.edges);
+    } = generateEdgeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, resolvedPrimitives?.edges);
+    this.edgeProgram = edgeProgram;
     this.edgeVariableEntries = Object.entries(edgeVariables) as [string, { type: string; default: unknown }][];
     this.edgePathsByName = new Map(edgePaths.map((p) => [p.name, p]));
-    this.edgeProgram = new EdgeProgramClass(gl, null, sigma);
-
-    const edgeLabelProgram = new EdgeLabelProgramClass(gl, null, sigma);
-    // The label background ribbon takes the picking framebuffer so label
-    // events can be wired onto it.
-    const edgeLabelBackgroundProgram = new EdgeLabelBackgroundProgramClass(gl, this.pickingFrameBuffer, sigma);
 
     // Create the shared internals object. All reassignable fields are plain properties;
     // satellites hold a reference to this object and see updates via direct assignment.
@@ -459,8 +450,8 @@ export default class Sigma<
       attachmentProgram,
       nodeDataTexture,
       edgeDataTexture,
-      nodeShapeMap,
-      nodeGlobalShapeIds,
+      nodeShapeMap: nodeShapeMap ?? null,
+      nodeGlobalShapeIds: nodeGlobalShapeIds ?? null,
       getDimensions: () => this.getDimensions(),
       getGraphDimensions: () => this.getGraphDimensions(),
       getStagePadding: () => this.getStagePadding(),
@@ -769,7 +760,7 @@ export default class Sigma<
       this.depthRanges.nodes[depth] = [{ offset: nodeProcessCount, count: items.length }];
       for (const node of items) {
         this.nodeBaseDepth[node] = depth;
-        this.nodeProgram.allocateNode?.(node);
+        this.nodeProgram.allocateNode(node);
         registerItem(this.pickingState, "node", node);
         this.addNodeToProgram(node, nodeProcessCount++);
       }
@@ -1071,8 +1062,8 @@ export default class Sigma<
     this.internals.edgeDataTexture!.upload();
 
     // Upload layer attribute textures
-    this.nodeProgram.uploadLayerTexture?.();
-    (this.edgeProgram as unknown as { uploadAttributeTexture?: () => void })?.uploadAttributeTexture?.();
+    this.nodeProgram.uploadLayerTexture();
+    this.edgeProgram.uploadAttributeTexture();
 
     // Bind data textures to their respective texture units
     this.internals.nodeDataTexture!.bind(NODE_DATA_TEXTURE_UNIT);
@@ -2920,8 +2911,6 @@ export default class Sigma<
       this.extraElements[id].remove();
     }
     this.extraElements = {};
-
-    this.labelRenderer.kill();
   }
 
   /**

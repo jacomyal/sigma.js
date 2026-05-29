@@ -62,15 +62,6 @@ export interface StepPathOptions {
  *
  * @param options - Path configuration
  * @returns EdgePath definition for step paths
- *
- * @example
- * ```typescript
- * const EdgeStepProgram = createEdgeProgram({
- *   paths: [pathStep({ orientation: "horizontal" })],
- *   extremities: [extremityNone(), extremityArrow()],
- *   layers: [layerPlain()],
- * });
- * ```
  */
 export function pathStep(options?: StepPathOptions): EdgePath {
   const {

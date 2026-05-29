@@ -274,7 +274,12 @@ export function createLabelBackgroundProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: CreateLabelBackgroundProgramOptions) {
+>(
+  gl: WebGL2RenderingContext,
+  pickingBuffer: WebGLFramebuffer | null,
+  renderer: Sigma<N, E, G>,
+  options: CreateLabelBackgroundProgramOptions,
+): LabelBackgroundProgram<N, E, G> {
   const { shapes, rotateWithCamera = false, label: labelOptions = {}, shapeGlobalIds } = options;
 
   if (shapes.length === 0) {
@@ -287,15 +292,11 @@ export function createLabelBackgroundProgram<
 
   type U = string;
 
-  return class NodeLabelBackgroundProgram extends Program<U, N, E, G> {
+  class NodeLabelBackgroundProgram extends Program<U, N, E, G> {
     static readonly labelMargin = labelMargin;
 
     protected totalCount = 0;
     protected bufferCapacity = 0;
-
-    constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
-      super(gl, pickingBuffer, renderer);
-    }
 
     getDefinition(): InstancedProgramDefinition<U> {
       const { FLOAT, UNSIGNED_BYTE, TRIANGLE_STRIP } = WebGL2RenderingContext;
@@ -395,17 +396,15 @@ export function createLabelBackgroundProgram<
         super.reallocate(this.bufferCapacity);
       }
     }
-  };
+  }
+
+  return new NodeLabelBackgroundProgram(gl, pickingBuffer, renderer);
 }
 
-export type LabelBackgroundProgramType<
+export interface LabelBackgroundProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = ReturnType<typeof createLabelBackgroundProgram<N, E, G>>;
-
-export type LabelBackgroundProgram<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = InstanceType<LabelBackgroundProgramType<N, E, G>>;
+> extends Program<string, N, E, G> {
+  processLabelBackground(offset: number, data: LabelBackgroundData): void;
+}

@@ -24,7 +24,13 @@ import { isAttributeSource } from "../nodes";
 import { Program } from "../program";
 import { ProgramInfo, loadFragmentShader, loadTransformFeedbackProgram, loadVertexShader } from "../utils";
 import { PREPASS_FLOATS_PER_EDGE, PREPASS_TF_VARYING_NAMES, generateEdgeShaders } from "./generator";
-import { createEdgeLabelBackgroundProgram, createEdgeLabelProgram, resolveEdgeLabelShaderConfig } from "./labels";
+import {
+  type EdgeLabelBackgroundProgram,
+  type EdgeLabelProgram,
+  createEdgeLabelBackgroundProgram,
+  createEdgeLabelProgram,
+  resolveEdgeLabelShaderConfig,
+} from "./labels";
 import { EDGE_ATTRIBUTE_TEXTURE_UNIT } from "./path-attribute-texture";
 import {
   EdgeExtremity,
@@ -60,39 +66,11 @@ float extremity_none(vec2 uv, float lengthRatio, float widthRatio) {
 }
 
 /**
- * Creates an edge program suite from paths, extremities, and layers. The
- * suite is a flat bundle: the edge program class plus the matching label
- * and label-background (ribbon) program classes.
+ * Builds an edge program suite from paths, extremities, and layers. The
+ * suite is a flat bundle of instances: the edge program plus the matching
+ * label and label-background (ribbon) programs.
  *
- * @param options - Configuration for the edge program
- * @returns A bundle `{ program, labelProgram, labelBackgroundProgram }`
- *
- * @example
- * ```typescript
- * import { createEdgeProgram, pathLine, pathCurved, extremityArrow, layerPlain } from "sigma/rendering";
- *
- * // Simple line (no extremities needed - "none" is implicit)
- * const { program: EdgeLineProgram } = createEdgeProgram({
- *   paths: [pathLine()],
- *   layers: [layerPlain()],
- * });
- *
- * // Arrow at head
- * const { program: EdgeArrowProgram } = createEdgeProgram({
- *   paths: [pathLine()],
- *   extremities: [extremityArrow()],
- *   layers: [layerPlain()],
- *   defaultHead: "arrow",
- * });
- *
- * // Multi-path: edges select path/extremity via attributes
- * const { program: MultiEdgeProgram } = createEdgeProgram({
- *   paths: [pathLine(), pathCurved()],
- *   extremities: [extremityArrow()],
- *   layers: [layerPlain()],
- * });
- * // Edges select via: { path: "curved", head: "arrow", tail: "none" }
- * ```
+ * @returns A bundle `{ edgeProgram, labelProgram, labelBackgroundProgram }`
  */
 export interface ResolvedEdgeIds {
   pathId: number;
@@ -106,7 +84,12 @@ export function createEdgeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: EdgeProgramOptions) {
+>(
+  gl: WebGL2RenderingContext,
+  pickingBuffer: WebGLFramebuffer | null,
+  renderer: Sigma<N, E, G>,
+  options: EdgeProgramOptions,
+): EdgeProgramBundle<N, E, G> {
   const normalized = normalizeEdgeProgramOptions(options);
   const { paths, layers, defaultHead, defaultTail } = normalized;
 
@@ -132,7 +115,7 @@ export function createEdgeProgram<
   // Compute attribute layout once for this program configuration (all layers)
   const attributeLayout: AttributeLayout = computeAttributeLayout([...paths, ...layers]);
 
-  // Create the edge program class
+  // Build the edge program instance
   const EdgeProgramClass = class extends Program<string, N, E, G> {
     // Lifecycle hooks storage for all layers
     private layerLifecycles: Map<number, EdgeLifecycleHooks> = new Map();
@@ -700,31 +683,43 @@ export function createEdgeProgram<
 
   // SDF text along the edge path, and the ribbon behind it. Both programs
   // consume the same resolved shader config, so the ribbon cannot drift
-  // from the text it pairs with.
-  const LabelProgramClass = createEdgeLabelProgram(labelFactoryOptions);
-  const LabelBackgroundProgramClass = createEdgeLabelBackgroundProgram({ shaderConfig: labelShaderConfig });
+  // from the text it pairs with. The label background gets the picking
+  // framebuffer so label events can be wired onto the ribbon.
+  const labelProgram = createEdgeLabelProgram(gl, null, renderer, labelFactoryOptions);
+  const labelBackgroundProgram = createEdgeLabelBackgroundProgram(gl, pickingBuffer, renderer, {
+    shaderConfig: labelShaderConfig,
+  });
 
   return {
-    program: EdgeProgramClass,
-    labelProgram: LabelProgramClass,
-    labelBackgroundProgram: LabelBackgroundProgramClass,
+    edgeProgram: new EdgeProgramClass(gl, null, renderer),
+    labelProgram,
+    labelBackgroundProgram,
   };
 }
 
-export type EdgeProgramBundle<
+export interface EdgeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = ReturnType<typeof createEdgeProgram<N, E, G>>;
+> extends Program<string, N, E, G> {
+  resolveEdgeIds(data: EdgeDisplayData, isSelfLoop: boolean, isParallel: boolean): ResolvedEdgeIds;
+  process(
+    edgeIndex: number,
+    offset: number,
+    sourceData: NodeDisplayData,
+    targetData: NodeDisplayData,
+    data: EdgeDisplayData,
+    edgeTextureIndex: number,
+  ): void;
+  uploadAttributeTexture(): void;
+}
 
-export type EdgeProgramType<
+export interface EdgeProgramBundle<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = EdgeProgramBundle<N, E, G>["program"];
-
-export type EdgeProgram<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = InstanceType<EdgeProgramType<N, E, G>>;
+> {
+  edgeProgram: EdgeProgram<N, E, G>;
+  labelProgram: EdgeLabelProgram<N, E, G>;
+  labelBackgroundProgram: EdgeLabelBackgroundProgram<N, E, G>;
+}

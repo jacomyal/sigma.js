@@ -11,7 +11,7 @@
 import { Attributes } from "graphology-types";
 
 import Sigma from "../../sigma";
-import { NodeDisplayData, RenderParams } from "../../types";
+import { LabelDisplayData, NodeDisplayData, RenderParams } from "../../types";
 import { indexToColor } from "../../utils";
 import {
   AttrDescriptor,
@@ -23,55 +23,41 @@ import {
 import { Program } from "../program";
 import { getShapeId, registerShapeInstance } from "../shapes";
 import { ProgramInfo } from "../utils";
-import { createBackdropProgram } from "./backdrops";
+import { type BackdropProgram, createBackdropProgram } from "./backdrops";
 import { generateShaders } from "./generator";
-import { createLabelBackgroundProgram, createLabelProgram } from "./labels";
+import {
+  type LabelBackgroundProgram,
+  type LabelProgram,
+  createLabelBackgroundProgram,
+  createLabelProgram,
+} from "./labels";
 import { FragmentLayer, LayerLifecycleContext, LayerLifecycleHooks, NodeProgramOptions } from "./types";
 
 // Texture unit for layer attribute texture (units 0-4 used by sigma, unit 5 for layer attributes)
 const LAYER_ATTRIBUTE_TEXTURE_UNIT = 5;
 
 /**
- * Creates a node program suite from SDF shape(s) and fragment layers. The
- * suite is a flat bundle: the node program class plus the matching label,
- * backdrop, and label-background program classes, alongside the shape
+ * Builds a node program suite from SDF shape(s) and fragment layers. The
+ * suite is a flat bundle of instances: the node program plus the matching
+ * label, backdrop, and label-background programs, alongside the shape
  * registry metadata sigma needs for multi-shape programs.
  *
  * Supports two modes:
- * - Single shape: Use `shape` for a program that renders one shape type
- * - Multi-shape: Use `shapes` for a program that can render different shapes per node
+ * - Single shape: a program that renders one shape type
+ * - Multi-shape: a program that can render different shapes per node
  *
- * @param options - Configuration for the node program
- * @returns A bundle `{ program, labelProgram, backdropProgram, labelBackgroundProgram, shapeSlug, shapeNameToIndex, shapeGlobalIds }`
- *
- * @example
- * ```typescript
- * // Single shape (backward compatible)
- * import { createNodeProgram, sdfCircle, layerFill } from "sigma/rendering";
- *
- * const { program: CircleProgram } = createNodeProgram({
- *   shape: sdfCircle(),
- *   layers: [layerFill()],
- * });
- * ```
- *
- * @example
- * ```typescript
- * // Multi-shape program
- * const { program: MultiShapeProgram } = createNodeProgram({
- *   shapes: [sdfCircle(), sdfSquare(), sdfTriangle(), sdfDiamond()],
- *   layers: [layerFill(), layerBorder({ ... })],
- * });
- *
- * // Nodes select their shape via the 'shape' attribute
- * graph.setNodeAttribute(node, 'shape', 'square');
- * ```
+ * @returns `{ nodeProgram, labelProgram, backdropProgram, labelBackgroundProgram, shapeSlug, shapeNameToIndex, shapeGlobalIds }`
  */
 export function createNodeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: NodeProgramOptions) {
+>(
+  gl: WebGL2RenderingContext,
+  pickingBuffer: WebGLFramebuffer | null,
+  renderer: Sigma<N, E, G>,
+  options: NodeProgramOptions,
+): NodeProgramBundle<N, E, G> {
   const { rotateWithCamera = false, label: labelOptions = {}, shapes } = options;
 
   if (shapes.length === 0) {
@@ -105,23 +91,21 @@ export function createNodeProgram<
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
   });
 
-  // Create the label program class with all shapes (for multi-shape support)
-  const LabelProgramClass = createLabelProgram({
+  // Companion programs (instances). LabelBackgroundProgram gets the
+  // picking framebuffer so label events can be wired onto the label
+  // rect; the other companions don't write picking IDs and get null.
+  const labelProgram = createLabelProgram(gl, null, renderer, {
     shapes,
     rotateWithCamera,
     label: labelOptions,
   });
-
-  // Create the backdrop program class with all shapes (for multi-shape support)
-  const BackdropProgramClass = createBackdropProgram({
+  const backdropProgram = createBackdropProgram(gl, null, renderer, {
     shapes,
     rotateWithCamera,
     label: labelOptions,
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
   });
-
-  // Create the label background program class (for label picking and optional visual background)
-  const LabelBackgroundProgramClass = createLabelBackgroundProgram({
+  const labelBackgroundProgram = createLabelBackgroundProgram(gl, pickingBuffer, renderer, {
     shapes,
     rotateWithCamera,
     label: labelOptions,
@@ -131,7 +115,7 @@ export function createNodeProgram<
   // Compute layout once for all instances
   const layerAttributeLayout = computeAttributeLayout(layers);
 
-  // Create the node program class
+  // Build the node program class (instantiated at the bottom)
   const NodeProgramClass = class extends Program<string, N, E, G> {
     // Static shared texture per GL context
     private static layerTextures = new WeakMap<WebGL2RenderingContext, ItemAttributeTexture>();
@@ -444,10 +428,10 @@ export function createNodeProgram<
   };
 
   return {
-    program: NodeProgramClass,
-    labelProgram: LabelProgramClass,
-    backdropProgram: BackdropProgramClass,
-    labelBackgroundProgram: LabelBackgroundProgramClass,
+    nodeProgram: new NodeProgramClass(gl, null, renderer),
+    labelProgram,
+    backdropProgram,
+    labelBackgroundProgram,
     // Shape registry metadata (consumed by sigma when the program is multi-shape).
     shapeSlug: primaryShapeSlug,
     shapeNameToIndex: shapes.length > 1 ? shapeNameToIndex : undefined,
@@ -455,20 +439,27 @@ export function createNodeProgram<
   };
 }
 
-export type NodeProgramBundle<
+export interface NodeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = ReturnType<typeof createNodeProgram<N, E, G>>;
+> extends Program<string, N, E, G> {
+  process(nodeIndex: number, offset: number, data: NodeDisplayData, textureIndex: number, nodeKey: string): void;
+  allocateNode(nodeKey: string): void;
+  freeNode(nodeKey: string): void;
+  uploadLayerTexture(): void;
+}
 
-export type NodeProgramType<
+export interface NodeProgramBundle<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = NodeProgramBundle<N, E, G>["program"];
-
-export type NodeProgram<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = InstanceType<NodeProgramType<N, E, G>>;
+> {
+  nodeProgram: NodeProgram<N, E, G>;
+  labelProgram: LabelProgram<string, N, E, G, LabelDisplayData>;
+  backdropProgram: BackdropProgram<N, E, G>;
+  labelBackgroundProgram: LabelBackgroundProgram<N, E, G>;
+  shapeSlug: string | undefined;
+  shapeNameToIndex: Record<string, number> | undefined;
+  shapeGlobalIds: number[] | undefined;
+}

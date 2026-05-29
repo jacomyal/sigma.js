@@ -13,15 +13,6 @@ import { SDFShape } from "../types";
  * A circle has no configurable options - it's always a perfect circle.
  *
  * @returns Circle SDF shape definition
- *
- * @example
- * ```typescript
- * const circleShape = sdfCircle();
- * const program = createNodeProgram({
- *   shape: circleShape,
- *   layers: [layerFill()],
- * });
- * ```
  */
 export function sdfCircle(): SDFShape {
   // language=GLSL

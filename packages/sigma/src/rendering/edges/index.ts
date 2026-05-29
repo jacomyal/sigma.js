@@ -9,7 +9,7 @@
  */
 
 // Program type aliases and edge-id resolution result
-export type { EdgeProgram, EdgeProgramType, EdgeProgramBundle, ResolvedEdgeIds } from "./factory";
+export type { EdgeProgram, EdgeProgramBundle, ResolvedEdgeIds } from "./factory";
 
 // Types
 export type {
@@ -75,12 +75,7 @@ export {
 export { generateEdgeShaders, type EdgeShaderGenerationOptions } from "./generator";
 
 // Edge labels
-export {
-  createEdgeLabelProgram,
-  type CreateEdgeLabelProgramOptions,
-  type EdgeLabelProgram,
-  type EdgeLabelProgramType,
-} from "./labels/factory";
+export { createEdgeLabelProgram, type CreateEdgeLabelProgramOptions, type EdgeLabelProgram } from "./labels/factory";
 export {
   generateEdgeLabelShaders,
   type EdgeLabelShaderOptions,
@@ -90,6 +85,5 @@ export {
   createEdgeLabelBackgroundProgram,
   type EdgeLabelBackgroundProgram,
   type EdgeLabelBackgroundData,
-  type EdgeLabelBackgroundProgramType,
   type CreateEdgeLabelBackgroundProgramOptions,
 } from "./labels/background";

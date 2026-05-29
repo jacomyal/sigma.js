@@ -8,10 +8,9 @@
  */
 
 export { LabelProgram } from "./base";
-export type { LabelProgramType } from "./base";
 
 export { createLabelBackgroundProgram } from "./background";
-export type { LabelBackgroundData, LabelBackgroundProgram, LabelBackgroundProgramType } from "./background";
+export type { LabelBackgroundData, LabelBackgroundProgram } from "./background";
 
 export { createLabelProgram } from "./factory";
 export type { CreateLabelProgramOptions } from "./factory";

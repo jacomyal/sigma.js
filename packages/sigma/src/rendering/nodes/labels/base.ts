@@ -7,7 +7,6 @@
  */
 import { Attributes } from "graphology-types";
 
-import type Sigma from "../../../sigma";
 import type { LabelDisplayData } from "../../../types";
 import { Program } from "../../program";
 import { ProgramInfo } from "../../utils";
@@ -36,23 +35,14 @@ export abstract class LabelProgram<
   G extends Attributes = Attributes,
   DataType extends LabelDataBase = LabelDisplayData,
 > extends Program<Uniform, N, E, G> {
-  /**
-   * Ensure all glyphs for the given texts are generated and available.
-   * Optional — implementations may provide this for glyph caching.
-   */
-  ensureGlyphsReady?(texts: string[], fontKey?: string): void;
+  /** Ensure all glyphs for the given texts are generated and available. */
+  abstract ensureGlyphsReady(texts: string[], fontKey?: string): void;
 
-  /**
-   * Register a font for use in labels.
-   * Optional — implementations may provide this for multi-font support.
-   */
-  registerFont?(family: string, weight?: string, style?: string): string;
+  /** Register a font for use in labels and return its lookup key. */
+  abstract registerFont(family: string, weight?: string, style?: string): string;
 
-  /**
-   * Measure a label using the same glyph metrics as rendering.
-   * Optional — only available when the implementation uses an SDF atlas.
-   */
-  measureLabel?(text: string, fontSize: number, fontKey?: string): { width: number; height: number };
+  /** Measure a label using the same glyph metrics as rendering. */
+  abstract measureLabel(text: string, fontSize: number, fontKey?: string): { width: number; height: number };
 
   /**
    * Total number of characters currently in the buffer.
@@ -132,13 +122,3 @@ export abstract class LabelProgram<
     }
   }
 }
-
-export type LabelProgramType<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = new (
-  gl: WebGL2RenderingContext,
-  pickingBuffer: WebGLFramebuffer | null,
-  renderer: Sigma<N, E, G>,
-) => LabelProgram<string, N, E, G>;

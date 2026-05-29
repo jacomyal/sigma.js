@@ -27,15 +27,6 @@ export interface CurvedPathOptions {
  *
  * @param options - Path configuration
  * @returns EdgePath definition for curved edges
- *
- * @example
- * ```typescript
- * const EdgeCurvedProgram = createEdgeProgram({
- *   paths: [pathCurved({ segments: 16 })],
- *   extremities: [extremityNone(), extremityArrow()],
- *   layers: [layerPlain()],
- * });
- * ```
  */
 export function pathCurved(options?: CurvedPathOptions): EdgePath {
   const { segments = 16 } = options ?? {};

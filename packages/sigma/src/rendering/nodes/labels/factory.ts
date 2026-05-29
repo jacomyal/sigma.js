@@ -2,13 +2,13 @@
  * Sigma.js Node Label Program Factory
  * ====================================
  *
- * Factory function that creates a LabelProgram class from an SDF shape definition.
- * The resulting label program uses the shape's SDF to compute exact edge positions,
- * enabling accurate label placement next to any node shape.
+ * Builds a node label program instance from an SDF shape definition. The
+ * program uses the shape's SDF to compute exact edge positions, so labels
+ * sit precisely next to the node's actual shape boundary.
  *
  * ## Overview
  *
- * This factory generates a WebGL label program that:
+ * The program:
  * 1. Renders text using SDF (Signed Distance Field) atlas for crisp text at any zoom
  * 2. Positions labels relative to the node's actual shape boundary (not just center)
  * 3. Supports multiple label positions: right, left, above, below, over
@@ -30,7 +30,6 @@ import { POSITION_MODE_MAP } from "../../glsl";
 import { InstancedProgramDefinition, ProgramInfo } from "../../utils";
 import { LabelOptions, SDFShape } from "../types";
 import { LabelProgram } from "./base";
-import type { LabelProgramType } from "./base";
 import { LabelShaderOptions, generateLabelShaders } from "./generator";
 
 // ============================================================================
@@ -81,30 +80,23 @@ interface LabelGlyphCache {
 // ============================================================================
 
 /**
- * Creates a label program from an SDF shape.
+ * Builds a node label program instance. The program renders text labels
+ * with shape-aware positioning, using the shape's SDF to compute exact
+ * edge distances for any direction.
  *
- * The resulting program renders text labels with shape-aware positioning,
- * using the shape's SDF to compute exact edge distances for any direction.
- *
- * @param options Configuration for the label program
- * @returns A LabelProgram class constructor
- *
- * @example
- * ```typescript
- * const SquareLabelProgram = createLabelProgram({
- *   shape: sdfSquare({ cornerRadius: 0.1 }),
- * });
- *
- * const sigma = new Sigma(graph, container, {
- *   labelProgramClasses: { default: SquareLabelProgram },
- * });
- * ```
+ * `createNodeProgram` calls this internally and exposes the instance in
+ * its `labelProgram` field.
  */
 export function createLabelProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: CreateLabelProgramOptions): LabelProgramType<N, E, G> {
+>(
+  gl: WebGL2RenderingContext,
+  pickingBuffer: WebGLFramebuffer | null,
+  renderer: Sigma<N, E, G>,
+  options: CreateLabelProgramOptions,
+): LabelProgram<string, N, E, G, LabelDisplayData> {
   const { rotateWithCamera = false, label: labelOptions = {}, shapes } = options;
   const labelMargin = labelOptions.margin ?? 5;
   const zoomToLabelSizeRatioFunction = labelOptions.zoomToLabelSizeRatioFunction ?? (() => 1);
@@ -131,16 +123,7 @@ export function createLabelProgram<
     | "u_zoomLabelSizeRatio"
     | string; // Allow shape-specific uniforms
 
-  // -------------------------------------------------------------------------
-  // Return the LabelProgram class
-  // -------------------------------------------------------------------------
-  return class NodeLabelProgram extends LabelProgram<LabelUniform, N, E, G, LabelDisplayData> {
-    /** Static reference to the options used to create this program */
-    static readonly programOptions = options;
-
-    /** Static reference to the generated shader code */
-    static readonly generatedShaders = generatedShaders;
-
+  class NodeLabelProgram extends LabelProgram<LabelUniform, N, E, G, LabelDisplayData> {
     /** Static reference to the label margin */
     static readonly labelMargin = labelMargin;
 
@@ -633,5 +616,7 @@ export function createLabelProgram<
 
       super.kill();
     }
-  };
+  }
+
+  return new NodeLabelProgram(gl, pickingBuffer, renderer);
 }

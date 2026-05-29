@@ -16,8 +16,9 @@
  *     hovering or clicking a label area fires the appropriate events.
  *
  * Body bounds, visibility ramp, and perpendicular offset come from the
- * shared helpers in `shared-shader-glsl.ts`. Resolved shader config is
- * read from the edge label program class so the two programs cannot drift.
+ * shared helpers in `shared-shader-glsl.ts`. The same resolved shader
+ * config is fed to both this factory and the edge label factory so the
+ * two programs cannot drift.
  *
  * @module
  */
@@ -291,7 +292,12 @@ export function createEdgeLabelBackgroundProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: CreateEdgeLabelBackgroundProgramOptions) {
+>(
+  gl: WebGL2RenderingContext,
+  pickingBuffer: WebGLFramebuffer | null,
+  renderer: Sigma<N, E, G>,
+  options: CreateEdgeLabelBackgroundProgramOptions,
+): EdgeLabelBackgroundProgram<N, E, G> {
   const { shaderConfig } = options;
   const { paths, fontSizeMode } = shaderConfig;
 
@@ -305,11 +311,11 @@ export function createEdgeLabelBackgroundProgram<
   const labelLayer = layerPlain();
   const attributeLayout = computeAttributeLayout([...paths, labelLayer]);
   const attrDescriptors = buildAttrDescriptors([...paths, labelLayer], attributeLayout);
-  let vertexShader: string | null = null;
+  const vertexShader = generateVertexShader(shaderConfig);
 
   type U = string;
 
-  return class GeneratedEdgeLabelBackgroundProgram extends Program<U, N, E, G> {
+  class GeneratedEdgeLabelBackgroundProgram extends Program<U, N, E, G> {
     protected totalCount = 0;
     protected bufferCapacity = 0;
 
@@ -317,8 +323,6 @@ export function createEdgeLabelBackgroundProgram<
     private packedAttributeData: Float32Array;
 
     constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
-      if (!vertexShader) vertexShader = generateVertexShader(shaderConfig);
-
       super(gl, pickingBuffer, renderer);
 
       this.edgeAttributeTexture = new ItemAttributeTexture(gl, attributeLayout);
@@ -349,7 +353,7 @@ export function createEdgeLabelBackgroundProgram<
 
       return {
         VERTICES: RIBBON_VERTICES,
-        VERTEX_SHADER_SOURCE: vertexShader!,
+        VERTEX_SHADER_SOURCE: vertexShader,
         FRAGMENT_SHADER_SOURCE: FRAGMENT_SHADER,
         METHOD: TRIANGLE_STRIP,
         UNIFORMS: uniforms as U[],
@@ -456,17 +460,15 @@ export function createEdgeLabelBackgroundProgram<
         super.reallocate(this.bufferCapacity);
       }
     }
-  };
+  }
+
+  return new GeneratedEdgeLabelBackgroundProgram(gl, pickingBuffer, renderer);
 }
 
-export type EdgeLabelBackgroundProgramType<
+export interface EdgeLabelBackgroundProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = ReturnType<typeof createEdgeLabelBackgroundProgram<N, E, G>>;
-
-export type EdgeLabelBackgroundProgram<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = InstanceType<EdgeLabelBackgroundProgramType<N, E, G>>;
+> extends Program<string, N, E, G> {
+  processEdgeLabelBackground(offset: number, labelKey: string, data: EdgeLabelBackgroundData): void;
+}

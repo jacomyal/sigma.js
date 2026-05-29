@@ -2,9 +2,9 @@
  * Sigma.js Backdrop Program Factory
  * ==================================
  *
- * Factory function that creates a backdrop program class from an SDF shape
- * definition. The resulting program renders the union of an enlarged node
- * shape and a label rectangle, with a soft shadow effect.
+ * Builds a backdrop program instance from an SDF shape definition. The
+ * program renders the union of an enlarged node shape and a label
+ * rectangle, with a soft shadow effect.
  *
  * @module
  */
@@ -55,7 +55,12 @@ export function createBackdropProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
->(options: CreateBackdropProgramOptions) {
+>(
+  gl: WebGL2RenderingContext,
+  pickingBuffer: WebGLFramebuffer | null,
+  renderer: Sigma<N, E, G>,
+  options: CreateBackdropProgramOptions,
+): BackdropProgram<N, E, G> {
   const { rotateWithCamera = false, label: labelOptions = {}, shapes, shapeGlobalIds } = options;
 
   if (shapes.length === 0) {
@@ -70,17 +75,11 @@ export function createBackdropProgram<
 
   type BackdropUniform = string;
 
-  return class NodeBackdropProgram extends Program<BackdropUniform, N, E, G> {
-    static readonly programOptions = options;
-    static readonly generatedShaders = generatedShaders;
+  class NodeBackdropProgram extends Program<BackdropUniform, N, E, G> {
     static readonly labelMargin = labelMargin;
 
     protected totalBackdropCount = 0;
     protected bufferCapacity = 0;
-
-    constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
-      super(gl, pickingBuffer, renderer);
-    }
 
     getDefinition(): InstancedProgramDefinition<BackdropUniform> {
       const { FLOAT, TRIANGLE_STRIP } = WebGL2RenderingContext;
@@ -202,17 +201,15 @@ export function createBackdropProgram<
         super.reallocate(this.bufferCapacity);
       }
     }
-  };
+  }
+
+  return new NodeBackdropProgram(gl, pickingBuffer, renderer);
 }
 
-export type BackdropProgramType<
+export interface BackdropProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
-> = ReturnType<typeof createBackdropProgram<N, E, G>>;
-
-export type BackdropProgram<
-  N extends Attributes = Attributes,
-  E extends Attributes = Attributes,
-  G extends Attributes = Attributes,
-> = InstanceType<BackdropProgramType<N, E, G>>;
+> extends Program<string, N, E, G> {
+  processBackdrop(offset: number, data: BackdropDisplayData): void;
+}

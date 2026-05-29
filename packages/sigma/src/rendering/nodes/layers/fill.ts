@@ -20,27 +20,6 @@ export interface LayerFillOptions {
  *
  * @param options - Optional configuration
  * @returns Fill layer definition
- *
- * @example
- * ```typescript
- * // Use node color (default)
- * const program = createNodeProgram({
- *   shapes: [sdfCircle()],
- *   layers: [layerFill()],
- * });
- *
- * // Use fixed color
- * const redProgram = createNodeProgram({
- *   shapes: [sdfCircle()],
- *   layers: [layerFill({ color: "#ff0000" })],
- * });
- *
- * // Use a custom attribute
- * const customProgram = createNodeProgram({
- *   shapes: [sdfCircle()],
- *   layers: [layerFill({ color: { attribute: "fillColor" } })],
- * });
- * ```
  */
 export function layerFill(options?: LayerFillOptions): FragmentLayer {
   const { UNSIGNED_BYTE } = WebGL2RenderingContext;
