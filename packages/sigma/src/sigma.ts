@@ -63,7 +63,7 @@ function applyNodeDefaults<
 >(settings: Settings<N, E, G>, key: string, data: Partial<NodeDisplayData>): NodeDisplayData {
   if (!hasOwnProperty.call(data, "x") || !hasOwnProperty.call(data, "y"))
     throw new Error(
-      `Sigma: could not find a valid position (x, y) for node "${key}". All your nodes must have a number "x" and "y". Maybe your forgot to apply a layout or your "nodeReducer" is not returning the correct data?`,
+      `Sigma: could not find a valid position (x, y) for node "${key}". All your nodes must have a number "x" and "y". Maybe you forgot to apply a layout or your "nodeReducer" is not returning the correct data?`,
     );
 
   if (!data.color) data.color = settings.defaultNodeColor;
@@ -1377,7 +1377,7 @@ export default class Sigma<
   }
 
   /**
-   * Update a node the internal data structures.
+   * Update a node in the internal data structures.
    * @private
    * @param key The node's graphology ID
    */
@@ -1399,7 +1399,7 @@ export default class Sigma<
     delete this.nodeDataCache[key];
     // Remove from node program index
     delete this.nodeProgramIndex[key];
-    // Remove from higlighted nodes
+    // Remove from highlighted nodes
     this.highlightedNodes.delete(key);
     // Remove from hovered
     if (this.hoveredNode === key) this.hoveredNode = null;
@@ -1530,7 +1530,7 @@ export default class Sigma<
    * Add the node data to its program.
    * @private
    * @param node The node's graphology ID
-   * @param fingerprint A fingerprint used to identity the node with picking
+   * @param fingerprint A fingerprint used to identify the node with picking
    * @param position The index where to place the node in the program
    */
   private addNodeToProgram(node: string, fingerprint: number, position: number): void {
@@ -1546,7 +1546,7 @@ export default class Sigma<
    * Add the edge data to its program.
    * @private
    * @param edge The edge's graphology ID
-   * @param fingerprint A fingerprint used to identity the edge with picking
+   * @param fingerprint A fingerprint used to identify the edge with picking
    * @param position The index where to place the edge in the program
    */
   private addEdgeToProgram(edge: string, fingerprint: number, position: number): void {
