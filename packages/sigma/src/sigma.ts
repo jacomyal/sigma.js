@@ -2248,7 +2248,7 @@ export default class Sigma<
    * of computations.
    */
   viewportToFramedGraph(coordinates: Coordinates, override: CoordinateConversionOverride = {}): Coordinates {
-    const recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !override.graphDimensions;
+    const recomputeMatrix = !!override.cameraState || !!override.viewportDimensions || !!override.graphDimensions;
     const invMatrix = override.matrix
       ? override.matrix
       : recomputeMatrix
