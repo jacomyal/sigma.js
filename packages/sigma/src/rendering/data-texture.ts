@@ -84,6 +84,9 @@ export class DataTexture {
     const { gl } = this;
 
     this.texture = gl.createTexture();
+
+    // Bind on unit 0 (scratch); other units hold live textures we must not disturb
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
     // RGBA32F format for full float precision, 2D layout
@@ -211,6 +214,8 @@ export class DataTexture {
 
     const { gl, textureWidth } = this;
 
+    // Bind on unit 0 (scratch); other units hold live textures we must not disturb
+    gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
     // Convert item range to texel range
