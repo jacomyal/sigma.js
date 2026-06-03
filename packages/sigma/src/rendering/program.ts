@@ -22,6 +22,43 @@ import {
   loadVertexShader,
 } from "./utils";
 
+/**
+ * Sets a single typed GLSL uniform from its specification. Sampler uniforms are
+ * bound separately, so they're skipped.
+ */
+export function setGLSLUniform(
+  gl: WebGL2RenderingContext,
+  location: WebGLUniformLocation | null,
+  uniform: UniformSpecification,
+): void {
+  if (!location || uniform.type === "sampler2D") return;
+
+  switch (uniform.type) {
+    case "float":
+      gl.uniform1f(location, uniform.value);
+      break;
+    case "int":
+    case "bool":
+      gl.uniform1i(location, uniform.value);
+      break;
+    case "vec2":
+      gl.uniform2fv(location, uniform.value);
+      break;
+    case "vec3":
+      gl.uniform3fv(location, uniform.value);
+      break;
+    case "vec4":
+      gl.uniform4fv(location, uniform.value);
+      break;
+    case "mat3":
+      gl.uniformMatrix3fv(location, false, uniform.value);
+      break;
+    case "mat4":
+      gl.uniformMatrix4fv(location, false, uniform.value);
+      break;
+  }
+}
+
 const SIZE_FACTOR_PER_ATTRIBUTE_TYPE: Record<number, number> = {
   [WebGL2RenderingContext.BOOL]: 1,
   [WebGL2RenderingContext.BYTE]: 1,
@@ -334,37 +371,7 @@ export abstract class Program<
   }
 
   protected setTypedUniform(uniform: UniformSpecification, programInfo: ProgramInfo): void {
-    const { gl, uniformLocations } = programInfo;
-    const location = uniformLocations[uniform.name];
-    if (!location) return;
-
-    // Sampler uniforms are bound separately
-    if (uniform.type === "sampler2D") return;
-
-    switch (uniform.type) {
-      case "float":
-        gl.uniform1f(location, uniform.value);
-        break;
-      case "int":
-      case "bool":
-        gl.uniform1i(location, uniform.value);
-        break;
-      case "vec2":
-        gl.uniform2fv(location, uniform.value);
-        break;
-      case "vec3":
-        gl.uniform3fv(location, uniform.value);
-        break;
-      case "vec4":
-        gl.uniform4fv(location, uniform.value);
-        break;
-      case "mat3":
-        gl.uniformMatrix3fv(location, false, uniform.value);
-        break;
-      case "mat4":
-        gl.uniformMatrix4fv(location, false, uniform.value);
-        break;
-    }
+    setGLSLUniform(programInfo.gl, programInfo.uniformLocations[uniform.name] ?? null, uniform);
   }
 
   abstract setUniforms(params: RenderParams, programInfo: ProgramInfo): void;
