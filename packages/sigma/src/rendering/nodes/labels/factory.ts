@@ -554,7 +554,11 @@ export function createLabelProgram<
     /**
      * Measures a label using the same glyph advance metrics as rendering.
      */
-    measureLabel(text: string, fontSize: number, fontKey?: string): { width: number; height: number } {
+    measureLabel(
+      text: string,
+      fontSize: number,
+      fontKey?: string,
+    ): { width: number; height: number; textHeight: number } {
       const actualFontKey = fontKey || this.defaultFontKey;
 
       this.atlasManager.ensureGlyphs(text, actualFontKey);
@@ -563,17 +567,25 @@ export function createLabelProgram<
       }
 
       let totalWidth = 0;
+      let maxAscent = 0;
+      let maxDescent = 0;
       for (const char of text) {
         const charCode = char.codePointAt(0);
         if (charCode === undefined) continue;
         const glyph = this.atlasManager.getGlyph(charCode, actualFontKey);
         if (glyph) {
           totalWidth += glyph.advance;
+          maxAscent = Math.max(maxAscent, glyph.bearingY);
+          maxDescent = Math.max(maxDescent, glyph.atlasHeight - glyph.bearingY);
         }
       }
 
       const scale = fontSize / this.atlasFontSize;
-      return { width: totalWidth * scale, height: fontSize };
+
+      // - height is the font size (line box)
+      // - textHeight is the actual glyph extent (maxAscent + maxDescent), used
+      //   to vertically center the label box on text.
+      return { width: totalWidth * scale, height: fontSize, textHeight: (maxAscent + maxDescent) * scale };
     }
 
     /**

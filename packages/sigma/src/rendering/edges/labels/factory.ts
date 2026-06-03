@@ -680,10 +680,14 @@ export function createEdgeLabelProgram<
      * grid never measures edge labels (only node labels), so this exists
      * mainly to satisfy the `LabelProgram` contract.
      */
-    measureLabel(text: string, fontSize: number, fontKey?: string): { width: number; height: number } {
+    measureLabel(
+      text: string,
+      fontSize: number,
+      fontKey?: string,
+    ): { width: number; height: number; textHeight: number } {
       const atlasWidth = this.measureLabelAtlasWidth(text, fontKey);
       const scale = fontSize / DEFAULT_SDF_ATLAS_OPTIONS.fontSize;
-      return { width: atlasWidth * scale, height: fontSize };
+      return { width: atlasWidth * scale, height: fontSize, textHeight: fontSize };
     }
 
     // -----------------------------------------------------------------------

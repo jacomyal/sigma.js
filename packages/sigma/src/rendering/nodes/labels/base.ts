@@ -42,7 +42,11 @@ export abstract class LabelProgram<
   abstract registerFont(family: string, weight?: string, style?: string): string;
 
   /** Measure a label using the same glyph metrics as rendering. */
-  abstract measureLabel(text: string, fontSize: number, fontKey?: string): { width: number; height: number };
+  abstract measureLabel(
+    text: string,
+    fontSize: number,
+    fontKey?: string,
+  ): { width: number; height: number; textHeight: number };
 
   /**
    * Total number of characters currently in the buffer.
