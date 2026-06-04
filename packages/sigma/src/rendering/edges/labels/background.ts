@@ -158,11 +158,9 @@ ${textureFetch.fetchCode}
 ${textureFetch.varyingAssignments}
   }
 
-  // --- Fetch node data (x, y, size, shapeId) ---
-  ivec2 srcTC = ivec2(srcIdx % u_nodeDataTextureWidth, srcIdx / u_nodeDataTextureWidth);
-  ivec2 tgtTC = ivec2(tgtIdx % u_nodeDataTextureWidth, tgtIdx / u_nodeDataTextureWidth);
-  vec4 srcN = texelFetch(u_nodeDataTexture, srcTC, 0);
-  vec4 tgtN = texelFetch(u_nodeDataTexture, tgtTC, 0);
+  // --- Fetch node data: geometry (texel 0) + rotation flags (texel 1) ---
+  vec4 srcN = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx);
+  vec4 tgtN = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx);
 
   vec2 source = srcN.xy;
   vec2 target = tgtN.xy;
@@ -172,6 +170,8 @@ ${textureFetch.varyingAssignments}
   v_targetNodeSize = targetSize;
   int sourceShapeId = int(srcN.w);
   int targetShapeId = int(tgtN.w);
+  float sourceRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx).r;
+  float targetRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx).r;
 
   // --- Pixel-to-graph conversion (fixed font mode) ---
   float matrixScaleX = length(vec2(u_matrix[0][0], u_matrix[1][0]));
@@ -181,8 +181,8 @@ ${textureFetch.varyingAssignments}
 
   // --- Body bounds (shared with edge label shader) ---
   vec3 bodyBounds = computeEdgeLabelBodyBounds(
-    pathId, source, sourceSize, sourceShapeId,
-    target, targetSize, targetShapeId,
+    pathId, source, sourceSize, sourceShapeId, sourceRotateAlign,
+    target, targetSize, targetShapeId, targetRotateAlign,
     webGLThickness, HEAD_RATIO, TAIL_RATIO
   );
   float bodyStartDist = bodyBounds.x;

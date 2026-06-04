@@ -24,15 +24,21 @@
  */
 export function generateFindSourceClampT(pathName: string): string {
   return /*glsl*/ `
-float findSourceClampT_${pathName}(vec2 source, float sourceSize, int sourceShapeId, vec2 target, float margin) {
+float findSourceClampT_${pathName}(vec2 source, float sourceSize, int sourceShapeId, float sourceRotateAlign, vec2 target, float margin) {
   float lo = 0.0, hi = 0.5;
   float nodeExtent = sourceSize * u_correctionRatio / u_sizeRatio * 2.0;
   float effectiveSize = 1.0 - u_correctionRatio / nodeExtent;
 
+  // Counter-rotate the query point so viewport-aligned nodes (rotateAlign=0) are
+  // clamped against their on-screen orientation; graph-aligned nodes skip it.
+  float ca = u_cameraAngle * (1.0 - sourceRotateAlign);
+  float rc = cos(ca), rs = sin(ca);
+  mat2 rot = mat2(rc, -rs, rs, rc);
+
   for (int i = 0; i < 12; i++) {
     float mid = (lo + hi) * 0.5;
     vec2 pos = path_${pathName}_position(mid, source, target);
-    vec2 localPos = (pos - source) / nodeExtent;
+    vec2 localPos = rot * ((pos - source) / nodeExtent);
     float sdf = querySDF(sourceShapeId, localPos, effectiveSize);
     if (sdf < 0.0) lo = mid;
     else hi = mid;
@@ -57,15 +63,20 @@ float findSourceClampT_${pathName}(vec2 source, float sourceSize, int sourceShap
  */
 export function generateFindTargetClampT(pathName: string): string {
   return /*glsl*/ `
-float findTargetClampT_${pathName}(vec2 source, vec2 target, float targetSize, int targetShapeId, float margin) {
+float findTargetClampT_${pathName}(vec2 source, vec2 target, float targetSize, int targetShapeId, float targetRotateAlign, float margin) {
   float lo = 0.5, hi = 1.0;
   float nodeExtent = targetSize * u_correctionRatio / u_sizeRatio * 2.0;
   float effectiveSize = 1.0 - u_correctionRatio / nodeExtent;
 
+  // See findSourceClampT_ for the rotation rationale.
+  float ca = u_cameraAngle * (1.0 - targetRotateAlign);
+  float rc = cos(ca), rs = sin(ca);
+  mat2 rot = mat2(rc, -rs, rs, rc);
+
   for (int i = 0; i < 12; i++) {
     float mid = (lo + hi) * 0.5;
     vec2 pos = path_${pathName}_position(mid, source, target);
-    vec2 localPos = (pos - target) / nodeExtent;
+    vec2 localPos = rot * ((pos - target) / nodeExtent);
     float sdf = querySDF(targetShapeId, localPos, effectiveSize);
     if (sdf < 0.0) hi = mid;
     else lo = mid;

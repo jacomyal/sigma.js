@@ -14,7 +14,12 @@
  * @module
  */
 import type { RenderParams } from "../../../types";
-import { GLSL_GET_LABEL_DIRECTION, GLSL_READ_NODE_DATA, generateFindEdgeDistanceForShapes } from "../../glsl";
+import {
+  GLSL_GET_LABEL_DIRECTION,
+  GLSL_READ_NODE_DATA,
+  GLSL_READ_NODE_FLAGS,
+  generateFindEdgeDistanceForShapes,
+} from "../../glsl";
 import type { NodeFrameTexture } from "../../node-frame-texture";
 import { setGLSLUniform } from "../../program";
 import { dedupeShapeUniforms, getShapeGLSLForShapes } from "../../shapes";
@@ -23,7 +28,6 @@ import { SDFShape, UniformSpecification } from "../types";
 
 export interface NodeLabelFramePassOptions {
   shapes: SDFShape[];
-  rotateWithCamera?: boolean;
   shapeGlobalIds?: number[];
 }
 
@@ -41,7 +45,7 @@ void main() {
 }
 `;
 
-function generateVertexShader(shapes: SDFShape[], rotateWithCamera: boolean, shapeGlobalIds?: number[]): string {
+function generateVertexShader(shapes: SDFShape[], shapeGlobalIds?: number[]): string {
   const shapeGLSL = getShapeGLSLForShapes(shapes);
 
   const shapeUniformDeclarations = dedupeShapeUniforms(shapes)
@@ -50,19 +54,14 @@ function generateVertexShader(shapes: SDFShape[], rotateWithCamera: boolean, sha
 
   // The shared boundary query — identical generator to the label/background/
   // attachment programs, so the distance written here is exactly what they used
-  // to compute in-shader.
-  const { code: findEdgeDistanceCode, multiShape } = generateFindEdgeDistanceForShapes(
-    shapes,
-    rotateWithCamera,
-    shapeGlobalIds,
-  );
+  // to compute in-shader. Rotation is applied per node below, not baked in.
+  const { code: findEdgeDistanceCode, multiShape } = generateFindEdgeDistanceForShapes(shapes, shapeGlobalIds);
 
   // language=GLSL
   const shader = /*glsl*/ `#version 300 es
 precision highp float;
 
 uniform float u_cameraAngle;
-uniform float u_labelsRotateWithCamera;
 uniform sampler2D u_nodeDataTexture;
 uniform int u_nodeDataTextureWidth;
 uniform float u_frameTextureWidth;
@@ -75,22 +74,29 @@ in float a_labelAngle;    // intrinsic label angle (radians)
 
 out float v_edgeDist;
 
-${multiShape ? GLSL_READ_NODE_DATA : ""}
+${GLSL_READ_NODE_DATA}
+${GLSL_READ_NODE_FLAGS}
 ${shapeGLSL}
 ${findEdgeDistanceCode}
 ${GLSL_GET_LABEL_DIRECTION}
 
 void main() {
+  int nodeIdx = int(a_nodeIndex);
   ${
     multiShape
       ? /*glsl*/ `// Multi-shape: the shape id lives in the node-data texture's .w channel:
-  g_shapeId = int(readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, int(a_nodeIndex)).w);`
+  g_shapeId = int(readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx).w);`
       : "// Single-shape mode, shape id not needed"
   }
 
-  // Effective angle: intrinsic (style-given) plus the camera angle only when the
-  // label is camera-aligned. The carried angle is always intrinsic.
-  float effectiveAngle = a_labelAngle + (u_labelsRotateWithCamera > 0.5 ? u_cameraAngle : 0.0);
+  // Per-node rotation alignment (0 = viewport, 1 = graph).
+  vec4 nodeFlags = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx);
+  float nodeRotation = nodeFlags.r;
+  float labelRotation = nodeFlags.g;
+
+  // Effective angle: intrinsic (style-given) plus the camera angle when the label
+  // is graph-aligned. The companions place the box at this same angle.
+  float effectiveAngle = a_labelAngle - labelRotation * u_cameraAngle;
 
   // The "over" mode (4) sits on the node center, so it has no edge distance.
   float edgeDist = 0.0;
@@ -104,6 +110,11 @@ void main() {
     vec2 rotatedScreenDir = mat2(ea_c, -ea_s, ea_s, ea_c) * screenDir;
     // Screen (Y-down) -> SDF (Y-up).
     vec2 sdfDir = vec2(rotatedScreenDir.x, -rotatedScreenDir.y);
+    // Counter-rotate into the shape's local frame for graph-aligned nodes, so the
+    // boundary is queried against the shape's actual on-screen orientation.
+    float nodeCa = -u_cameraAngle * nodeRotation;
+    float nc = cos(nodeCa), ns = sin(nodeCa);
+    sdfDir = mat2(nc, -ns, ns, nc) * sdfDir;
     edgeDist = findEdgeDistance(sdfDir, 1.0);
   }
   v_edgeDist = edgeDist;
@@ -134,19 +145,18 @@ export class NodeLabelFramePass {
   static readonly FLOATS_PER_POINT = 3;
 
   constructor(gl: WebGL2RenderingContext, options: NodeLabelFramePassOptions) {
-    const { shapes, rotateWithCamera = false, shapeGlobalIds } = options;
+    const { shapes, shapeGlobalIds } = options;
     if (shapes.length === 0) throw new Error("NodeLabelFramePass: at least one shape must be provided");
 
     this.gl = gl;
     this.shapeUniforms = dedupeShapeUniforms(shapes);
 
-    this.vertexShader = loadVertexShader(gl, generateVertexShader(shapes, rotateWithCamera, shapeGlobalIds));
+    this.vertexShader = loadVertexShader(gl, generateVertexShader(shapes, shapeGlobalIds));
     this.fragmentShader = loadFragmentShader(gl, FRAGMENT_SHADER);
     this.program = loadProgram(gl, [this.vertexShader, this.fragmentShader]);
 
     const uniformNames = [
       "u_cameraAngle",
-      "u_labelsRotateWithCamera",
       "u_nodeDataTexture",
       "u_nodeDataTextureWidth",
       "u_frameTextureWidth",
@@ -178,17 +188,11 @@ export class NodeLabelFramePass {
   /**
    * Writes the normalized edge distance into `frameTexture` for every label in
    * `pointData` (an interleaved `[nodeIndex, positionMode, labelAngle]` array
-   * of `count` points). Expects the node-data texture already bound. Leaves
-   * the framebuffer/viewport for the caller to restore (the post-offscreen
-   * reset).
+   * of `count` points). The per-node rotation alignment is read from the
+   * node-data texture (already bound). Leaves the framebuffer/viewport for the
+   * caller to restore (the post-offscreen reset).
    */
-  run(
-    pointData: Float32Array,
-    count: number,
-    frameTexture: NodeFrameTexture,
-    params: RenderParams,
-    labelsRotateWithCamera: boolean,
-  ): void {
+  run(pointData: Float32Array, count: number, frameTexture: NodeFrameTexture, params: RenderParams): void {
     if (count === 0) return;
 
     const { gl } = this;
@@ -200,7 +204,6 @@ export class NodeLabelFramePass {
 
     const u = this.uniformLocations;
     gl.uniform1f(u.u_cameraAngle, params.cameraAngle);
-    gl.uniform1f(u.u_labelsRotateWithCamera, labelsRotateWithCamera ? 1 : 0);
     gl.uniform1i(u.u_nodeDataTexture, params.nodeDataTextureUnit);
     gl.uniform1i(u.u_nodeDataTextureWidth, params.nodeDataTextureWidth);
     gl.uniform1f(u.u_frameTextureWidth, frameTexture.getTextureWidth());

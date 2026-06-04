@@ -14,6 +14,7 @@
  *
  * @module
  */
+import { GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../../glsl";
 import { generateShapeSelectorGLSL, getAllShapeGLSL } from "../../shapes";
 import { numberToGLSLFloat } from "../../utils";
 import {
@@ -65,39 +66,41 @@ export function generateAllClampFunctions(paths: EdgePath[]): string {
   if (paths.length === 1) {
     return `${clampFunctions}
 
-float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, vec2 target, float margin) {
-  return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, target, margin);
+float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, float sourceRotateAlign, vec2 target, float margin) {
+  return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, sourceRotateAlign, target, margin);
 }
 
-float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float margin) {
-  return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, margin);
+float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float targetRotateAlign, float margin) {
+  return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, targetRotateAlign, margin);
 }`;
   }
 
   const srcCases = paths
     .map(
-      (p, i) => `    case ${i}: return findSourceClampT_${p.name}(source, sourceSize, sourceShapeId, target, margin);`,
+      (p, i) =>
+        `    case ${i}: return findSourceClampT_${p.name}(source, sourceSize, sourceShapeId, sourceRotateAlign, target, margin);`,
     )
     .join("\n");
   const tgtCases = paths
     .map(
-      (p, i) => `    case ${i}: return findTargetClampT_${p.name}(source, target, targetSize, targetShapeId, margin);`,
+      (p, i) =>
+        `    case ${i}: return findTargetClampT_${p.name}(source, target, targetSize, targetShapeId, targetRotateAlign, margin);`,
     )
     .join("\n");
 
   return `${clampFunctions}
 
-float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, vec2 target, float margin) {
+float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, float sourceRotateAlign, vec2 target, float margin) {
   switch (pathId) {
 ${srcCases}
-    default: return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, target, margin);
+    default: return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, sourceRotateAlign, target, margin);
   }
 }
 
-float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float margin) {
+float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float targetRotateAlign, float margin) {
   switch (pathId) {
 ${tgtCases}
-    default: return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, margin);
+    default: return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, targetRotateAlign, margin);
   }
 }`;
 }
@@ -112,12 +115,12 @@ ${tgtCases}
 export const EDGE_LABEL_BODY_BOUNDS_GLSL = /*glsl*/ `
 vec3 computeEdgeLabelBodyBounds(
   int pathId,
-  vec2 source, float sourceSize, int sourceShapeId,
-  vec2 target, float targetSize, int targetShapeId,
+  vec2 source, float sourceSize, int sourceShapeId, float sourceRotateAlign,
+  vec2 target, float targetSize, int targetShapeId, float targetRotateAlign,
   float webGLThickness, float headLengthRatio, float tailLengthRatio
 ) {
-  float tStart = queryFindSourceClampT(pathId, source, sourceSize, sourceShapeId, target, 0.0);
-  float tEnd = queryFindTargetClampT(pathId, source, target, targetSize, targetShapeId, 0.0);
+  float tStart = queryFindSourceClampT(pathId, source, sourceSize, sourceShapeId, sourceRotateAlign, target, 0.0);
+  float tEnd = queryFindTargetClampT(pathId, source, target, targetSize, targetShapeId, targetRotateAlign, 0.0);
   float pathLength = queryPathLength(pathId, source, target);
   float visibleLength = pathLength * (tEnd - tStart);
 
@@ -233,8 +236,11 @@ ${paths.map((p, i) => (p.hasSharpCorners ? `    case ${i}: return path_${p.name}
 
   return /*glsl*/ `
 // ============================================================================
-// Node Shape SDFs (for binary-search clamp)
+// Node data fetch (geometry texel + rotation-flags texel) and Shape SDFs
 // ============================================================================
+
+${GLSL_READ_NODE_DATA}
+${GLSL_READ_NODE_FLAGS}
 
 ${getAllShapeGLSL()}
 

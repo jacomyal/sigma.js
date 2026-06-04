@@ -10,6 +10,7 @@
 import {
   GLSL_NODE_SIZE_TO_PIXELS,
   GLSL_READ_NODE_DATA,
+  GLSL_READ_NODE_FLAGS,
   GLSL_READ_NODE_FRAME,
   GLSL_SDF_BOX,
   GLSL_SDF_ROTATED_BOX,
@@ -28,7 +29,6 @@ export interface GeneratedBackdropShaders {
 
 export interface BackdropShaderOptions {
   shapes: SDFShape[];
-  rotateWithCamera?: boolean;
   /** Maps local shape index to global shape ID (for multi-shape programs). */
   shapeGlobalIds?: number[];
 }
@@ -79,6 +79,7 @@ in vec2 a_quadCorner;
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
+uniform float u_cameraAngle;
 uniform vec2 u_resolution;
 uniform float u_pixelRatio;
 uniform float u_labelMargin;
@@ -96,6 +97,7 @@ out vec2 v_labelCenter;
 out vec2 v_labelHalfSize;
 out float v_aaWidth;
 out float v_shapeId;
+out float v_nodeRotation;
 out float v_labelAngle;
 out vec4 v_backdropColor;
 out vec4 v_backdropShadowColor;
@@ -107,6 +109,7 @@ out float v_backdropCornerRadius;
 out float v_backdropArea;
 
 ${GLSL_READ_NODE_DATA}
+${GLSL_READ_NODE_FLAGS}
 ${GLSL_READ_NODE_FRAME}
 
 void main() {
@@ -118,6 +121,13 @@ void main() {
   vec2 nodePosition = nodeData.xy;
   float nodeSize = nodeData.z;
   float shapeId = nodeData.w;
+
+  // Per-node rotation alignment (0 = viewport, 1 = graph). nodeRotation drives
+  // the fragment's shape outline; labelRotation turns the label box with camera.
+  vec4 nodeFlags = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx);
+  float nodeRotation = nodeFlags.r;
+  float labelRotation = nodeFlags.g;
+  v_nodeRotation = nodeRotation;
 
   ${GLSL_NODE_SIZE_TO_PIXELS}
   // CSS pixel attributes are multiplied by u_pixelRatio to match nodeRadiusPixels,
@@ -151,8 +161,11 @@ void main() {
   vec2 labelHalfSize = vec2(labelW * 0.5 + effectiveLabelPad, labelH * 0.5 + effectiveLabelPad);
   vec2 labelOffset = vec2(0.0);
 
-  float la_c = cos(a_labelAngle);
-  float la_s = sin(a_labelAngle);
+  // Effective label angle: intrinsic angle plus the camera angle when the label
+  // is graph-aligned, so the box orbits the node in lockstep with the frame-pass.
+  float labelAngle = a_labelAngle - labelRotation * u_cameraAngle;
+  float la_c = cos(labelAngle);
+  float la_s = sin(labelAngle);
   mat2 labelRotMat = mat2(la_c, -la_s, la_s, la_c);
 
   vec3 nodeClip = u_matrix * vec3(nodePosition, 1.0);
@@ -258,7 +271,7 @@ void main() {
   v_labelHalfSize = labelHalfSize;
   v_aaWidth = 1.0;
   v_shapeId = shapeId;
-  v_labelAngle = a_labelAngle;
+  v_labelAngle = labelAngle;
   v_backdropColor = a_backdropColor;
   v_backdropShadowColor = a_backdropShadowColor;
   v_backdropShadowBlur = a_backdropShadowBlur;
@@ -274,7 +287,7 @@ void main() {
 }
 
 export function generateBackdropFragmentShader(options: BackdropShaderOptions): string {
-  const { shapes, rotateWithCamera = false, shapeGlobalIds } = options;
+  const { shapes, shapeGlobalIds } = options;
 
   // Get all shape SDF functions (deduplicated)
   const shapeGLSL = getShapeGLSLForShapes(shapes);
@@ -343,14 +356,15 @@ ${cases}
   // Evaluate node SDF at effective scale (enlarged - cornerRadius) then subtract
   // cornerRadius. This "shrink, evaluate, expand" technique rounds convex corners.
   // When cornerRadius=0, effectiveRadius=enlargedRadius and the subtraction is a no-op.
-  const nodeUVCode = rotateWithCamera
-    ? `float effectiveRadius = max(enlargedRadius - cornerRadius, 0.01);
-  float ca_c = cos(u_cameraAngle);
-  float ca_s = sin(u_cameraAngle);
+  // Per-node, in screen space: graph-aligned nodes (v_nodeRotation=1) turn with
+  // the camera, so the outline rotates by the camera angle to match the node;
+  // viewport-aligned nodes (0) stay screen-upright (no rotation).
+  const nodeUVCode = `float effectiveRadius = max(enlargedRadius - cornerRadius, 0.01);
+  float ca = u_cameraAngle * v_nodeRotation;
+  float ca_c = cos(ca);
+  float ca_s = sin(ca);
   vec2 rotatedScreenUV = mat2(ca_c, -ca_s, ca_s, ca_c) * screenUV;
-  vec2 nodeUV = vec2(rotatedScreenUV.x, -rotatedScreenUV.y) / effectiveRadius;`
-    : `float effectiveRadius = max(enlargedRadius - cornerRadius, 0.01);
-  vec2 nodeUV = vec2(screenUV.x, -screenUV.y) / effectiveRadius;`;
+  vec2 nodeUV = vec2(rotatedScreenUV.x, -rotatedScreenUV.y) / effectiveRadius;`;
 
   // language=GLSL
   const glsl = /*glsl*/ `#version 300 es
@@ -363,6 +377,7 @@ in vec2 v_labelCenter;
 in vec2 v_labelHalfSize;
 in float v_aaWidth;
 in float v_shapeId;
+in float v_nodeRotation;
 in float v_labelAngle;
 in vec4 v_backdropColor;
 in vec4 v_backdropShadowColor;

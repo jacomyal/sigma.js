@@ -234,14 +234,10 @@ ${textureFetch.varyingAssignments}
   }
 
   // -------------------------------------------------------------------------
-  // Fetch node data from node texture
+  // Fetch node data from node texture (geometry texel + rotation-flags texel)
   // -------------------------------------------------------------------------
-  // Texture format: vec4(x, y, size, shapeId)
-  // 2D texture layout: texCoord = (index % width, index / width)
-  ivec2 srcTexCoord = ivec2(srcIdx % u_nodeDataTextureWidth, srcIdx / u_nodeDataTextureWidth);
-  ivec2 tgtTexCoord = ivec2(tgtIdx % u_nodeDataTextureWidth, tgtIdx / u_nodeDataTextureWidth);
-  vec4 srcNodeData = texelFetch(u_nodeDataTexture, srcTexCoord, 0);
-  vec4 tgtNodeData = texelFetch(u_nodeDataTexture, tgtTexCoord, 0);
+  vec4 srcNodeData = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx);
+  vec4 tgtNodeData = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx);
 
   vec2 source = srcNodeData.xy;
   vec2 target = tgtNodeData.xy;
@@ -251,6 +247,9 @@ ${textureFetch.varyingAssignments}
   v_targetNodeSize = targetSize;
   int sourceShapeId = int(srcNodeData.w);
   int targetShapeId = int(tgtNodeData.w);
+  // Per-node rotation alignment (0 = viewport, 1 = graph), for boundary clamping.
+  float sourceRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx).r;
+  float targetRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx).r;
   float charTextOffset = a_charMetrics.x;
   float charAdvance = a_charMetrics.y;
   float totalTextWidth = a_charMetrics.z;
@@ -277,8 +276,8 @@ ${textureFetch.varyingAssignments}
   // Step 2: Compute body bounds (truncated at node boundaries + extremities)
   // -------------------------------------------------------------------------
   vec3 bodyBounds = computeEdgeLabelBodyBounds(
-    pathId, source, sourceSize, sourceShapeId,
-    target, targetSize, targetShapeId,
+    pathId, source, sourceSize, sourceShapeId, sourceRotateAlign,
+    target, targetSize, targetShapeId, targetRotateAlign,
     webGLThickness, headLengthRatio, tailLengthRatio
   );
   float bodyStartDist = bodyBounds.x;

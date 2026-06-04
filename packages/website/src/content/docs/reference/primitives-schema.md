@@ -31,14 +31,10 @@ For a conceptual overview, see [Styles and primitives](/concepts/styles-and-prim
     label?: LabelOptions,
     backdrop?: BackdropOptions,
     labelAttachments?: Record<string, LabelAttachmentRenderer>,
-    rotateWithCamera?: boolean,
     variables?: VariablesDefinition,
   },
 }
 ```
-
-The `rotateWithCamera` primitive specifies if nodes should keep their vertical orientations when the camera angle
-changes or not.
 
 ### shapes
 

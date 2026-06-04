@@ -9,7 +9,7 @@
  * @module
  */
 import { DEFAULT_SDF_ATLAS_OPTIONS } from "../../../core/sdf-atlas";
-import { GLSL_GET_LABEL_DIRECTION, GLSL_READ_NODE_DATA, GLSL_READ_NODE_FRAME } from "../../glsl";
+import { GLSL_GET_LABEL_DIRECTION, GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS, GLSL_READ_NODE_FRAME } from "../../glsl";
 import { numberToGLSLFloat } from "../../utils";
 
 const ATLAS_FONT_SIZE = DEFAULT_SDF_ATLAS_OPTIONS.fontSize;
@@ -86,6 +86,7 @@ in vec2 a_quadCorner;        // Quad corner: [-1,-1], [1,-1], [-1,1], [1,1]
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
+uniform float u_cameraAngle;
 uniform vec2 u_resolution;
 uniform vec2 u_atlasSize;
 uniform sampler2D u_nodeDataTexture;
@@ -116,6 +117,7 @@ const float ATLAS_FONT_SIZE = ${numberToGLSLFloat(ATLAS_FONT_SIZE)};
 // ============================================================================
 
 ${GLSL_READ_NODE_DATA}
+${GLSL_READ_NODE_FLAGS}
 ${GLSL_READ_NODE_FRAME}
 ${GLSL_GET_LABEL_DIRECTION}
 
@@ -137,6 +139,9 @@ void main() {
   // Normalized edge distance from the shared frame texture (the frame-pass ran
   // the SDF search once; the label just reads the result).
   float edgeDist = readNodeFrame(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx);
+
+  // Per-node label rotation alignment: 0 = viewport, 1 = label turns with camera.
+  float labelRotation = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx).g;
 
   // Apply zoom-dependent label size scaling
   // Positional values are in CSS pixels; multiply by u_pixelRatio to convert to
@@ -202,9 +207,11 @@ ${step3Code}
     charPixelPos.y += verticalCenter;
   }
 
-  // Apply label angle rotation
-  float la_c = cos(a_labelAngle);
-  float la_s = sin(a_labelAngle);
+  // Apply label angle rotation. Graph-aligned labels add the camera angle so the
+  // whole label orbits the node in lockstep with the frame-pass edge distance.
+  float labelAngle = a_labelAngle - labelRotation * u_cameraAngle;
+  float la_c = cos(labelAngle);
+  float la_s = sin(labelAngle);
   mat2 labelRotMat = mat2(la_c, -la_s, la_s, la_c);
   charPixelPos = labelRotMat * charPixelPos;
 
@@ -299,6 +306,7 @@ export function collectLabelUniforms(): string[] {
     "u_matrix",
     "u_sizeRatio",
     "u_correctionRatio",
+    "u_cameraAngle",
     "u_resolution",
     "u_atlasSize",
     "u_atlas",

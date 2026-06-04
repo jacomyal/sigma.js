@@ -150,7 +150,6 @@ export interface NodePrimitives {
   shapes?: readonly NodeShapeSpec[] | NodeShapeSpec[];
   variables?: VariablesDefinition;
   layers?: readonly NodeLayerSpec[] | NodeLayerSpec[];
-  rotateWithCamera?: boolean;
   label?: LabelOptions;
   backdrop?: BackdropOptions;
   labelAttachments?: Record<string, LabelAttachmentRenderer>;
@@ -214,7 +213,6 @@ export const DEFAULT_NODE_PRIMITIVES: Required<NodePrimitives> = {
   shapes: [sdfCircle()],
   variables: {},
   layers: [layerFill()],
-  rotateWithCamera: false,
   label: {},
   backdrop: {},
   labelAttachments: {},

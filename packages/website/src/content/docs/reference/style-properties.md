@@ -16,12 +16,13 @@ These are the built-in style properties available for nodes:
 
 ### Position and geometry
 
-| Property | Type     | Description                                                                                                          |
-| -------- | -------- | -------------------------------------------------------------------------------------------------------------------- |
-| `x`      | `number` | X coordinate in graph space                                                                                          |
-| `y`      | `number` | Y coordinate in graph space                                                                                          |
-| `size`   | `number` | Node size (actual pixel size depends on `autoRescale`, `itemSizesReference`, and `zoomToSizeRatioFunction` settings) |
-| `shape`  | `string` | Shape name (e.g. `"circle"`, `"square"`). Must match a shape declared in `primitives.nodes.shapes`                   |
+| Property            | Type                    | Description                                                                                                           |
+| ------------------- | ----------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `x`                 | `number`                | X coordinate in graph space                                                                                           |
+| `y`                 | `number`                | Y coordinate in graph space                                                                                           |
+| `size`              | `number`                | Node size (actual pixel size depends on `autoRescale`, `itemSizesReference`, and `zoomToSizeRatioFunction` settings)  |
+| `shape`             | `string`                | Shape name (e.g. `"circle"`, `"square"`). Must match a shape declared in `primitives.nodes.shapes`                    |
+| `rotationAlignment` | `"viewport" \| "graph"` | Shape orientation as the camera rotates: `"viewport"` (default) stays screen-upright, `"graph"` turns with the camera |
 
 ### Appearance
 
@@ -49,21 +50,22 @@ full model and recipes.
 
 ### Label properties
 
-| Property                   | Type                                                | Description                                                             |
-| -------------------------- | --------------------------------------------------- | ----------------------------------------------------------------------- |
-| `label`                    | `string`                                            | Label text content                                                      |
-| `labelColor`               | `string`                                            | Label text color                                                        |
-| `labelSize`                | `number`                                            | Label font size in pixels                                               |
-| `labelFont`                | `string`                                            | Label font family (e.g. `"Georgia, serif"`)                             |
-| `labelVisibility`          | `"auto" \| "visible" \| "hidden"`                   | `"auto"` uses density-based culling, `"visible"` forces display         |
-| `labelPosition`            | `"right" \| "left" \| "above" \| "below" \| "over"` | Label position relative to node                                         |
-| `labelAngle`               | `number`                                            | Label rotation angle in radians                                         |
-| `labelDepth`               | `string`                                            | Depth layer for label rendering (defaults to related node's `depth`)    |
-| `labelAttachment`          | `string \| null`                                    | Label attachment name (references `primitives.nodes.labelAttachments`)  |
-| `labelAttachmentPlacement` | `"below" \| "above" \| "left" \| "right"`           | Attachment position relative to label                                   |
-| `labelBackgroundColor`     | `string`                                            | Label background fill color (transparent = no background)               |
-| `labelBackgroundPadding`   | `number`                                            | Padding around the label background in pixels                           |
-| `labelCursor`              | `string`                                            | CSS cursor to show when hovering the label (requires `nodeLabelEvents`) |
+| Property                   | Type                                                | Description                                                                                                                  |
+| -------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `label`                    | `string`                                            | Label text content                                                                                                           |
+| `labelColor`               | `string`                                            | Label text color                                                                                                             |
+| `labelSize`                | `number`                                            | Label font size in pixels                                                                                                    |
+| `labelFont`                | `string`                                            | Label font family (e.g. `"Georgia, serif"`)                                                                                  |
+| `labelVisibility`          | `"auto" \| "visible" \| "hidden"`                   | `"auto"` uses density-based culling, `"visible"` forces display                                                              |
+| `labelPosition`            | `"right" \| "left" \| "above" \| "below" \| "over"` | Label position relative to node                                                                                              |
+| `labelAngle`               | `number`                                            | Label rotation angle in radians                                                                                              |
+| `labelRotationAlignment`   | `"viewport" \| "graph"`                             | Label orientation as the camera rotates: `"viewport"` (default) stays screen-upright, `"graph"` orbits/turns with the camera |
+| `labelDepth`               | `string`                                            | Depth layer for label rendering (defaults to related node's `depth`)                                                         |
+| `labelAttachment`          | `string \| null`                                    | Label attachment name (references `primitives.nodes.labelAttachments`)                                                       |
+| `labelAttachmentPlacement` | `"below" \| "above" \| "left" \| "right"`           | Attachment position relative to label                                                                                        |
+| `labelBackgroundColor`     | `string`                                            | Label background fill color (transparent = no background)                                                                    |
+| `labelBackgroundPadding`   | `number`                                            | Padding around the label background in pixels                                                                                |
+| `labelCursor`              | `string`                                            | CSS cursor to show when hovering the label (requires `nodeLabelEvents`)                                                      |
 
 ### Backdrop properties
 

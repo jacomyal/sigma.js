@@ -42,10 +42,9 @@
     }
   }
 
-  const { labelAngle, labelMargin, rotateWithCamera } = registerControls({
+  const { labelAngle, labelMargin } = registerControls({
     labelAngle: { type: "number", label: "Angle (°)", default: 0, min: -180, max: 180, step: 5 },
     labelMargin: { type: "number", label: "Margin (px)", default: 0, min: 0, max: 50, step: 1 },
-    rotateWithCamera: { type: "boolean", label: "Rotate with camera", default: false },
   });
 
   new Sigma(graph, container, {
@@ -53,7 +52,6 @@
       nodes: {
         shapes: [sdfCircle(), sdfSquare(), sdfTriangle(), sdfDiamond()],
         layers: [layerFill()],
-        rotateWithCamera,
         label: { margin: labelMargin },
       },
     },

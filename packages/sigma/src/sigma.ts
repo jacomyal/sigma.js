@@ -101,6 +101,7 @@ import {
   identity,
   matrixFromCamera,
   multiplyVec2,
+  nodeRotationFlags,
   removePositionFromDepthRanges,
   setMembership,
   validateGraph,
@@ -221,7 +222,7 @@ export default class Sigma<
   // Custom layer programs (fullscreen quad effects), keyed by unique id
   private customLayerPrograms = new Map<string, { depth: string; program: CustomLayerProgram }>();
 
-  // Shape slug for edge clamping (encodes shape name, params, rotateWithCamera)
+  // Shape slug for edge clamping (encodes shape name and params)
   private nodeShapeSlug: string | null = null;
 
   // WebGL Labels (SDF-based rendering)
@@ -1092,13 +1093,7 @@ export default class Sigma<
       // Run the frame-pass over the displayed labels to write each one's normalized
       // edge distance into the node-frame texture (unit 2); consumers read it there.
       const { data, count } = this.labelRenderer.buildFramePassPoints();
-      this.nodeFramePass.run(
-        data,
-        count,
-        this.internals.nodeFrameTexture!,
-        params,
-        false, // labelsRotateWithCamera: camera-aligned labels are a follow-up
-      );
+      this.nodeFramePass.run(data, count, this.internals.nodeFrameTexture!, params);
       this.internals.nodeFrameTexture!.bind(NODE_FRAME_TEXTURE_UNIT);
     }
 
@@ -1518,7 +1513,14 @@ export default class Sigma<
   private addNodeToProgram(node: string, position: number): void {
     const data = this.internals.nodeDataCache[node];
     this.internals.nodeDataTexture!.allocate(node);
-    this.internals.nodeDataTexture!.updateNode(node, data.x, data.y, data.size, this.getNodeShapeId(data));
+    this.internals.nodeDataTexture!.updateNode(
+      node,
+      data.x,
+      data.y,
+      data.size,
+      this.getNodeShapeId(data),
+      ...nodeRotationFlags(data),
+    );
     const textureIndex = this.internals.nodeDataTexture!.getIndex(node);
     this.nodeProgram.process(pickingIdOf(this.pickingState, "node", node), position, data, textureIndex, node);
     this.nodeProgramIndex[node] = position;
@@ -2342,7 +2344,14 @@ export default class Sigma<
       } else {
         shapeId = getShapeId(newData.shape || "circle");
       }
-      this.internals.nodeDataTexture!.updateNode(node, newData.x, newData.y, newData.size, shapeId);
+      this.internals.nodeDataTexture!.updateNode(
+        node,
+        newData.x,
+        newData.y,
+        newData.size,
+        shapeId,
+        ...nodeRotationFlags(newData),
+      );
       if (oldDepth && newData.depth !== oldDepth) {
         this.updateNodeDepthRanges(node, oldDepth, newData.depth);
       }
@@ -2364,6 +2373,8 @@ export default class Sigma<
     const oldDepth = data.depth;
     const oldZIndex = data.zIndex;
     const oldAttachment = data.labelAttachment;
+    const oldRotationAlignment = data.rotationAlignment;
+    const oldLabelRotationAlignment = data.labelRotationAlignment;
 
     evaluateNodeStyle(
       this.stylesDeclaration!.nodes as Record<string, unknown>,
@@ -2401,8 +2412,14 @@ export default class Sigma<
     setMembership(this.internals.nodesWithForcedLabels, node, hasForcedLabel(data));
     setMembership(this.internals.nodesWithBackdrop, node, hasBackdrop(data));
 
-    // Node data texture only if position/size/shape changed
-    if (rawPositionChanged || data.size !== oldSize || data.shape !== oldShape) {
+    // Node data texture only if position/size/shape/rotation changed
+    if (
+      rawPositionChanged ||
+      data.size !== oldSize ||
+      data.shape !== oldShape ||
+      data.rotationAlignment !== oldRotationAlignment ||
+      data.labelRotationAlignment !== oldLabelRotationAlignment
+    ) {
       let shapeId: number;
       if (
         this.internals.nodeShapeMap &&
@@ -2414,7 +2431,7 @@ export default class Sigma<
       } else {
         shapeId = getShapeId(data.shape || "circle");
       }
-      this.internals.nodeDataTexture!.updateNode(node, data.x, data.y, data.size, shapeId);
+      this.internals.nodeDataTexture!.updateNode(node, data.x, data.y, data.size, shapeId, ...nodeRotationFlags(data));
     }
 
     // Update the depth bucket. A depth change is reflected immediately via

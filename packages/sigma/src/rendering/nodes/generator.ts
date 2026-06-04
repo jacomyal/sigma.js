@@ -7,6 +7,7 @@
  * @module
  */
 import { computeAttributeLayout, generateAttributeTextureFetch } from "../data-texture";
+import { GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../glsl";
 import { generateNodeShapeSelectorGLSL, getShapeGLSLForShapes } from "../shapes";
 import { AttributeSpecification, FragmentLayer, SDFShape } from "./types";
 
@@ -24,7 +25,6 @@ export interface ShaderGenerationOptions {
    */
   shapes: SDFShape[];
   layers: FragmentLayer[];
-  rotateWithCamera?: boolean;
   /**
    * Array mapping local shape index to global shape ID.
    * Required for multi-shape programs to convert global IDs from node data texture
@@ -39,9 +39,11 @@ export interface ShaderGenerationOptions {
  *
  * @param shapes - Array of SDF shapes this program supports
  * @param layers - Array of fragment layers
- * @param rotateWithCamera - Whether nodes should rotate with the camera (default: false)
+ *
+ * Whether a node's shape stays screen-upright or turns with the camera is a
+ * per-node value (the `nodeRotation` flag in the node-data texture), read here.
  */
-export function generateVertexShader(shapes: SDFShape[], layers: FragmentLayer[], rotateWithCamera = false): string {
+export function generateVertexShader(shapes: SDFShape[], layers: FragmentLayer[]): string {
   // Standard uniforms that are always declared (to avoid redefinition)
   const standardUniforms = new Set([
     "u_matrix",
@@ -139,15 +141,20 @@ out float v_shapeId;              // Shape ID for multi-shape programs
 // Layer varyings
 ${layerVaryings}
 
+// Node-data fetch helpers (geometry texel + rotation-flags texel)
+${GLSL_READ_NODE_DATA}
+${GLSL_READ_NODE_FLAGS}
+
 void main() {
-  // Fetch node data from texture: vec4(x, y, size, shapeId)
-  // 2D texture layout: texCoord = (index % width, index / width)
+  // Fetch node geometry: vec4(x, y, size, shapeId).
   int nodeIdx = int(a_nodeIndex);
-  ivec2 texCoord = ivec2(nodeIdx % u_nodeDataTextureWidth, nodeIdx / u_nodeDataTextureWidth);
-  vec4 nodeData = texelFetch(u_nodeDataTexture, texCoord, 0);
+  vec4 nodeData = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx);
   vec2 a_position = nodeData.xy;
   float a_size = nodeData.z;
   v_shapeId = nodeData.w;  // Pass shape ID to fragment shader
+
+  // Per-node rotation alignment: 0 = viewport (screen-upright), 1 = graph.
+  float nodeRotation = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx).r;
 
 ${fetchCode}
 
@@ -161,15 +168,16 @@ ${fetchCode}
   #else
     vec2 offset = a_quadCorner * size;
   #endif
-${
-  rotateWithCamera
-    ? ""
-    : `  // Counter-rotate the quad offset so nodes stay upright when camera rotates
-  float c = cos(u_cameraAngle);
-  float s = sin(u_cameraAngle);
-  offset = mat2(c, s, -s, c) * offset;
-`
-}  vec2 position = a_position + offset;
+  // Counter-rotate the quad offset so viewport-aligned nodes stay upright as the
+  // camera turns. Graph-aligned nodes (nodeRotation=1) skip it and turn with the
+  // camera. The angle scales by (1 - nodeRotation) so both fall out of one path.
+  {
+    float ca = u_cameraAngle * (1.0 - nodeRotation);
+    float c = cos(ca);
+    float s = sin(ca);
+    offset = mat2(c, s, -s, c) * offset;
+  }
+  vec2 position = a_position + offset;
 
   gl_Position = vec4(
     (u_matrix * vec3(position, 1)).xy,
@@ -212,15 +220,12 @@ ${varyingAssignments}
  *
  * @param shapes - Array of SDF shapes this program supports
  * @param layers - Array of fragment layers
- * @param rotateWithCamera - Whether nodes rotate with camera
  * @param shapeGlobalIds - Optional array mapping local shape index to global ID (for multi-shape programs)
+ *
+ * The node's shape rotation is applied by the vertex shader (quad geometry), so
+ * the fragment SDF query (`queryNodeSDF`) is rotation-agnostic.
  */
-export function generateFragmentShader(
-  shapes: SDFShape[],
-  layers: FragmentLayer[],
-  rotateWithCamera: boolean,
-  shapeGlobalIds?: number[],
-): string {
+export function generateFragmentShader(shapes: SDFShape[], layers: FragmentLayer[], shapeGlobalIds?: number[]): string {
   // Generate layer function calls with "over" compositing
   const layerCalls = layers
     .map((layer, index) => {
@@ -283,7 +288,7 @@ export function generateFragmentShader(
 
   // Generate queryNodeSDF() function for shape selection
   // Pass shapeGlobalIds for multi-shape programs to generate global→local conversion
-  const shapeSelectorGLSL = generateNodeShapeSelectorGLSL(shapes, rotateWithCamera, shapeGlobalIds);
+  const shapeSelectorGLSL = generateNodeShapeSelectorGLSL(shapes, shapeGlobalIds);
 
   // language=GLSL
   const glsl = /*glsl*/ `#version 300 es
@@ -442,11 +447,11 @@ export function collectAttributes(_layers: FragmentLayer[]): AttributeSpecificat
  * Main generator function that produces complete shader code and metadata.
  */
 export function generateShaders(options: ShaderGenerationOptions): GeneratedShaders {
-  const { shapes, layers, rotateWithCamera = false, shapeGlobalIds } = options;
+  const { shapes, layers, shapeGlobalIds } = options;
 
   return {
-    vertexShader: generateVertexShader(shapes, layers, rotateWithCamera),
-    fragmentShader: generateFragmentShader(shapes, layers, rotateWithCamera, shapeGlobalIds),
+    vertexShader: generateVertexShader(shapes, layers),
+    fragmentShader: generateFragmentShader(shapes, layers, shapeGlobalIds),
     uniforms: collectUniforms(shapes, layers),
     attributes: collectAttributes(layers),
   };

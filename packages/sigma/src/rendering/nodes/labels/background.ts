@@ -22,6 +22,7 @@ import {
   GLSL_LABEL_BOX_CENTER,
   GLSL_NODE_SIZE_TO_PIXELS,
   GLSL_READ_NODE_DATA,
+  GLSL_READ_NODE_FLAGS,
   GLSL_READ_NODE_FRAME,
 } from "../../glsl";
 import { Program } from "../../program";
@@ -72,6 +73,7 @@ in vec2 a_quadCorner;
 uniform mat3 u_matrix;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
+uniform float u_cameraAngle;
 uniform vec2 u_resolution;
 uniform float u_pixelRatio;
 uniform float u_labelMargin;
@@ -87,6 +89,7 @@ out vec4 v_id;
 out vec4 v_color;
 
 ${GLSL_READ_NODE_DATA}
+${GLSL_READ_NODE_FLAGS}
 ${GLSL_READ_NODE_FRAME}
 ${GLSL_LABEL_BOX_CENTER}
 
@@ -100,6 +103,9 @@ void main() {
 
   // Shape-aware edge distance, read once from the shared frame texture.
   float edgeDist = readNodeFrame(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx);
+
+  // Per-node label rotation alignment: 0 = viewport, 1 = label turns with camera.
+  float labelRotation = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx).g;
 
   ${GLSL_NODE_SIZE_TO_PIXELS}
 
@@ -123,8 +129,10 @@ void main() {
   vec2 labelHalfSize = vec2(labelW * 0.5 + padding, labelH * 0.5 + padding);
   vec2 labelOffset = vec2(0.0);
 
-  float la_c = cos(a_labelAngle);
-  float la_s = sin(a_labelAngle);
+  // Graph-aligned labels add the camera angle so the rect orbits with the text.
+  float labelAngle = a_labelAngle - labelRotation * u_cameraAngle;
+  float la_c = cos(labelAngle);
+  float la_s = sin(labelAngle);
   mat2 labelRotMat = mat2(la_c, -la_s, la_s, la_c);
 
   vec3 nodeClip = u_matrix * vec3(nodePosition, 1.0);
@@ -216,6 +224,7 @@ export function createLabelBackgroundProgram<
           "u_matrix",
           "u_sizeRatio",
           "u_correctionRatio",
+          "u_cameraAngle",
           "u_resolution",
           "u_pixelRatio",
           "u_labelMargin",
@@ -267,6 +276,7 @@ export function createLabelBackgroundProgram<
       gl.uniformMatrix3fv(uniformLocations.u_matrix, false, params.matrix);
       gl.uniform1f(uniformLocations.u_sizeRatio, params.sizeRatio);
       gl.uniform1f(uniformLocations.u_correctionRatio, params.correctionRatio);
+      gl.uniform1f(uniformLocations.u_cameraAngle, params.cameraAngle);
       gl.uniform2f(uniformLocations.u_resolution, params.width * params.pixelRatio, params.height * params.pixelRatio);
       gl.uniform1f(uniformLocations.u_pixelRatio, params.pixelRatio);
       gl.uniform1f(uniformLocations.u_labelMargin, NodeLabelBackgroundProgram.labelMargin);

@@ -14,7 +14,6 @@ import { SDFShape, UniformSpecification } from "../types";
 interface RegisteredShapeInstance {
   shape: SDFShape;
   uniformValues: Record<string, number>;
-  rotatesWithCamera: boolean;
   slug: string;
 }
 
@@ -22,25 +21,26 @@ const shapeInstanceRegistry = new Map<string, RegisteredShapeInstance>();
 const shapeIdMap = new Map<string, number>();
 let nextShapeId = 0;
 
-function generateShapeSlug(shape: SDFShape, rotatesWithCamera: boolean): string {
+function generateShapeSlug(shape: SDFShape): string {
   let slug = shape.name;
   const nonZeroParams = shape.uniforms
     .filter((u) => u.type === "float" && u.value !== undefined && u.value !== 0)
     .map((u) => `${u.name.replace("u_", "")}=${u.value}`)
     .sort();
   if (nonZeroParams.length > 0) slug += "#" + nonZeroParams.join("#");
-  if (rotatesWithCamera) slug += "#rwc";
   return slug;
 }
 
-export function registerShapeInstance(shape: SDFShape, rotatesWithCamera = false): string {
-  const slug = generateShapeSlug(shape, rotatesWithCamera);
+// Rotation alignment is no longer baked into the shape: it's a per-node flag in
+// the node-data texture, so a shape registers once regardless of orientation.
+export function registerShapeInstance(shape: SDFShape): string {
+  const slug = generateShapeSlug(shape);
   if (!shapeInstanceRegistry.has(slug)) {
     const uniformValues: Record<string, number> = {};
     for (const u of shape.uniforms) {
       if (u.type === "float" && u.value !== undefined) uniformValues[u.name] = u.value;
     }
-    shapeInstanceRegistry.set(slug, { shape, uniformValues, rotatesWithCamera, slug });
+    shapeInstanceRegistry.set(slug, { shape, uniformValues, slug });
     shapeIdMap.set(slug, nextShapeId++);
   }
   return slug;
@@ -99,25 +99,18 @@ float querySDF(int shapeId, vec2 uv, float size) {
 `;
   }
 
+  // querySDF is rotation-agnostic: callers pre-rotate `uv` per node (the camera
+  // counter-rotation depends on the node's rotation-alignment flag).
   const cases = shapes
     .map(([slug, registered], index) => {
-      const { shape, uniformValues, rotatesWithCamera } = registered;
+      const { shape, uniformValues } = registered;
       const floatUniforms = shape.uniforms.filter((u) => u.type === "float");
       const paramValues = floatUniforms.map((u) => numberToGLSLFloat(uniformValues[u.name] ?? 0));
       const sdfCall =
         paramValues.length === 0
-          ? `sdf_${shape.name}(queryUV, size)`
-          : `sdf_${shape.name}(queryUV, size, ${paramValues.join(", ")})`;
-
-      if (!rotatesWithCamera) {
-        return `    case ${index}: { // ${slug}
-      float c = cos(u_cameraAngle), s = sin(u_cameraAngle);
-      vec2 queryUV = mat2(c, -s, s, c) * uv;
-      return ${sdfCall};
-    }`;
-      }
-      return `    case ${index}: // ${slug}
-      return ${sdfCall.replace("queryUV", "uv")};`;
+          ? `sdf_${shape.name}(uv, size)`
+          : `sdf_${shape.name}(uv, size, ${paramValues.join(", ")})`;
+      return `    case ${index}: return ${sdfCall}; // ${slug}`;
     })
     .join("\n");
 
@@ -140,11 +133,7 @@ export function dedupeShapeUniforms(shapes: SDFShape[]): UniformSpecification[] 
   return [...new Map(shapes.flatMap((s) => s.uniforms).map((u) => [u.name, u])).values()];
 }
 
-export function generateNodeShapeSelectorGLSL(
-  shapes: SDFShape[],
-  _rotatesWithCamera: boolean,
-  shapeGlobalIds?: number[],
-): string {
+export function generateNodeShapeSelectorGLSL(shapes: SDFShape[], shapeGlobalIds?: number[]): string {
   if (shapes.length === 0) {
     return /*glsl*/ `
 void queryNodeSDF(int shapeId, vec2 uv, float size) {

@@ -9,6 +9,7 @@
  * @module
  */
 import { computeAttributeLayout } from "../data-texture";
+import { GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../glsl";
 import { isAttributeSource } from "../nodes";
 import { generateShapeSelectorGLSL, getAllShapeGLSL } from "../shapes";
 import { numberToGLSLFloat } from "../utils";
@@ -238,41 +239,41 @@ function generateAllClampFunctions(paths: EdgePath[]): string {
   if (paths.length === 1) {
     // Single path: selectors just call the single path's functions directly
     parts.push(`
-float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, vec2 target, float margin) {
-  return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, target, margin);
+float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, float sourceRotateAlign, vec2 target, float margin) {
+  return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, sourceRotateAlign, target, margin);
 }
 
-float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float margin) {
-  return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, margin);
+float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float targetRotateAlign, float margin) {
+  return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, targetRotateAlign, margin);
 }`);
   } else {
     // Multiple paths: generate switch statements
     const sourceCases = paths
       .map(
         (p, i) =>
-          `    case ${i}: return findSourceClampT_${p.name}(source, sourceSize, sourceShapeId, target, margin);`,
+          `    case ${i}: return findSourceClampT_${p.name}(source, sourceSize, sourceShapeId, sourceRotateAlign, target, margin);`,
       )
       .join("\n");
 
     const targetCases = paths
       .map(
         (p, i) =>
-          `    case ${i}: return findTargetClampT_${p.name}(source, target, targetSize, targetShapeId, margin);`,
+          `    case ${i}: return findTargetClampT_${p.name}(source, target, targetSize, targetShapeId, targetRotateAlign, margin);`,
       )
       .join("\n");
 
     parts.push(`
-float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, vec2 target, float margin) {
+float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, float sourceRotateAlign, vec2 target, float margin) {
   switch (pathId) {
 ${sourceCases}
-    default: return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, target, margin);
+    default: return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, sourceRotateAlign, target, margin);
   }
 }
 
-float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float margin) {
+float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float targetRotateAlign, float margin) {
   switch (pathId) {
 ${targetCases}
-    default: return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, margin);
+    default: return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, targetRotateAlign, margin);
   }
 }`);
   }
@@ -341,6 +342,10 @@ out vec4 pre_clamp;
 // Extremity width factor array (needed for extremityScale computation)
 const float EXTREMITY_WIDTH_FACTORS[${extremities.length}] = float[](${extremityWidthFactors});
 
+// Node-data fetch helpers (geometry texel + rotation-flags texel)
+${GLSL_READ_NODE_DATA}
+${GLSL_READ_NODE_FLAGS}
+
 // Shape SDFs for node boundary clamping
 ${getAllShapeGLSL()}
 ${generateShapeSelectorGLSL()}
@@ -374,11 +379,9 @@ void main() {
 ${textureFetch.fetchCode}
 ${textureFetch.varyingAssignments}
 
-  // Fetch node positions, sizes, and shape IDs
-  ivec2 srcTexCoord = ivec2(srcIdx % u_nodeDataTextureWidth, srcIdx / u_nodeDataTextureWidth);
-  ivec2 tgtTexCoord = ivec2(tgtIdx % u_nodeDataTextureWidth, tgtIdx / u_nodeDataTextureWidth);
-  vec4 srcNodeData = texelFetch(u_nodeDataTexture, srcTexCoord, 0);
-  vec4 tgtNodeData = texelFetch(u_nodeDataTexture, tgtTexCoord, 0);
+  // Fetch node geometry (texel 0) and rotation flags (texel 1).
+  vec4 srcNodeData = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx);
+  vec4 tgtNodeData = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx);
 
   vec2 a_source = srcNodeData.xy;
   vec2 a_target = tgtNodeData.xy;
@@ -386,6 +389,9 @@ ${textureFetch.varyingAssignments}
   float a_targetSize = tgtNodeData.z;
   float a_sourceShapeId = srcNodeData.w;
   float a_targetShapeId = tgtNodeData.w;
+  // Per-node rotation alignment (0 = viewport, 1 = graph), for boundary clamping.
+  float a_sourceRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx).r;
+  float a_targetRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx).r;
 
   v_sourceNodeSize = a_sourceSize;
   v_targetNodeSize = a_targetSize;
@@ -401,8 +407,8 @@ ${textureFetch.varyingAssignments}
   float webGLThickness = pixelsThickness * u_correctionRatio / u_sizeRatio;
 
   // SDF clamping: find where the edge body meets the node boundaries
-  float tStart = tailLengthRatio > 0.0 ? queryFindSourceClampT(pathId, a_source, a_sourceSize, int(a_sourceShapeId), a_target, 0.0) : 0.0;
-  float tEnd = headLengthRatio > 0.0 ? queryFindTargetClampT(pathId, a_source, a_target, a_targetSize, int(a_targetShapeId), 0.0) : 1.0;
+  float tStart = tailLengthRatio > 0.0 ? queryFindSourceClampT(pathId, a_source, a_sourceSize, int(a_sourceShapeId), a_sourceRotateAlign, a_target, 0.0) : 0.0;
+  float tEnd = headLengthRatio > 0.0 ? queryFindTargetClampT(pathId, a_source, a_target, a_targetSize, int(a_targetShapeId), a_targetRotateAlign, 0.0) : 1.0;
 
   // Path length and zone boundaries (needed for straightening check)
   float pathLength = queryPathLength(pathId, a_source, a_target);
@@ -461,11 +467,13 @@ ${textureFetch.varyingAssignments}
     if (tailLengthRatio > 0.0) {
       float srcExtent = a_sourceSize * u_correctionRatio / u_sizeRatio * 2.0;
       float srcEffective = 1.0 - u_correctionRatio / srcExtent;
+      float srcCa = u_cameraAngle * (1.0 - a_sourceRotateAlign);
+      mat2 srcRot = mat2(cos(srcCa), -sin(srcCa), sin(srcCa), cos(srcCa));
       float lo = 0.0, hi = 0.5;
       for (int i = 0; i < 12; i++) {
         float mid = (lo + hi) * 0.5;
         vec2 pos = mix(a_source, a_target, mid);
-        vec2 localPos = (pos - a_source) / srcExtent;
+        vec2 localPos = srcRot * ((pos - a_source) / srcExtent);
         float sdf = querySDF(int(a_sourceShapeId), localPos, srcEffective);
         if (sdf < 0.0) lo = mid; else hi = mid;
       }
@@ -474,11 +482,13 @@ ${textureFetch.varyingAssignments}
     if (headLengthRatio > 0.0) {
       float tgtExtent = a_targetSize * u_correctionRatio / u_sizeRatio * 2.0;
       float tgtEffective = 1.0 - u_correctionRatio / tgtExtent;
+      float tgtCa = u_cameraAngle * (1.0 - a_targetRotateAlign);
+      mat2 tgtRot = mat2(cos(tgtCa), -sin(tgtCa), sin(tgtCa), cos(tgtCa));
       float lo = 0.5, hi = 1.0;
       for (int i = 0; i < 12; i++) {
         float mid = (lo + hi) * 0.5;
         vec2 pos = mix(a_source, a_target, mid);
-        vec2 localPos = (pos - a_target) / tgtExtent;
+        vec2 localPos = tgtRot * ((pos - a_target) / tgtExtent);
         float sdf = querySDF(int(a_targetShapeId), localPos, tgtEffective);
         if (sdf < 0.0) hi = mid; else lo = mid;
       }
@@ -676,6 +686,9 @@ ${generateAllPathsGLSL(paths)}
 // Path selector functions
 ${generateAllPathSelectors(paths)}
 
+// Node-data fetch helper (geometry texel of the two-texel node stride)
+${GLSL_READ_NODE_DATA}
+
 void main() {
   // Fetch edge data from edge texture (2 texels per edge)
   // Texel 0: sourceNodeIndex, targetNodeIndex, thickness, reserved
@@ -706,11 +719,9 @@ ${textureFetch.fetchCode}
   // Assign path/layer attribute varyings
 ${textureFetch.varyingAssignments}
 
-  // Fetch source and target node data from node texture
-  ivec2 srcTexCoord = ivec2(srcIdx % u_nodeDataTextureWidth, srcIdx / u_nodeDataTextureWidth);
-  ivec2 tgtTexCoord = ivec2(tgtIdx % u_nodeDataTextureWidth, tgtIdx / u_nodeDataTextureWidth);
-  vec4 srcNodeData = texelFetch(u_nodeDataTexture, srcTexCoord, 0);
-  vec4 tgtNodeData = texelFetch(u_nodeDataTexture, tgtTexCoord, 0);
+  // Fetch source and target node geometry (texel 0 of the two-texel node stride)
+  vec4 srcNodeData = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx);
+  vec4 tgtNodeData = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx);
 
   vec2 a_source = srcNodeData.xy;
   vec2 a_target = tgtNodeData.xy;

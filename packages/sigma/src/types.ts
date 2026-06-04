@@ -100,9 +100,14 @@ export interface DisplayData {
   cursor?: string;
 }
 
+/** Whether something stays screen-upright ("viewport") or turns with the camera ("graph"). */
+export type RotationAlignment = "viewport" | "graph";
+
 export interface NodeDisplayData extends Coordinates, DisplayData {
   highlighted: boolean;
   shape?: string; // Shape name for edge clamping (e.g., "circle", "square")
+  rotationAlignment?: RotationAlignment; // Node shape orientation: screen-upright or graph-fixed
+  labelRotationAlignment?: RotationAlignment; // Label orientation: screen-upright or orbits with camera
   labelPosition?: LabelPosition; // Label position relative to node
   labelSize?: number; // Label font size in pixels
   labelFont?: string; // Label font family (e.g., "Georgia, serif")

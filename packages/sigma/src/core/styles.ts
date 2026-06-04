@@ -390,6 +390,8 @@ export const DEFAULT_NODE_DISPLAY_DATA: Omit<
   color: "#666",
   opacity: 1,
   shape: "circle",
+  rotationAlignment: "viewport",
+  labelRotationAlignment: "viewport",
   visibility: "visible",
   depth: "nodes",
   zIndex: 0,

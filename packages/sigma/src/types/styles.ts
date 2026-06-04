@@ -256,6 +256,10 @@ export interface NodeBuiltInVariables<
 > {
   /** Node shape (must match a shape declared in programs) */
   shape?: GraphicValue<NA, NS, GS, Shape>;
+  /** Node shape orientation: "viewport" stays screen-upright, "graph" turns with the camera */
+  rotationAlignment?: GraphicValue<NA, NS, GS, "viewport" | "graph">;
+  /** Label orientation: "viewport" stays screen-upright, "graph" orbits/turns with the camera */
+  labelRotationAlignment?: GraphicValue<NA, NS, GS, "viewport" | "graph">;
   /** X coordinate in graph space */
   x?: GraphicValue<NA, NS, GS, number>;
   /** Y coordinate in graph space */

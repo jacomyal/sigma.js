@@ -144,13 +144,32 @@ vec2 labelBoxCenter(float positionMode, float labelStart, vec2 halfSize, float t
 }
 `;
 
+/** Texels per node in the node-data texture (geometry + rotation flags). */
+export const NODE_DATA_TEXELS_PER_NODE = 2;
+
 /**
- * Reads a node's data texel `(x, y, size, shapeId)` from the node-data texture
- * by node index. Shared by the label programs so the fetch isn't re-inlined.
+ * Reads a node's geometry texel `(x, y, size, shapeId)` from the node-data
+ * texture by node index. Shared by every node-data consumer so the two-texel
+ * stride lives in exactly one place.
  */
 export const GLSL_READ_NODE_DATA = /*glsl*/ `
 vec4 readNodeData(sampler2D nodeDataTexture, int nodeDataTextureWidth, int nodeIndex) {
-  ivec2 coord = ivec2(nodeIndex % nodeDataTextureWidth, nodeIndex / nodeDataTextureWidth);
+  int t = nodeIndex * ${NODE_DATA_TEXELS_PER_NODE};
+  ivec2 coord = ivec2(t % nodeDataTextureWidth, t / nodeDataTextureWidth);
+  return texelFetch(nodeDataTexture, coord, 0);
+}
+`;
+
+/**
+ * Reads a node's rotation-flags texel from the node-data texture (texel 1):
+ *   .r = nodeRotation  (0 = viewport/screen-upright, 1 = graph/turns with camera)
+ *   .g = labelRotation (0 = viewport, 1 = label orbits with camera)
+ * Same node index as readNodeData. Requires GLSL_READ_NODE_DATA's stride.
+ */
+export const GLSL_READ_NODE_FLAGS = /*glsl*/ `
+vec4 readNodeFlags(sampler2D nodeDataTexture, int nodeDataTextureWidth, int nodeIndex) {
+  int t = nodeIndex * ${NODE_DATA_TEXELS_PER_NODE} + 1;
+  ivec2 coord = ivec2(t % nodeDataTextureWidth, t / nodeDataTextureWidth);
   return texelFetch(nodeDataTexture, coord, 0);
 }
 `;
@@ -184,7 +203,6 @@ float readNodeFrame(sampler2D frameTexture, int frameTextureWidth, int nodeIndex
  */
 export function generateFindEdgeDistanceForShapes(
   shapes: SDFShape[],
-  rotateWithCamera: boolean,
   shapeGlobalIds?: number[],
 ): { code: string; multiShape: boolean } {
   const floatParams = (shape: SDFShape): string[] =>
@@ -198,7 +216,7 @@ export function generateFindEdgeDistanceForShapes(
   };
 
   if (shapes.length === 1) {
-    return { code: findEdgeDistanceLoop(sdfCall(shapes[0]), rotateWithCamera), multiShape: false };
+    return { code: findEdgeDistanceLoop(sdfCall(shapes[0])), multiShape: false };
   }
 
   // Multi-shape: switch over the node's (global) shape id. Case ids are the
@@ -215,7 +233,7 @@ ${cases}
   }
 }
 int g_shapeId;
-${findEdgeDistanceLoop("queryShapeSDF(g_shapeId, uv, size)", rotateWithCamera)}
+${findEdgeDistanceLoop("queryShapeSDF(g_shapeId, uv, size)")}
 `;
 
   return { code, multiShape: true };
@@ -223,20 +241,14 @@ ${findEdgeDistanceLoop("queryShapeSDF(g_shapeId, uv, size)", rotateWithCamera)}
 
 /**
  * The findEdgeDistance binary search, parameterized by the SDF expression to
- * test (`uv`/`size` in scope). When `rotateWithCamera`, the direction is
- * counter-rotated by the camera angle once before the loop so the search runs
- * in shape-local space. Single- and multi-shape programs share this body.
+ * test (`uv`/`size` in scope). Rotation is not handled here: the caller
+ * pre-rotates `direction` per node (the camera counter-rotation depends on the
+ * node's rotation-alignment flag). Single- and multi-shape programs share this.
  */
-function findEdgeDistanceLoop(sdfExpr: string, rotateWithCamera: boolean): string {
-  const counterRotate = rotateWithCamera
-    ? /*glsl*/ `  float c = cos(-u_cameraAngle), s = sin(-u_cameraAngle);
-  direction = mat2(c, -s, s, c) * direction;
-`
-    : "";
-
+function findEdgeDistanceLoop(sdfExpr: string): string {
   return /*glsl*/ `
 float findEdgeDistance(vec2 direction, float size) {
-${counterRotate}  float lo = 0.0, hi = 2.0;
+  float lo = 0.0, hi = 2.0;
   for (int i = 0; i < 8; i++) {
     float mid = (lo + hi) * 0.5;
     vec2 uv = direction * mid;

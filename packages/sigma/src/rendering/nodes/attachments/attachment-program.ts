@@ -21,6 +21,7 @@ import {
   DEFAULT_LABEL_MARGIN,
   GLSL_LABEL_BOX_CENTER,
   GLSL_READ_NODE_DATA,
+  GLSL_READ_NODE_FLAGS,
   GLSL_READ_NODE_FRAME,
   GLSL_ROTATE_2D,
 } from "../../glsl";
@@ -56,6 +57,7 @@ uniform vec2 u_resolution;
 uniform float u_labelPixelSnapping;
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
+uniform float u_cameraAngle;
 uniform float u_pixelRatio;
 uniform float u_labelMargin;
 uniform float u_zoomLabelSizeRatio;
@@ -86,6 +88,7 @@ in vec2 a_quadCorner;           // [-1,-1], [1,-1], [-1,1], [1,1]
 out vec2 v_texCoord;
 
 ${GLSL_READ_NODE_DATA}
+${GLSL_READ_NODE_FLAGS}
 ${GLSL_READ_NODE_FRAME}
 ${GLSL_LABEL_BOX_CENTER}
 ${GLSL_ROTATE_2D}
@@ -102,6 +105,9 @@ void main() {
   // the SDF search once; we just read the result).
   float edgeDist = readNodeFrame(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx);
 
+  // Per-node label rotation alignment: 0 = viewport, 1 = label turns with camera.
+  float labelRotation = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx).g;
+
   vec3 nodeClip = u_matrix * vec3(nodePos, 1.0);
 
   // Node radius in physical pixels (matches label/background).
@@ -117,7 +123,8 @@ void main() {
   float gap = ${ATTACHMENT_GAP.toFixed(1)} * zoomScale * u_pixelRatio;
   float labelMargin = u_labelMargin * zoomScale * u_pixelRatio;
 
-  mat2 labelRotMat = rotate2D(a_labelAngle);
+  // Graph-aligned labels add the camera angle so the attachment orbits with the box.
+  mat2 labelRotMat = rotate2D(a_labelAngle - labelRotation * u_cameraAngle);
 
   // Label box center relative to the node center (pre-rotation). The shape-aware
   // edge distance comes from the frame texture, so placement matches the label.
@@ -277,6 +284,7 @@ export function createAttachmentProgram<
           "u_labelPixelSnapping",
           "u_sizeRatio",
           "u_correctionRatio",
+          "u_cameraAngle",
           "u_pixelRatio",
           "u_labelMargin",
           "u_zoomLabelSizeRatio",
@@ -331,6 +339,7 @@ export function createAttachmentProgram<
       gl.uniform1f(uniformLocations.u_labelPixelSnapping, params.labelPixelSnapping);
       gl.uniform1f(uniformLocations.u_sizeRatio, params.sizeRatio);
       gl.uniform1f(uniformLocations.u_correctionRatio, params.correctionRatio);
+      gl.uniform1f(uniformLocations.u_cameraAngle, params.cameraAngle);
       gl.uniform1f(uniformLocations.u_pixelRatio, params.pixelRatio);
       gl.uniform1f(uniformLocations.u_labelMargin, NodeAttachmentProgram.labelMargin);
       gl.uniform1f(uniformLocations.u_zoomLabelSizeRatio, 1 / zoomToLabelSizeRatioFunction(params.zoomRatio));

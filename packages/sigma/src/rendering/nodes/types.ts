@@ -441,15 +441,8 @@ export interface NodeProgramOptions {
   backdrop?: BackdropOptions;
 
   /**
-   * Whether nodes should rotate with the camera.
-   * - false (default): Nodes stay upright regardless of camera rotation
-   * - true: Nodes rotate along with the camera
-   */
-  rotateWithCamera?: boolean;
-
-  /**
    * Declared label attachments. Only their presence matters here: when none are
-   * declared, the attachment program is built as a no-op (see createNodeProgram).
+   * declared, no attachment program is built (see createNodeProgram).
    */
   labelAttachments?: Record<string, LabelAttachmentRenderer>;
 }

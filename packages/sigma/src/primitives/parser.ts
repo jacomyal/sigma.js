@@ -315,7 +315,6 @@ export function generateNodeProgram<
   const bundle = createNodeProgram<N, E, G>(gl, pickingBuffer, renderer, {
     shapes,
     layers,
-    rotateWithCamera: nodePrimitives?.rotateWithCamera,
     label: nodePrimitives?.label,
     backdrop: nodePrimitives?.backdrop,
     labelAttachments: nodePrimitives?.labelAttachments,

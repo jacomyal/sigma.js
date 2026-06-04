@@ -172,41 +172,18 @@ describe("Composed node program shader generation", () => {
     });
   });
 
-  describe("rotateWithCamera option", () => {
-    test("generates compilable shaders with rotateWithCamera: false (default)", () => {
+  describe("per-node rotation alignment", () => {
+    test("vertex applies the camera counter-rotation scaled by the per-node flag", () => {
       const generated = generateShaders({
         shapes: [sdfCircle()],
         layers: [layerFill()],
-        rotateWithCamera: false,
       });
 
       expectShadersToCompile(generated.vertexShader, generated.fragmentShader);
-      // Should include counter-rotation code
-      expect(generated.vertexShader).toContain("cos(u_cameraAngle)");
-      expect(generated.vertexShader).toContain("sin(u_cameraAngle)");
-    });
-
-    test("generates compilable shaders with rotateWithCamera: true", () => {
-      const generated = generateShaders({
-        shapes: [sdfCircle()],
-        layers: [layerFill()],
-        rotateWithCamera: true,
-      });
-
-      expectShadersToCompile(generated.vertexShader, generated.fragmentShader);
-      // Should NOT include counter-rotation code in main shader body
-      expect(generated.vertexShader).not.toContain("mat2(c, s, -s, c)");
-    });
-
-    test("defaults to rotateWithCamera: false when not specified", () => {
-      const generated = generateShaders({
-        shapes: [sdfCircle()],
-        layers: [layerFill()],
-      });
-
-      // Should include counter-rotation code by default
-      expect(generated.vertexShader).toContain("cos(u_cameraAngle)");
-      expect(generated.vertexShader).toContain("Counter-rotate");
+      // Rotation is data-driven: the angle scales by (1 - nodeRotation) so both
+      // viewport (0) and graph (1) alignment fall out of one code path.
+      expect(generated.vertexShader).toContain("1.0 - nodeRotation");
+      expect(generated.vertexShader).toContain("u_cameraAngle");
     });
 
     test("includes u_cameraAngle uniform", () => {
@@ -218,28 +195,13 @@ describe("Composed node program shader generation", () => {
       expect(generated.uniforms).toContain("u_cameraAngle");
     });
 
-    test("works with all shapes and rotateWithCamera: false", () => {
+    test("works with all shapes", () => {
       const allShapes = [sdfCircle(), sdfSquare(), sdfTriangle(), sdfDiamond()];
 
       for (const shape of allShapes) {
         const generated = generateShaders({
           shapes: [shape],
           layers: [layerFill()],
-          rotateWithCamera: false,
-        });
-
-        expectShadersToCompile(generated.vertexShader, generated.fragmentShader);
-      }
-    });
-
-    test("works with all shapes and rotateWithCamera: true", () => {
-      const allShapes = [sdfCircle(), sdfSquare(), sdfTriangle(), sdfDiamond()];
-
-      for (const shape of allShapes) {
-        const generated = generateShaders({
-          shapes: [shape],
-          layers: [layerFill()],
-          rotateWithCamera: true,
         });
 
         expectShadersToCompile(generated.vertexShader, generated.fragmentShader);

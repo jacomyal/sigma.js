@@ -44,7 +44,6 @@ export interface BackdropDisplayData {
 
 export interface CreateBackdropProgramOptions {
   shapes: SDFShape[];
-  rotateWithCamera?: boolean;
   label?: LabelOptions;
   /** Maps local shape index to global shape ID (for multi-shape programs). */
   shapeGlobalIds?: number[];
@@ -60,7 +59,7 @@ export function createBackdropProgram<
   renderer: Sigma<N, E, G>,
   options: CreateBackdropProgramOptions,
 ): BackdropProgram<N, E, G> {
-  const { rotateWithCamera = false, label: labelOptions = {}, shapes, shapeGlobalIds } = options;
+  const { label: labelOptions = {}, shapes, shapeGlobalIds } = options;
 
   if (shapes.length === 0) {
     throw new Error("createBackdropProgram: at least one shape must be provided in 'shapes'");
@@ -69,7 +68,7 @@ export function createBackdropProgram<
   const labelMargin = labelOptions.margin ?? 5;
   const zoomToLabelSizeRatioFunction = labelOptions.zoomToLabelSizeRatioFunction ?? (() => 1);
 
-  const shaderOptions: BackdropShaderOptions = { shapes, rotateWithCamera, shapeGlobalIds };
+  const shaderOptions: BackdropShaderOptions = { shapes, shapeGlobalIds };
   const generatedShaders = generateBackdropShaders(shaderOptions);
 
   type BackdropUniform = string;

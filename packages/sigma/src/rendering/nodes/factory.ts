@@ -60,7 +60,7 @@ export function createNodeProgram<
   renderer: Sigma<N, E, G>,
   options: NodeProgramOptions,
 ): NodeProgramBundle<N, E, G> {
-  const { rotateWithCamera = false, label: labelOptions = {}, shapes } = options;
+  const { label: labelOptions = {}, shapes } = options;
 
   if (shapes.length === 0) {
     throw new Error("createNodeProgram: at least one shape must be provided in 'shapes'");
@@ -73,7 +73,7 @@ export function createNodeProgram<
   let primaryShapeSlug: string | undefined;
 
   shapes.forEach((shape, index) => {
-    const slug = registerShapeInstance(shape, rotateWithCamera);
+    const slug = registerShapeInstance(shape);
     if (index === 0) primaryShapeSlug = slug;
     // Map shape name to local index for GPU-side shape selection
     shapeNameToIndex[shape.name] = index;
@@ -89,7 +89,6 @@ export function createNodeProgram<
   let generated = generateShaders({
     shapes,
     layers,
-    rotateWithCamera,
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
   });
 
@@ -101,7 +100,6 @@ export function createNodeProgram<
   });
   const backdropProgram = createBackdropProgram(gl, null, renderer, {
     shapes,
-    rotateWithCamera,
     label: labelOptions,
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
   });
@@ -121,7 +119,6 @@ export function createNodeProgram<
   // texture, which the companions above read instead of searching themselves.
   const framePass = new NodeLabelFramePass(gl, {
     shapes,
-    rotateWithCamera,
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
   });
 
@@ -255,7 +252,6 @@ export function createNodeProgram<
       generated = generateShaders({
         shapes,
         layers,
-        rotateWithCamera,
         shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
       });
 
