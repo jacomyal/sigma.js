@@ -65,8 +65,9 @@ export {
   generateLabelVertexShader,
   generateLabelFragmentShader,
   collectLabelUniforms,
+  NodeLabelFramePass,
 } from "./labels";
-export type { GeneratedLabelShaders, LabelShaderOptions } from "./labels";
+export type { GeneratedLabelShaders, NodeLabelFramePassOptions } from "./labels";
 
 export {
   generateBackdropShaders,
@@ -77,4 +78,5 @@ export {
 export type { GeneratedBackdropShaders, BackdropShaderOptions } from "./backdrops";
 
 // Label attachment programs
-export { AttachmentManager, AttachmentProgram } from "./attachments";
+export { AttachmentManager } from "./attachments";
+export type { AttachmentProgram } from "./attachments";

@@ -85,7 +85,7 @@ export class DataTexture {
 
     this.texture = gl.createTexture();
 
-    // Bind on unit 0 (scratch); other units hold live textures we must not disturb
+    // Bind on scratch unit 0 (all other units hold live textures):
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
 
@@ -214,7 +214,7 @@ export class DataTexture {
 
     const { gl, textureWidth } = this;
 
-    // Bind on unit 0 (scratch); other units hold live textures we must not disturb
+    // Bind on scratch unit 0 (all other units hold live textures):
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
 

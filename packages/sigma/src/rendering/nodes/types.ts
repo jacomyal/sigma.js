@@ -9,7 +9,7 @@
  *
  * @module
  */
-import { BackdropOptions } from "../../primitives/types";
+import { BackdropOptions, LabelAttachmentRenderer } from "../../primitives/types";
 
 export type Vec2 = [number, number];
 export type Vec3 = [number, number, number];
@@ -446,4 +446,10 @@ export interface NodeProgramOptions {
    * - true: Nodes rotate along with the camera
    */
   rotateWithCamera?: boolean;
+
+  /**
+   * Declared label attachments. Only their presence matters here: when none are
+   * declared, the attachment program is built as a no-op (see createNodeProgram).
+   */
+  labelAttachments?: Record<string, LabelAttachmentRenderer>;
 }

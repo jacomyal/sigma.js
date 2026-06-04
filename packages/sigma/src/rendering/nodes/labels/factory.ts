@@ -26,11 +26,11 @@ import { floatColor, getPixelRatio } from "../../../utils";
 // Constants
 // ============================================================================
 
-import { POSITION_MODE_MAP } from "../../glsl";
+import { DEFAULT_LABEL_MARGIN, POSITION_MODE_MAP } from "../../glsl";
 import { InstancedProgramDefinition, ProgramInfo } from "../../utils";
-import { LabelOptions, SDFShape } from "../types";
+import { LabelOptions } from "../types";
 import { LabelProgram } from "./base";
-import { LabelShaderOptions, generateLabelShaders } from "./generator";
+import { generateLabelShaders } from "./generator";
 
 // ============================================================================
 // Types
@@ -40,19 +40,6 @@ import { LabelShaderOptions, generateLabelShaders } from "./generator";
  * Options for creating a label program.
  */
 export interface CreateLabelProgramOptions {
-  /**
-   * Array of SDF shape definitions.
-   * The label will use the correct shape based on each node's shapeId.
-   */
-  shapes: SDFShape[];
-
-  /**
-   * Whether nodes rotate with the camera.
-   * When true, labels rotate with the node.
-   * When false (default), labels stay screen-aligned.
-   */
-  rotateWithCamera?: boolean;
-
   /**
    * Label styling and behavior options.
    */
@@ -80,9 +67,9 @@ interface LabelGlyphCache {
 // ============================================================================
 
 /**
- * Builds a node label program instance. The program renders text labels
- * with shape-aware positioning, using the shape's SDF to compute exact
- * edge distances for any direction.
+ * Builds a node label program instance. The program renders text labels,
+ * positioning them from the shape-aware edge distance the frame-pass writes to
+ * the shared frame texture.
  *
  * `createNodeProgram` calls this internally and exposes the instance in
  * its `labelProgram` field.
@@ -97,17 +84,14 @@ export function createLabelProgram<
   renderer: Sigma<N, E, G>,
   options: CreateLabelProgramOptions,
 ): LabelProgram<string, N, E, G, LabelDisplayData> {
-  const { rotateWithCamera = false, label: labelOptions = {}, shapes } = options;
-  const labelMargin = labelOptions.margin ?? 5;
+  const { label: labelOptions = {} } = options;
+  const labelMargin = labelOptions.margin ?? DEFAULT_LABEL_MARGIN;
   const zoomToLabelSizeRatioFunction = labelOptions.zoomToLabelSizeRatioFunction ?? (() => 1);
 
-  if (shapes.length === 0) {
-    throw new Error("createLabelProgram: at least one shape must be provided in 'shapes'");
-  }
-
-  // Generate shaders at factory creation time (not per-instance)
-  const shaderOptions: LabelShaderOptions = { shapes, rotateWithCamera };
-  const generatedShaders = generateLabelShaders(shaderOptions);
+  // Generate shaders at factory creation time (not per-instance). The label text
+  // is shape-agnostic now — the shape-aware boundary distance comes from the
+  // frame-pass via the shared frame texture.
+  const generatedShaders = generateLabelShaders();
 
   // Uniform type for TypeScript
   type LabelUniform =
@@ -460,7 +444,6 @@ export function createLabelProgram<
       gl.uniformMatrix3fv(uniformLocations.u_matrix, false, params.matrix);
       gl.uniform1f(uniformLocations.u_sizeRatio, params.sizeRatio);
       gl.uniform1f(uniformLocations.u_correctionRatio, params.correctionRatio);
-      gl.uniform1f(uniformLocations.u_cameraAngle, params.cameraAngle);
 
       // Viewport size in physical pixels
       gl.uniform2f(uniformLocations.u_resolution, params.width * params.pixelRatio, params.height * params.pixelRatio);
@@ -486,6 +469,10 @@ export function createLabelProgram<
         gl.uniform1i(uniformLocations.u_nodeDataTextureWidth, params.nodeDataTextureWidth);
       }
 
+      // Shared frame texture (normalized edge distances written by the frame-pass)
+      gl.uniform1i(uniformLocations.u_nodeFrameTexture, params.nodeFrameTextureUnit);
+      gl.uniform1i(uniformLocations.u_nodeFrameTextureWidth, params.nodeFrameTextureWidth);
+
       // SDF rendering parameters
       gl.uniform1f(uniformLocations.u_gamma, this.gamma);
       gl.uniform1f(uniformLocations.u_sdfBuffer, this.sdfBuffer);
@@ -497,18 +484,6 @@ export function createLabelProgram<
         1 / NodeLabelProgram.zoomToLabelSizeRatioFunction(params.zoomRatio),
       );
       gl.uniform1f(uniformLocations.u_labelPixelSnapping, params.labelPixelSnapping);
-
-      // Shape-specific uniforms (for SDF edge detection)
-      // Deduplicate uniforms across all shapes
-      const seenUniforms = new Set<string>();
-      for (const shape of shapes) {
-        for (const uniform of shape.uniforms) {
-          if (!seenUniforms.has(uniform.name)) {
-            seenUniforms.add(uniform.name);
-            this.setTypedUniform(uniform, programInfo);
-          }
-        }
-      }
     }
 
     // -----------------------------------------------------------------------

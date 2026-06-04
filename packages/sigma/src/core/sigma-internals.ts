@@ -21,8 +21,9 @@ import {
   LabelBackgroundProgram,
   LabelProgram,
   NodeDataTexture,
+  NodeFrameTexture,
 } from "../rendering";
-import { AttachmentProgram } from "../rendering";
+import type { AttachmentProgram } from "../rendering";
 import { Settings } from "../settings";
 import { CameraState, Coordinates, Dimensions, EdgeDisplayData, NodeDisplayData } from "../types";
 import { BaseEdgeState, BaseNodeState } from "../types/styles";
@@ -74,6 +75,7 @@ export type SigmaInternals<
   attachmentManager: AttachmentManager | null;
   attachmentProgram: AttachmentProgram<N, E, G> | null;
   nodeDataTexture: NodeDataTexture | null;
+  nodeFrameTexture: NodeFrameTexture | null;
   edgeDataTexture: EdgeDataTexture | null;
   nodeShapeMap: Record<string, number> | null;
   nodeGlobalShapeIds: number[] | null;

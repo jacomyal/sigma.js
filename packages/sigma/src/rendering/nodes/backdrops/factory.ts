@@ -14,20 +14,19 @@ import type Sigma from "../../../sigma";
 import type { LabelPosition, RenderParams } from "../../../types";
 import { POSITION_MODE_MAP } from "../../glsl";
 import { Program } from "../../program";
+import { dedupeShapeUniforms } from "../../shapes";
 import { InstancedProgramDefinition, ProgramInfo } from "../../utils";
 import { LabelOptions, SDFShape } from "../types";
 import { BackdropShaderOptions, generateBackdropShaders } from "./generator";
 
 export interface BackdropDisplayData {
   key: string;
-  x: number;
-  y: number;
-  size: number;
+  nodeIndex: number; // node-data texture index (position/size/shapeId + edge distance)
   label: string | null;
   labelWidth: number;
-  labelHeight: number;
+  labelHeight: number; // font line box (CSS px)
+  textHeight: number; // actual glyph height (CSS px)
   type: string;
-  shapeId: number;
   position: LabelPosition;
   labelAngle: number;
   // Per-node backdrop style data
@@ -91,11 +90,10 @@ export function createBackdropProgram<
         METHOD: TRIANGLE_STRIP,
         UNIFORMS: generatedShaders.uniforms as BackdropUniform[],
         ATTRIBUTES: [
-          { name: "a_nodePosition", size: 2, type: FLOAT },
-          { name: "a_nodeSize", size: 1, type: FLOAT },
-          { name: "a_shapeId", size: 1, type: FLOAT },
+          { name: "a_nodeIndex", size: 1, type: FLOAT },
           { name: "a_labelWidth", size: 1, type: FLOAT },
           { name: "a_labelHeight", size: 1, type: FLOAT },
+          { name: "a_textHeight", size: 1, type: FLOAT },
           { name: "a_positionMode", size: 1, type: FLOAT },
           { name: "a_labelAngle", size: 1, type: FLOAT },
           { name: "a_backdropColor", size: 4, type: FLOAT },
@@ -121,12 +119,10 @@ export function createBackdropProgram<
       const { floats, STRIDE } = this;
       let i = offset * STRIDE;
 
-      floats[i++] = data.x;
-      floats[i++] = data.y;
-      floats[i++] = data.size;
-      floats[i++] = data.shapeId;
+      floats[i++] = data.nodeIndex;
       floats[i++] = data.labelWidth;
       floats[i++] = data.labelHeight;
+      floats[i++] = data.textHeight;
       floats[i++] = POSITION_MODE_MAP[data.position];
       floats[i++] = data.labelAngle;
       floats[i++] = data.backdropColor[0];
@@ -167,15 +163,15 @@ export function createBackdropProgram<
       gl.uniform1f(uniformLocations.u_zoomLabelSizeRatio, 1 / zoomToLabelSizeRatioFunction(params.zoomRatio));
       gl.uniform1f(uniformLocations.u_labelPixelSnapping, params.labelPixelSnapping);
 
-      // Shape-specific uniforms
-      const seenUniforms = new Set<string>();
-      for (const shape of shapes) {
-        for (const uniform of shape.uniforms) {
-          if (!seenUniforms.has(uniform.name)) {
-            seenUniforms.add(uniform.name);
-            this.setTypedUniform(uniform, programInfo);
-          }
-        }
+      // Shared node-data + frame textures (position/size/shapeId + edge distance)
+      gl.uniform1i(uniformLocations.u_nodeDataTexture, params.nodeDataTextureUnit);
+      gl.uniform1i(uniformLocations.u_nodeDataTextureWidth, params.nodeDataTextureWidth);
+      gl.uniform1i(uniformLocations.u_nodeFrameTexture, params.nodeFrameTextureUnit);
+      gl.uniform1i(uniformLocations.u_nodeFrameTextureWidth, params.nodeFrameTextureWidth);
+
+      // Shape-specific uniforms (fragment shader keeps the node SDF for the outline)
+      for (const uniform of dedupeShapeUniforms(shapes)) {
+        this.setTypedUniform(uniform, programInfo);
       }
     }
 

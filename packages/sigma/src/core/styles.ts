@@ -31,7 +31,7 @@ import {
   isInlineStateConditional,
   isValueFunction,
 } from "../types/styles";
-import { resolveEasing } from "../utils/easings";
+import { resolveEasing } from "../utils";
 
 /**
  * Type guard: checks if a binding has numerical range properties.
@@ -382,7 +382,10 @@ export function analyzeStyleDeclaration(
  * Default field values for NodeDisplayData, applied at the start of each style evaluation.
  * Does not include x, y (from graph attributes) or highlighted (from node state).
  */
-const DEFAULT_NODE_DISPLAY_DATA: Partial<NodeDisplayData> = {
+export const DEFAULT_NODE_DISPLAY_DATA: Omit<
+  Required<NodeDisplayData>,
+  "highlighted" | "x" | "y" | "labelBackgroundColor" | "labelBackgroundPadding" | "cursor" | "labelCursor"
+> = {
   size: 10,
   color: "#666",
   opacity: 1,
@@ -415,13 +418,15 @@ const DEFAULT_NODE_DISPLAY_DATA: Partial<NodeDisplayData> = {
 /**
  * Default field values for EdgeDisplayData, applied at the start of each style evaluation.
  */
-const DEFAULT_EDGE_DISPLAY_DATA: Partial<EdgeDisplayData> = {
+export const DEFAULT_EDGE_DISPLAY_DATA: Omit<
+  Required<EdgeDisplayData>,
+  "parallelPath" | "labelPosition" | "labelBackgroundColor" | "labelBackgroundPadding" | "cursor" | "labelCursor"
+> = {
   size: 1,
   color: "#ccc",
   opacity: 1,
   path: "straight",
   selfLoopPath: "loop",
-  parallelPath: undefined,
   parallelSpread: 0.25,
   tail: "none",
   head: "none",
@@ -431,11 +436,7 @@ const DEFAULT_EDGE_DISPLAY_DATA: Partial<EdgeDisplayData> = {
   label: "",
   labelColor: "#666",
   labelVisibility: "auto",
-  labelPosition: undefined,
   labelDepth: "edges",
-  labelBackgroundColor: undefined,
-  labelBackgroundPadding: undefined,
-  labelCursor: undefined,
 };
 
 // Keys used as rule control flow — skipped when iterating over style properties.
@@ -651,7 +652,7 @@ export function evaluateEdgeStyle<
     state as unknown as Record<string, unknown>,
     graphState as unknown as Record<string, unknown>,
     graph,
-    DEFAULT_EDGE_DISPLAY_DATA as Record<string, unknown>,
+    DEFAULT_EDGE_DISPLAY_DATA as unknown as Record<string, unknown>,
   );
 
   // Normalize: numeric labelPosition is not rendered (treat as default/undefined)

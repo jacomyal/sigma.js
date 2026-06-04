@@ -15,6 +15,7 @@ export {
   getShapeGLSL,
   getAllShapeGLSL,
   getShapeGLSLForShapes,
+  dedupeShapeUniforms,
   generateShapeSelectorGLSL,
   generateNodeShapeSelectorGLSL,
   clearShapeInstanceRegistry,

@@ -9,7 +9,7 @@
  * @module
  */
 import { numberToGLSLFloat } from "../../utils";
-import { SDFShape } from "../types";
+import { SDFShape, UniformSpecification } from "../types";
 
 interface RegisteredShapeInstance {
   shape: SDFShape;
@@ -133,6 +133,11 @@ ${cases}
 
 export function getShapeGLSLForShapes(shapes: SDFShape[]): string {
   return deduplicateShapeGLSL(shapes);
+}
+
+/** Shape uniforms across all shapes, deduplicated by name (first occurrence wins). */
+export function dedupeShapeUniforms(shapes: SDFShape[]): UniformSpecification[] {
+  return [...new Map(shapes.flatMap((s) => s.uniforms).map((u) => [u.name, u])).values()];
 }
 
 export function generateNodeShapeSelectorGLSL(

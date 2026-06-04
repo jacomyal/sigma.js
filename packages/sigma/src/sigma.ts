@@ -47,12 +47,13 @@ import {
 } from "./primitives";
 import {
   AttachmentManager,
-  AttachmentProgram,
   DepthBucketCollection,
   EdgeDataTexture,
   EdgePath,
   EdgeProgram,
   NodeDataTexture,
+  NodeFrameTexture,
+  NodeLabelFramePass,
   NodeProgram,
   getShapeId,
 } from "./rendering";
@@ -108,6 +109,8 @@ import {
 /**
  * Constants.
  */
+// Texture unit for the per-frame node-frame texture (normalized edge distances)
+const NODE_FRAME_TEXTURE_UNIT = 2;
 // Texture unit for the shared node data texture (position, size, shapeId)
 const NODE_DATA_TEXTURE_UNIT = 3;
 // Texture unit for the shared edge data texture (source/target indices, thickness, curvature, etc.)
@@ -209,6 +212,7 @@ export default class Sigma<
 
   // Programs (single program per item kind)
   private nodeProgram: NodeProgram<N, E, G>;
+  private nodeFramePass: NodeLabelFramePass;
   private edgeProgram: EdgeProgram<N, E, G>;
 
   // Resolved depth layers (fixed at construction, cached to avoid repeated spreading)
@@ -384,6 +388,11 @@ export default class Sigma<
     // Initialize node data texture for sharing position/size/shape data between node and edge programs
     const nodeDataTexture = new NodeDataTexture(this.webGLContext!);
 
+    // Shared label-placement texture: the normalized edge distances written by
+    // the label frame-pass (GPU), node-indexed in lockstep with
+    // nodeDataTexture
+    const nodeFrameTexture = new NodeFrameTexture(this.webGLContext!);
+
     // Initialize edge data texture for sharing edge data between edge and edge label programs
     const edgeDataTexture = new EdgeDataTexture(this.webGLContext!);
 
@@ -396,22 +405,25 @@ export default class Sigma<
       labelProgram,
       backdropProgram,
       labelBackgroundProgram,
+      attachmentProgram,
+      framePass,
       shapeSlug: nodeShapeSlug,
       shapeNameToIndex: nodeShapeMap,
       shapeGlobalIds: nodeGlobalShapeIds,
       variables: nodeVariables,
     } = generateNodeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, resolvedPrimitives?.nodes);
     this.nodeProgram = nodeProgram;
+    this.nodeFramePass = framePass;
     this.nodeVariableEntries = Object.entries(nodeVariables) as [string, { type: string; default: unknown }][];
     if (nodeShapeSlug) this.nodeShapeSlug = nodeShapeSlug;
 
-    // Create label attachment system if attachments are declared
+    // Create the attachment atlas manager only when attachments are declared.
+    // The shape-aware attachment program comes from the node bundle and renders
+    // only when this manager exists (see LabelRenderer.renderAttachments).
     const labelAttachments = resolvedPrimitives?.nodes?.labelAttachments;
     let attachmentManager: AttachmentManager | null = null;
-    let attachmentProgram: AttachmentProgram<N, E, G> | null = null;
     if (labelAttachments && Object.keys(labelAttachments).length > 0) {
       attachmentManager = new AttachmentManager(gl, labelAttachments, () => this.scheduleRender());
-      attachmentProgram = new AttachmentProgram(gl, null, sigma);
     }
 
     const {
@@ -449,6 +461,7 @@ export default class Sigma<
       attachmentManager,
       attachmentProgram,
       nodeDataTexture,
+      nodeFrameTexture,
       edgeDataTexture,
       nodeShapeMap: nodeShapeMap ?? null,
       nodeGlobalShapeIds: nodeGlobalShapeIds ?? null,
@@ -1032,6 +1045,10 @@ export default class Sigma<
     // console.log(this.graphToViewportRatio * this.correctionRatio * this.normalizationFunction.ratio * 2);
 
     this.frameId++;
+    // Keep the node-frame texture sized to the node-data texture before capturing
+    // render params, so the texture width baked into params (and read by consumers
+    // as texel coordinates) reflects any resize this frame.
+    this.internals.nodeFrameTexture!.ensureCapacity(this.internals.nodeDataTexture!.getCapacity());
     const params: RenderParams = this.getRenderParams();
     // Skip the edge picking pass when the edge kind isn't pickable this frame.
     const edgeParams: RenderParams = KIND_REGISTRY.edge.writesPickingThisFrame(this.internals)
@@ -1072,6 +1089,17 @@ export default class Sigma<
     // Pre-compute which node labels will be displayed (needed by both backdrops and labels)
     if (this.internals.settings.renderLabels) {
       this.labelRenderer.computeDisplayedNodeLabels();
+      // Run the frame-pass over the displayed labels to write each one's normalized
+      // edge distance into the node-frame texture (unit 2); consumers read it there.
+      const { data, count } = this.labelRenderer.buildFramePassPoints();
+      this.nodeFramePass.run(
+        data,
+        count,
+        this.internals.nodeFrameTexture!,
+        params,
+        false, // labelsRotateWithCamera: camera-aligned labels are a follow-up
+      );
+      this.internals.nodeFrameTexture!.bind(NODE_FRAME_TEXTURE_UNIT);
     }
 
     // Pre-compute edge label candidates (consumed by both the background pass
@@ -1572,6 +1600,8 @@ export default class Sigma<
       labelPickingPadding: this.internals.settings.labelPickingPadding,
       nodeDataTextureUnit: NODE_DATA_TEXTURE_UNIT,
       nodeDataTextureWidth: this.internals.nodeDataTexture!.getTextureWidth(),
+      nodeFrameTextureUnit: NODE_FRAME_TEXTURE_UNIT,
+      nodeFrameTextureWidth: this.internals.nodeFrameTexture!.getTextureWidth(),
       edgeDataTextureUnit: EDGE_DATA_TEXTURE_UNIT,
       edgeDataTextureWidth: this.internals.edgeDataTexture!.getTextureWidth(),
       pickingFrameBuffer: this.pickingFrameBuffer,
@@ -2867,6 +2897,7 @@ export default class Sigma<
 
     // Kill programs:
     this.nodeProgram.kill();
+    this.nodeFramePass.kill();
     this.edgeProgram.kill();
     this.internals.labelProgram.kill();
     this.internals.edgeLabelProgram.kill();
@@ -2891,6 +2922,12 @@ export default class Sigma<
     if (this.internals.nodeDataTexture) {
       this.internals.nodeDataTexture.kill();
       this.internals.nodeDataTexture = null;
+    }
+
+    // Cleanup shared node-frame texture
+    if (this.internals.nodeFrameTexture) {
+      this.internals.nodeFrameTexture.kill();
+      this.internals.nodeFrameTexture = null;
     }
 
     // Cleanup edge data texture

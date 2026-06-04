@@ -318,6 +318,7 @@ export function generateNodeProgram<
     rotateWithCamera: nodePrimitives?.rotateWithCamera,
     label: nodePrimitives?.label,
     backdrop: nodePrimitives?.backdrop,
+    labelAttachments: nodePrimitives?.labelAttachments,
   });
 
   return { ...bundle, variables };

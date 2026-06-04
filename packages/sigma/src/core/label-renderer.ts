@@ -11,10 +11,11 @@ import { Attributes } from "graphology-types";
 import { LabelAttachmentContext } from "../primitives";
 import {
   BackdropDisplayData,
+  DEFAULT_LABEL_BACKGROUND_PADDING,
+  DEFAULT_LABEL_MARGIN,
   EdgeLabelBackgroundData,
   LabelBackgroundData,
   POSITION_MODE_MAP,
-  getShapeId,
 } from "../rendering";
 import { ATTACHMENT_GAP, ATTACHMENT_PLACEMENT_MAP, ATTACHMENT_TEXTURE_UNIT } from "../rendering/nodes/attachments";
 import { EdgeLabelDisplayData, EdgeLabelPosition, LabelDisplayData, RenderParams } from "../types";
@@ -31,6 +32,7 @@ import {
 import { KIND_REGISTRY, pickingIdOf } from "./interactive-kinds";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./labels";
 import { SigmaInternals } from "./sigma-internals";
+import { DEFAULT_NODE_DISPLAY_DATA } from "./styles";
 
 const X_LABEL_MARGIN = 150;
 const Y_LABEL_MARGIN = 50;
@@ -54,7 +56,9 @@ export class LabelRenderer<
   /** Per-frame edge-label candidate list, shared by background and label passes. */
   private edgeLabelCandidates: string[] = [];
   private renderedNodeLabels: Set<string> = new Set();
-  private labelSizeCache = new Map<string, { width: number; height: number }>();
+  private labelSizeCache = new Map<string, { width: number; height: number; textHeight: number }>();
+  /** Reusable interleaved [nodeIndex, positionMode, labelAngle] buffer for the frame-pass. */
+  private framePassPoints: Float32Array = new Float32Array(0);
 
   constructor(private internals: SigmaInternals<N, E, G>) {}
 
@@ -110,8 +114,9 @@ export class LabelRenderer<
   private measureNodeLabel(data: { label?: string | null; labelSize?: number; labelFont?: string }): {
     width: number;
     height: number;
+    textHeight: number;
   } {
-    if (!data.label) return { width: 0, height: 0 };
+    if (!data.label) return { width: 0, height: 0, textHeight: 0 };
 
     const { labelProgram, primitives } = this.internals;
     const labelSize = data.labelSize ?? 14;
@@ -203,6 +208,37 @@ export class LabelRenderer<
     }
   }
 
+  /**
+   * Builds the interleaved point buffer the frame-pass scatters over: one
+   * `[nodeIndex, positionMode, labelAngle]` triple per displayed label. Run in
+   * the pre-pass after computeDisplayedNodeLabels. The frame-pass uses these
+   * to compute each label's edge distance; consumers carry the same values as
+   * their own attributes (from the same source), so nothing can drift.
+   */
+  buildFramePassPoints(): { data: Float32Array; count: number } {
+    const { nodeDataCache, nodeDataTexture } = this.internals;
+    if (!nodeDataTexture) return { data: this.framePassPoints, count: 0 };
+
+    const needed = this.displayedNodeLabels.size * 3;
+    if (this.framePassPoints.length < needed) this.framePassPoints = new Float32Array(needed);
+
+    const buf = this.framePassPoints;
+    let count = 0;
+    for (const node of this.displayedNodeLabels) {
+      const data = nodeDataCache[node];
+      if (!data) continue;
+      const index = nodeDataTexture.getIndex(node);
+      if (index < 0) continue;
+
+      buf[count * 3] = index;
+      buf[count * 3 + 1] = POSITION_MODE_MAP[data.labelPosition || DEFAULT_NODE_DISPLAY_DATA.labelPosition] ?? 0;
+      buf[count * 3 + 2] = data.labelAngle ?? 0;
+      count++;
+    }
+
+    return { data: buf, count };
+  }
+
   /** Render node labels for the given depth layer. */
   renderWebGLLabels(params: RenderParams, depth?: string): void {
     const { nodeDataCache, labelProgram, primitives, nodeDataTexture } = this.internals;
@@ -225,8 +261,8 @@ export class LabelRenderer<
 
     // TODO: These defaults should come from the styles system
     const defaultLabelSize = 14;
-    const defaultLabelMargin = primitives?.nodes?.label?.margin ?? 5;
-    const defaultLabelPosition = "right" as const;
+    const defaultLabelMargin = primitives?.nodes?.label?.margin ?? DEFAULT_LABEL_MARGIN;
+    const defaultLabelPosition = DEFAULT_NODE_DISPLAY_DATA.labelPosition;
     const defaultLabelFont = primitives?.nodes?.label?.font?.family || "sans-serif";
 
     const fontKeyMap = new Map<string, string>();
@@ -274,22 +310,17 @@ export class LabelRenderer<
 
   /** Render backdrops (background + shadow) behind nodes with labels. */
   renderBackdrops(params: RenderParams, depth?: string): void {
-    const {
-      backdropProgram,
-      nodeDataCache,
-      nodesWithBackdrop,
-      attachmentManager,
-      pixelRatio,
-      nodeShapeMap,
-      nodeGlobalShapeIds,
-    } = this.internals;
+    const { backdropProgram, nodeDataCache, nodesWithBackdrop, attachmentManager, pixelRatio, nodeDataTexture } =
+      this.internals;
 
-    const nodes: string[] = [];
+    const nodes: { key: string; nodeIndex: number }[] = [];
     for (const key of nodesWithBackdrop) {
       const data = nodeDataCache[key];
       if (!data || data.visibility === "hidden") continue;
       if (depth && data.depth !== depth) continue;
-      nodes.push(key);
+      const nodeIndex = nodeDataTexture?.getIndex(key) ?? -1;
+      if (nodeIndex < 0) continue;
+      nodes.push({ key, nodeIndex });
     }
 
     if (nodes.length === 0) return;
@@ -297,13 +328,14 @@ export class LabelRenderer<
     backdropProgram.reallocate(nodes.length);
 
     for (let i = 0; i < nodes.length; i++) {
-      const key = nodes[i];
+      const { key, nodeIndex } = nodes[i];
       const data = nodeDataCache[key];
 
       const labelVisible = this.displayedNodeLabels.has(key);
-      let { width: labelWidth, height: labelHeight } = labelVisible
-        ? this.measureNodeLabel(data)
-        : { width: 0, height: 0 };
+      const nodeLabelMeasurement = labelVisible ? this.measureNodeLabel(data) : { width: 0, height: 0, textHeight: 0 };
+      const textHeight = nodeLabelMeasurement.textHeight;
+      let labelWidth = nodeLabelMeasurement.width;
+      let labelHeight = nodeLabelMeasurement.height;
 
       let labelBoxOffsetX = 0;
       let labelBoxOffsetY = 0;
@@ -325,14 +357,6 @@ export class LabelRenderer<
         }
       }
 
-      let shapeId: number;
-      if (nodeShapeMap && nodeGlobalShapeIds) {
-        const localIndex = nodeShapeMap[data.shape || Object.keys(nodeShapeMap)[0]];
-        shapeId = nodeGlobalShapeIds[localIndex];
-      } else {
-        shapeId = getShapeId(data.shape || "circle");
-      }
-
       const rawBgColor = data.backdropColor ? colorToArray(data.backdropColor) : [255, 255, 255, 255];
       const rawShadowColor = data.backdropShadowColor ? colorToArray(data.backdropShadowColor) : [0, 0, 0, 128];
       const backdropColor = rawBgColor.map((c) => c / 255) as [number, number, number, number];
@@ -350,15 +374,13 @@ export class LabelRenderer<
 
       const backdropData: BackdropDisplayData = {
         key,
-        x: data.x,
-        y: data.y,
-        size: data.size,
+        nodeIndex,
         label: data.label,
         labelWidth,
         labelHeight,
+        textHeight,
         type: "default",
-        shapeId,
-        position: data.labelPosition || "right",
+        position: data.labelPosition || DEFAULT_NODE_DISPLAY_DATA.labelPosition,
         labelAngle: data.labelAngle ?? 0,
         backdropColor,
         backdropShadowColor,
@@ -381,7 +403,7 @@ export class LabelRenderer<
 
   /** Render label background rectangles (picking + optional visual) for displayed node labels. */
   renderLabelBackgrounds(params: RenderParams, depth?: string): void {
-    const { labelBackgroundProgram, nodeDataCache, nodeShapeMap, nodeGlobalShapeIds } = this.internals;
+    const { labelBackgroundProgram, nodeDataCache, nodeDataTexture } = this.internals;
 
     const eventsEnabled = KIND_REGISTRY.nodeLabel.writesPickingThisFrame(this.internals);
 
@@ -403,15 +425,10 @@ export class LabelRenderer<
       const key = nodes[i];
       const data = nodeDataCache[key];
 
-      const { width: labelWidth, height: labelHeight } = this.measureNodeLabel(data);
+      const nodeIndex = nodeDataTexture?.getIndex(key) ?? -1;
+      if (nodeIndex < 0) continue;
 
-      let shapeId: number;
-      if (nodeShapeMap && nodeGlobalShapeIds) {
-        const localIndex = nodeShapeMap[data.shape || Object.keys(nodeShapeMap)[0]];
-        shapeId = nodeGlobalShapeIds[localIndex];
-      } else {
-        shapeId = getShapeId(data.shape || "circle");
-      }
+      const { width: labelWidth, height: labelHeight, textHeight } = this.measureNodeLabel(data);
 
       // In separate mode the label kind has its own range; otherwise the rect
       // writes the parent node's picking ID so a hit resolves as a node.
@@ -421,17 +438,15 @@ export class LabelRenderer<
       const bgColor = data.labelBackgroundColor ? floatColor(data.labelBackgroundColor) : floatColor("transparent");
 
       const bgData: LabelBackgroundData = {
-        x: data.x,
-        y: data.y,
-        size: data.size,
-        shapeId,
+        nodeIndex,
         id: indexToColor(pickingIndex),
         color: bgColor,
         labelWidth,
         labelHeight,
-        positionMode: POSITION_MODE_MAP[data.labelPosition || "right"] ?? 0,
+        textHeight,
+        positionMode: POSITION_MODE_MAP[data.labelPosition || DEFAULT_NODE_DISPLAY_DATA.labelPosition] ?? 0,
         labelAngle: data.labelAngle ?? 0,
-        padding: data.labelBackgroundPadding ?? 3,
+        padding: data.labelBackgroundPadding ?? DEFAULT_LABEL_BACKGROUND_PADDING,
       };
 
       labelBackgroundProgram.processLabelBackground(i, bgData);
@@ -475,7 +490,8 @@ export class LabelRenderer<
 
   /** Render label attachments (icons, badges, etc.) after nodes but before labels. */
   renderAttachments(params: RenderParams, depth?: string): void {
-    const { attachmentManager, attachmentProgram, nodeDataCache, nodesWithBackdrop, pixelRatio } = this.internals;
+    const { attachmentManager, attachmentProgram, nodeDataCache, nodesWithBackdrop, pixelRatio, nodeDataTexture } =
+      this.internals;
     if (!attachmentManager || !attachmentProgram) return;
 
     let validCount = 0;
@@ -491,11 +507,12 @@ export class LabelRenderer<
       const entry = attachmentManager.getEntry(key, data.labelAttachment);
       if (!entry) continue;
 
-      const nodeIndex = pickingIdOf(this.internals.pickingState, "node", key);
-      if (nodeIndex === 0) continue;
+      // Node-data index: the shader reads node position/size + the shared edge
+      // distance from the node-data and frame textures by this index.
+      const nodeIndex = nodeDataTexture?.getIndex(key) ?? -1;
+      if (nodeIndex < 0) continue;
 
-      const { width: labelWidth, height: labelHeight } = this.measureNodeLabel(data);
-      const positionMode = POSITION_MODE_MAP[data.labelPosition || "right"] ?? 0;
+      const { width: labelWidth, height: labelHeight, textHeight } = this.measureNodeLabel(data);
       const attachmentPlacement = ATTACHMENT_PLACEMENT_MAP[data.labelAttachmentPlacement || "below"] ?? 0;
 
       attachmentProgram.processAttachment(validCount, {
@@ -506,10 +523,11 @@ export class LabelRenderer<
         atlasH: entry.height,
         attachWidth: entry.width / pixelRatio,
         attachHeight: entry.height / pixelRatio,
-        positionMode,
+        positionMode: POSITION_MODE_MAP[data.labelPosition || DEFAULT_NODE_DISPLAY_DATA.labelPosition] ?? 0,
         attachmentPlacement,
         labelWidth,
         labelHeight,
+        textHeight,
         labelAngle: data.labelAngle ?? 0,
       });
       validCount++;

@@ -193,6 +193,9 @@ export interface RenderParams {
   labelPickingPadding: number;
   nodeDataTextureUnit: number;
   nodeDataTextureWidth: number;
+  /** Shared per-frame node-frame texture (normalized edge distances). */
+  nodeFrameTextureUnit: number;
+  nodeFrameTextureWidth: number;
   edgeDataTextureUnit: number;
   edgeDataTextureWidth: number;
   pickingFrameBuffer: WebGLFramebuffer | null;

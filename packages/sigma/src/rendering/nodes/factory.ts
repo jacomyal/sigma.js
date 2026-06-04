@@ -23,11 +23,13 @@ import {
 import { Program } from "../program";
 import { getShapeId, registerShapeInstance } from "../shapes";
 import { ProgramInfo } from "../utils";
+import { type AttachmentProgram, createAttachmentProgram } from "./attachments";
 import { type BackdropProgram, createBackdropProgram } from "./backdrops";
 import { generateShaders } from "./generator";
 import {
   type LabelBackgroundProgram,
   type LabelProgram,
+  NodeLabelFramePass,
   createLabelBackgroundProgram,
   createLabelProgram,
 } from "./labels";
@@ -95,8 +97,6 @@ export function createNodeProgram<
   // picking framebuffer so label events can be wired onto the label
   // rect; the other companions don't write picking IDs and get null.
   const labelProgram = createLabelProgram(gl, null, renderer, {
-    shapes,
-    rotateWithCamera,
     label: labelOptions,
   });
   const backdropProgram = createBackdropProgram(gl, null, renderer, {
@@ -106,9 +106,22 @@ export function createNodeProgram<
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
   });
   const labelBackgroundProgram = createLabelBackgroundProgram(gl, pickingBuffer, renderer, {
+    label: labelOptions,
+  });
+  // Attachments anchor to the label box, whose shape-aware placement now comes
+  // from the shared frame texture — so the program no longer needs the shapes
+  // itself. Built only when attachments are declared; otherwise null, and the
+  // label renderer skips the pass (it also needs the attachment atlas manager).
+  const attachmentProgram =
+    options.labelAttachments && Object.keys(options.labelAttachments).length > 0
+      ? createAttachmentProgram(gl, null, renderer, { label: labelOptions })
+      : null;
+  // The single shape-aware placement program: each frame it writes the
+  // normalized edge distance for every displayed label into the node-frame
+  // texture, which the companions above read instead of searching themselves.
+  const framePass = new NodeLabelFramePass(gl, {
     shapes,
     rotateWithCamera,
-    label: labelOptions,
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
   });
 
@@ -432,6 +445,8 @@ export function createNodeProgram<
     labelProgram,
     backdropProgram,
     labelBackgroundProgram,
+    attachmentProgram,
+    framePass,
     // Shape registry metadata (consumed by sigma when the program is multi-shape).
     shapeSlug: primaryShapeSlug,
     shapeNameToIndex: shapes.length > 1 ? shapeNameToIndex : undefined,
@@ -459,6 +474,8 @@ export interface NodeProgramBundle<
   labelProgram: LabelProgram<string, N, E, G, LabelDisplayData>;
   backdropProgram: BackdropProgram<N, E, G>;
   labelBackgroundProgram: LabelBackgroundProgram<N, E, G>;
+  attachmentProgram: AttachmentProgram<N, E, G> | null;
+  framePass: NodeLabelFramePass;
   shapeSlug: string | undefined;
   shapeNameToIndex: Record<string, number> | undefined;
   shapeGlobalIds: number[] | undefined;
