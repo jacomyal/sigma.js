@@ -1,11 +1,15 @@
 /**
- * Sigma.js Node Frame Texture
- * ===========================
+ * Sigma.js Frame Texture
+ * ======================
  *
- * A per-frame scratchpad with one slot per node. The label frame-pass fills it
- * in once; every label part (text, background, backdrop, attachment) reads it
- * back, so the cost of locating a node's edge is paid once, and they all agree
- * on where the label goes.
+ * A per-frame scratchpad with one texel per item (node or edge). A frame-pass
+ * fills it in once; every consumer reads it back, so an expensive per-item
+ * computation (label edge distance for nodes, source/target clamp for edges)
+ * is paid once and everyone agrees on the result.
+ *
+ * `channels` picks the storage format: 1 -> `R32F` (one float/item, e.g. the
+ * node label edge distance), 4 -> `RGBA32F` (four floats/item, e.g. the edge
+ * clamp `vec4(tStart, tEnd, straightenFactor, pathLength)`).
  *
  * @module
  */
@@ -15,24 +19,32 @@ const GROWTH_FACTOR = 1.5;
 // Match DataTexture: cap width at a widely-supported limit, grow height.
 const MAX_TEXTURE_WIDTH = 4096;
 
-export class NodeFrameTexture {
+export interface FrameTextureOptions {
+  /** Floats stored per item: 1 -> R32F, 4 -> RGBA32F. */
+  channels: 1 | 4;
+  initialCapacity?: number;
+}
+
+export class FrameTexture {
   private gl: WebGL2RenderingContext;
+  private channels: 1 | 4;
   private texture: WebGLTexture | null = null;
   private framebuffer: WebGLFramebuffer | null = null;
   private capacity: number;
   private textureWidth: number;
   private textureHeight: number;
 
-  constructor(gl: WebGL2RenderingContext, initialCapacity: number = INITIAL_CAPACITY) {
-    // Float color-buffer rendering must be enabled before R32F is renderable.
+  constructor(gl: WebGL2RenderingContext, options: FrameTextureOptions) {
+    // Float color-buffer rendering must be enabled before R32F/RGBA32F is renderable.
     if (!gl.getExtension("EXT_color_buffer_float")) {
       throw new Error(
-        "sigma: EXT_color_buffer_float is required for label placement but is unavailable in this WebGL2 context.",
+        "sigma: EXT_color_buffer_float is required for label/edge placement but is unavailable in this WebGL2 context.",
       );
     }
 
     this.gl = gl;
-    this.capacity = this.roundUpToPowerOfTwo(initialCapacity);
+    this.channels = options.channels;
+    this.capacity = this.roundUpToPowerOfTwo(options.initialCapacity ?? INITIAL_CAPACITY);
     const dims = this.computeDimensions(this.capacity);
     this.textureWidth = dims.width;
     this.textureHeight = dims.height;
@@ -51,12 +63,14 @@ export class NodeFrameTexture {
 
   private create(): void {
     const { gl } = this;
+    const internalFormat = this.channels === 1 ? gl.R32F : gl.RGBA32F;
+    const format = this.channels === 1 ? gl.RED : gl.RGBA;
 
     this.texture = gl.createTexture();
     // Transient unit 0, so a resize never clears a data texture on the active unit.
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.R32F, this.textureWidth, this.textureHeight, 0, gl.RED, gl.FLOAT, null);
+    gl.texImage2D(gl.TEXTURE_2D, 0, internalFormat, this.textureWidth, this.textureHeight, 0, format, gl.FLOAT, null);
     // Sampled with texelFetch (nearest, no filtering needed).
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
@@ -68,7 +82,7 @@ export class NodeFrameTexture {
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this.texture, 0);
 
     if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) !== gl.FRAMEBUFFER_COMPLETE) {
-      throw new Error("sigma: R32F framebuffer for label placement is incomplete.");
+      throw new Error("sigma: float framebuffer for frame-pass placement is incomplete.");
     }
 
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -76,8 +90,8 @@ export class NodeFrameTexture {
   }
 
   /**
-   * Grows the texture so `capacity` nodes are addressable, keeping it sized
-   * against the node-data texture. A no-op once large enough.
+   * Grows the texture so `capacity` items are addressable, keeping it sized
+   * against the matching data texture. A no-op once large enough.
    */
   ensureCapacity(capacity: number): void {
     if (capacity <= this.capacity) return;

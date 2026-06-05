@@ -203,6 +203,9 @@ export interface RenderParams {
   nodeFrameTextureWidth: number;
   edgeDataTextureUnit: number;
   edgeDataTextureWidth: number;
+  /** Shared per-frame edge-frame texture (per-edge clamp vec4). */
+  edgeFrameTextureUnit: number;
+  edgeFrameTextureWidth: number;
   pickingFrameBuffer: WebGLFramebuffer | null;
   labelPixelSnapping: number;
 }

@@ -21,9 +21,9 @@ import {
   DEFAULT_LABEL_MARGIN,
   GLSL_LABEL_BOX_CENTER,
   GLSL_NODE_SIZE_TO_PIXELS,
+  GLSL_READ_FRAME_TEXEL,
   GLSL_READ_NODE_DATA,
   GLSL_READ_NODE_FLAGS,
-  GLSL_READ_NODE_FRAME,
 } from "../../glsl";
 import { Program } from "../../program";
 import { InstancedProgramDefinition, ProgramInfo } from "../../utils";
@@ -90,7 +90,7 @@ out vec4 v_color;
 
 ${GLSL_READ_NODE_DATA}
 ${GLSL_READ_NODE_FLAGS}
-${GLSL_READ_NODE_FRAME}
+${GLSL_READ_FRAME_TEXEL}
 ${GLSL_LABEL_BOX_CENTER}
 
 void main() {
@@ -102,7 +102,7 @@ void main() {
   float nodeSize = nodeData.z;
 
   // Shape-aware edge distance, read once from the shared frame texture.
-  float edgeDist = readNodeFrame(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx);
+  float edgeDist = readFrameTexel(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx).r;
 
   // Per-node label rotation alignment: 0 = viewport, 1 = label turns with camera.
   float labelRotation = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx).g;

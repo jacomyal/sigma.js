@@ -8,19 +8,25 @@
  *
  * It's the only place, for the whole nodes rendering, that needs to perform
  * the SDF binary search. The labels, their backgrounds, backdrops and
- * attachments then simply read the node-frame texture, and all agree on
- * placement.
+ * attachments then simply read the node-frame texture (via `readFrameTexel`,
+ * reusing `a_nodeIndex` since the texture is sized in lockstep with the
+ * node-data texture), and all agree on placement.
+ *
+ * The stored value is `findEdgeDistance(dir, 1.0)`: unitless and zoom-independent
+ * (the texture is R32F, so readers take `.r`). Consumers recover pixels locally
+ * via `GLSL_NODE_SIZE_TO_PIXELS` + the margin uniform:
+ *   labelStart = nodeRadiusPixels * edgeDist + margin
  *
  * @module
  */
 import type { RenderParams } from "../../../types";
+import type { FrameTexture } from "../../frame-texture";
 import {
   GLSL_GET_LABEL_DIRECTION,
   GLSL_READ_NODE_DATA,
   GLSL_READ_NODE_FLAGS,
   generateFindEdgeDistanceForShapes,
 } from "../../glsl";
-import type { NodeFrameTexture } from "../../node-frame-texture";
 import { setGLSLUniform } from "../../program";
 import { dedupeShapeUniforms, getShapeGLSLForShapes } from "../../shapes";
 import { loadFragmentShader, loadProgram, loadVertexShader } from "../../utils";
@@ -192,7 +198,7 @@ export class NodeLabelFramePass {
    * node-data texture (already bound). Leaves the framebuffer/viewport for the
    * caller to restore (the post-offscreen reset).
    */
-  run(pointData: Float32Array, count: number, frameTexture: NodeFrameTexture, params: RenderParams): void {
+  run(pointData: Float32Array, count: number, frameTexture: FrameTexture, params: RenderParams): void {
     if (count === 0) return;
 
     const { gl } = this;

@@ -9,9 +9,9 @@
  */
 import {
   GLSL_NODE_SIZE_TO_PIXELS,
+  GLSL_READ_FRAME_TEXEL,
   GLSL_READ_NODE_DATA,
   GLSL_READ_NODE_FLAGS,
-  GLSL_READ_NODE_FRAME,
   GLSL_SDF_BOX,
   GLSL_SDF_ROTATED_BOX,
   GLSL_SDF_ROUNDED_BOX,
@@ -110,7 +110,7 @@ out float v_backdropArea;
 
 ${GLSL_READ_NODE_DATA}
 ${GLSL_READ_NODE_FLAGS}
-${GLSL_READ_NODE_FRAME}
+${GLSL_READ_FRAME_TEXEL}
 
 void main() {
   int nodeIdx = int(a_nodeIndex);
@@ -174,7 +174,7 @@ void main() {
   if (labelW > 0.0) {
     // labelW > 0.0 means this node's label is displayed, so the frame-pass wrote
     // its edge distance this frame.
-    float edgeDistPixels = nodeRadiusPixels * readNodeFrame(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx);
+    float edgeDistPixels = nodeRadiusPixels * readFrameTexel(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx).r;
     // labelMargin matches the label shader's margin (gap from node edge to text)
     float labelStart = edgeDistPixels + labelMargin;
     // Above/below center on the actual glyph height, not the font line box, so

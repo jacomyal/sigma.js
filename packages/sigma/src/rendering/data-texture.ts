@@ -299,6 +299,15 @@ export class DataTexture {
   }
 
   /**
+   * Highest index ever allocated + 1. Unlike `getCount`, this spans freed
+   * holes, so it bounds every live item's row (what a per-row `gl_VertexID`
+   * pass must cover).
+   */
+  getHighWaterMark(): number {
+    return this.nextIndex;
+  }
+
+  /**
    * Checks if there are pending changes to upload.
    */
   isDirty(): boolean {

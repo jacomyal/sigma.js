@@ -30,6 +30,9 @@ export type {
 // Factory
 export { createEdgeProgram } from "./factory";
 
+// Edge frame-pass (per-edge clamp precompute)
+export { EdgeFramePass, type EdgeFramePassOptions } from "./frame-pass";
+
 // Paths
 export {
   pathLine,

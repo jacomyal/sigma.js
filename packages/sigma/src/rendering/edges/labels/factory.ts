@@ -574,6 +574,14 @@ export function createEdgeLabelProgram<
         gl.uniform1i(uniformLocations.u_edgeDataTextureWidth, params.edgeDataTextureWidth);
       }
 
+      // Edge-frame texture: per-edge clamp written by the frame-pass (bound by sigma.ts)
+      if (uniformLocations.u_edgeFrameTexture !== undefined) {
+        gl.uniform1i(uniformLocations.u_edgeFrameTexture, params.edgeFrameTextureUnit);
+      }
+      if (uniformLocations.u_edgeFrameTextureWidth !== undefined) {
+        gl.uniform1i(uniformLocations.u_edgeFrameTextureWidth, params.edgeFrameTextureWidth);
+      }
+
       // Border width uniform (only if border is enabled)
       if (hasBorder && textBorder && uniformLocations.u_borderWidth !== undefined) {
         // Convert border width from pixels to SDF units

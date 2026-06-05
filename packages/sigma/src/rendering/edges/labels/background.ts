@@ -109,6 +109,8 @@ uniform sampler2D u_nodeDataTexture;
 uniform int u_nodeDataTextureWidth;
 uniform sampler2D u_edgeDataTexture;
 uniform int u_edgeDataTextureWidth;
+uniform sampler2D u_edgeFrameTexture; // Per-edge clamp (tStart, tEnd, straightenFactor, pathLength)
+uniform int u_edgeFrameTextureWidth;
 ${isScaledMode ? "uniform float u_zoomSizeRatio;" : ""}
 
 ${textureFetch.uniformDeclarations}
@@ -168,10 +170,6 @@ ${textureFetch.varyingAssignments}
   float targetSize = tgtN.z;
   v_sourceNodeSize = sourceSize;
   v_targetNodeSize = targetSize;
-  int sourceShapeId = int(srcN.w);
-  int targetShapeId = int(tgtN.w);
-  float sourceRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx).r;
-  float targetRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx).r;
 
   // --- Pixel-to-graph conversion (fixed font mode) ---
   float matrixScaleX = length(vec2(u_matrix[0][0], u_matrix[1][0]));
@@ -180,9 +178,9 @@ ${textureFetch.varyingAssignments}
   float webGLThickness = thickness * u_correctionRatio / u_sizeRatio;
 
   // --- Body bounds (shared with edge label shader) ---
+  vec4 edgeClamp = readFrameTexel(u_edgeFrameTexture, u_edgeFrameTextureWidth, edgeIdx);
   vec3 bodyBounds = computeEdgeLabelBodyBounds(
-    pathId, source, sourceSize, sourceShapeId, sourceRotateAlign,
-    target, targetSize, targetShapeId, targetRotateAlign,
+    edgeClamp.x, edgeClamp.y, edgeClamp.w,
     webGLThickness, HEAD_RATIO, TAIL_RATIO
   );
   float bodyStartDist = bodyBounds.x;
@@ -345,6 +343,8 @@ export function createEdgeLabelBackgroundProgram<
         "u_nodeDataTextureWidth",
         "u_edgeDataTexture",
         "u_edgeDataTextureWidth",
+        "u_edgeFrameTexture",
+        "u_edgeFrameTextureWidth",
       ];
       if (fontSizeMode === "scaled") uniforms.push("u_zoomSizeRatio");
       if (attributeLayout.floatsPerItem > 0) {
@@ -415,6 +415,10 @@ export function createEdgeLabelBackgroundProgram<
         gl.uniform1i(uniformLocations.u_edgeDataTexture, params.edgeDataTextureUnit);
       if (uniformLocations.u_edgeDataTextureWidth !== undefined)
         gl.uniform1i(uniformLocations.u_edgeDataTextureWidth, params.edgeDataTextureWidth);
+      if (uniformLocations.u_edgeFrameTexture !== undefined)
+        gl.uniform1i(uniformLocations.u_edgeFrameTexture, params.edgeFrameTextureUnit);
+      if (uniformLocations.u_edgeFrameTextureWidth !== undefined)
+        gl.uniform1i(uniformLocations.u_edgeFrameTextureWidth, params.edgeFrameTextureWidth);
 
       if (fontSizeMode === "scaled" && uniformLocations.u_zoomSizeRatio !== undefined) {
         const zoomToSizeRatioFunction = this.renderer.getSetting("zoomToSizeRatioFunction");

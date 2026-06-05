@@ -20,9 +20,9 @@ import type { RenderParams } from "../../../types";
 import {
   DEFAULT_LABEL_MARGIN,
   GLSL_LABEL_BOX_CENTER,
+  GLSL_READ_FRAME_TEXEL,
   GLSL_READ_NODE_DATA,
   GLSL_READ_NODE_FLAGS,
-  GLSL_READ_NODE_FRAME,
   GLSL_ROTATE_2D,
 } from "../../glsl";
 import { Program } from "../../program";
@@ -89,7 +89,7 @@ out vec2 v_texCoord;
 
 ${GLSL_READ_NODE_DATA}
 ${GLSL_READ_NODE_FLAGS}
-${GLSL_READ_NODE_FRAME}
+${GLSL_READ_FRAME_TEXEL}
 ${GLSL_LABEL_BOX_CENTER}
 ${GLSL_ROTATE_2D}
 
@@ -103,7 +103,7 @@ void main() {
 
   // Normalized edge distance from the shared frame texture (the frame-pass ran
   // the SDF search once; we just read the result).
-  float edgeDist = readNodeFrame(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx);
+  float edgeDist = readFrameTexel(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx).r;
 
   // Per-node label rotation alignment: 0 = viewport, 1 = label turns with camera.
   float labelRotation = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx).g;

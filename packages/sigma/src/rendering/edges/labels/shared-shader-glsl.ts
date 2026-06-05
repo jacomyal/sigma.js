@@ -8,21 +8,15 @@
  * body bounds, visibility ramp, and perpendicular offset by position mode
  * — any drift there would misalign the background with its label.
  *
- * Consumers splice the GLSL strings into their vertex shader *after* the
- * path dispatch block (which declares `queryFindSourceClampT`,
- * `queryFindTargetClampT`, `queryPathLength`, etc.).
+ * The per-edge clamp (`tStart`, `tEnd`, `pathLength`) is no longer searched
+ * here: both programs read it from the edge-frame texture (`readFrameTexel`),
+ * computed once by the frame-pass, and pass it into `computeEdgeLabelBodyBounds`.
  *
  * @module
  */
-import { GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../../glsl";
-import { generateShapeSelectorGLSL, getAllShapeGLSL } from "../../shapes";
+import { GLSL_READ_FRAME_TEXEL, GLSL_READ_NODE_DATA } from "../../glsl";
 import { numberToGLSLFloat } from "../../utils";
-import {
-  generateFindSourceClampT,
-  generateFindTargetClampT,
-  generateNumericalTangentNormal,
-  generatePathFallbacks,
-} from "../shared-glsl";
+import { generateNumericalTangentNormal, generatePathFallbacks } from "../shared-glsl";
 import type { EdgePath } from "../types";
 
 /**
@@ -54,74 +48,18 @@ ${cases}
 }
 
 /**
- * Generates all clamp T functions and their selectors for multi-path support.
- * Declares `findSourceClampT_<name>` / `findTargetClampT_<name>` for each path,
- * then wraps them in `queryFindSourceClampT` / `queryFindTargetClampT`.
- */
-export function generateAllClampFunctions(paths: EdgePath[]): string {
-  const clampFunctions = paths
-    .map((p) => `${generateFindSourceClampT(p.name)}\n${generateFindTargetClampT(p.name)}`)
-    .join("\n\n");
-
-  if (paths.length === 1) {
-    return `${clampFunctions}
-
-float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, float sourceRotateAlign, vec2 target, float margin) {
-  return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, sourceRotateAlign, target, margin);
-}
-
-float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float targetRotateAlign, float margin) {
-  return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, targetRotateAlign, margin);
-}`;
-  }
-
-  const srcCases = paths
-    .map(
-      (p, i) =>
-        `    case ${i}: return findSourceClampT_${p.name}(source, sourceSize, sourceShapeId, sourceRotateAlign, target, margin);`,
-    )
-    .join("\n");
-  const tgtCases = paths
-    .map(
-      (p, i) =>
-        `    case ${i}: return findTargetClampT_${p.name}(source, target, targetSize, targetShapeId, targetRotateAlign, margin);`,
-    )
-    .join("\n");
-
-  return `${clampFunctions}
-
-float queryFindSourceClampT(int pathId, vec2 source, float sourceSize, int sourceShapeId, float sourceRotateAlign, vec2 target, float margin) {
-  switch (pathId) {
-${srcCases}
-    default: return findSourceClampT_${paths[0].name}(source, sourceSize, sourceShapeId, sourceRotateAlign, target, margin);
-  }
-}
-
-float queryFindTargetClampT(int pathId, vec2 source, vec2 target, float targetSize, int targetShapeId, float targetRotateAlign, float margin) {
-  switch (pathId) {
-${tgtCases}
-    default: return findTargetClampT_${paths[0].name}(source, target, targetSize, targetShapeId, targetRotateAlign, margin);
-  }
-}`;
-}
-
-/**
- * Body-bounds helper in WebGL units: finds where the path exits the source
- * node, enters the target node, then shrinks by head/tail extremities.
- * Depends on `queryFindSourceClampT`, `queryFindTargetClampT`, `queryPathLength`.
+ * Body-bounds helper in WebGL units: from the per-edge clamp (`tStart`, `tEnd`,
+ * `pathLength` read from the edge-frame texture), finds the label body span and
+ * shrinks it by the head/tail extremities. The clamp search itself lives in the
+ * frame-pass, so the search is no longer duplicated here.
  *
  * Returns (bodyStartDist, bodyEndDist, bodyLength).
  */
 export const EDGE_LABEL_BODY_BOUNDS_GLSL = /*glsl*/ `
 vec3 computeEdgeLabelBodyBounds(
-  int pathId,
-  vec2 source, float sourceSize, int sourceShapeId, float sourceRotateAlign,
-  vec2 target, float targetSize, int targetShapeId, float targetRotateAlign,
+  float tStart, float tEnd, float pathLength,
   float webGLThickness, float headLengthRatio, float tailLengthRatio
 ) {
-  float tStart = queryFindSourceClampT(pathId, source, sourceSize, sourceShapeId, sourceRotateAlign, target, 0.0);
-  float tEnd = queryFindTargetClampT(pathId, source, target, targetSize, targetShapeId, targetRotateAlign, 0.0);
-  float pathLength = queryPathLength(pathId, source, target);
   float visibleLength = pathLength * (tEnd - tStart);
 
   float headLength = headLengthRatio * webGLThickness;
@@ -181,10 +119,11 @@ float computeEdgeLabelPerpOffset(
 /**
  * Emits the GLSL preamble shared by edge label shaders (both the SDF text
  * shader and the ribbon background shader). Covers everything between the
- * attribute/uniform declarations and `main()`: shape SDFs, per-path
- * functions, path-query selectors, clamp functions, and the three helpers
- * above. A single source of truth so the two shaders cannot drift on body
- * bounds, path sampling, or visibility ramp.
+ * attribute/uniform declarations and `main()`: per-path functions, path-query
+ * selectors, the edge-frame fetch, and the three helpers above. A single source
+ * of truth so the two shaders cannot drift on body bounds, path sampling, or
+ * visibility ramp. The clamp search itself no longer lives here — it is read
+ * from the edge-frame texture (`readFrameTexel`), computed once by the frame-pass.
  *
  * Expects the caller to have declared `v_sourceNodeSize` / `v_targetNodeSize`
  * and any path-attribute varyings (e.g. `v_curvature`) before splicing this
@@ -236,15 +175,11 @@ ${paths.map((p, i) => (p.hasSharpCorners ? `    case ${i}: return path_${p.name}
 
   return /*glsl*/ `
 // ============================================================================
-// Node data fetch (geometry texel + rotation-flags texel) and Shape SDFs
+// Node data fetch (geometry texel) and per-edge clamp fetch (edge-frame texture)
 // ============================================================================
 
 ${GLSL_READ_NODE_DATA}
-${GLSL_READ_NODE_FLAGS}
-
-${getAllShapeGLSL()}
-
-${generateShapeSelectorGLSL()}
+${GLSL_READ_FRAME_TEXEL}
 
 // ============================================================================
 // Path Functions (one block per path)
@@ -267,12 +202,6 @@ ${generatePathSelector(paths, "queryPathLength", "length", "float", "vec2 source
 ${generatePathSelector(paths, "queryPathTAtDistance", "t_at_distance", "float", "float dist, vec2 source, vec2 target", "dist, source, target")}
 
 ${sharpCornersDispatch}
-
-// ============================================================================
-// Binary Search Clamp Functions (find where path exits source / enters target)
-// ============================================================================
-
-${generateAllClampFunctions(paths)}
 
 // ============================================================================
 // Shared helpers (body bounds, alpha ramp, perpendicular offset)

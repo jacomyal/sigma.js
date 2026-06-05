@@ -9,7 +9,7 @@
  * @module
  */
 import { DEFAULT_SDF_ATLAS_OPTIONS } from "../../../core/sdf-atlas";
-import { GLSL_GET_LABEL_DIRECTION, GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS, GLSL_READ_NODE_FRAME } from "../../glsl";
+import { GLSL_GET_LABEL_DIRECTION, GLSL_READ_FRAME_TEXEL, GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../../glsl";
 import { numberToGLSLFloat } from "../../utils";
 
 const ATLAS_FONT_SIZE = DEFAULT_SDF_ATLAS_OPTIONS.fontSize;
@@ -118,7 +118,7 @@ const float ATLAS_FONT_SIZE = ${numberToGLSLFloat(ATLAS_FONT_SIZE)};
 
 ${GLSL_READ_NODE_DATA}
 ${GLSL_READ_NODE_FLAGS}
-${GLSL_READ_NODE_FRAME}
+${GLSL_READ_FRAME_TEXEL}
 ${GLSL_GET_LABEL_DIRECTION}
 
 // ============================================================================
@@ -138,7 +138,7 @@ void main() {
 
   // Normalized edge distance from the shared frame texture (the frame-pass ran
   // the SDF search once; the label just reads the result).
-  float edgeDist = readNodeFrame(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx);
+  float edgeDist = readFrameTexel(u_nodeFrameTexture, u_nodeFrameTextureWidth, nodeIdx).r;
 
   // Per-node label rotation alignment: 0 = viewport, 1 = label turns with camera.
   float labelRotation = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx).g;

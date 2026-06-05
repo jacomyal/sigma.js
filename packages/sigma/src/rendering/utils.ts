@@ -105,32 +105,6 @@ export function loadProgram(gl: WebGL2RenderingContext, shaders: Array<WebGLShad
   return program;
 }
 
-/**
- * Creates a WebGL program with transform feedback varyings, linked before
- * any fragment stage. A trivial fragment shader is always included for
- * driver compatibility (RASTERIZER_DISCARD prevents it from executing).
- */
-export function loadTransformFeedbackProgram(
-  gl: WebGL2RenderingContext,
-  vertexShader: WebGLShader,
-  fragmentShader: WebGLShader,
-  tfVaryingNames: string[],
-): WebGLProgram {
-  const program = gl.createProgram();
-  if (program === null) throw new Error("loadTransformFeedbackProgram: error while creating the program.");
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.transformFeedbackVaryings(program, tfVaryingNames, gl.INTERLEAVED_ATTRIBS);
-  gl.linkProgram(program);
-  const linked = gl.getProgramParameter(program, gl.LINK_STATUS);
-  if (!linked) {
-    const infoLog = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(`loadTransformFeedbackProgram: error while linking the program.\n${infoLog}`);
-  }
-  return program;
-}
-
 export function killProgram({ gl, buffer, program, vertexShader, fragmentShader }: ProgramInfo): void {
   gl.deleteShader(vertexShader);
   gl.deleteShader(fragmentShader);

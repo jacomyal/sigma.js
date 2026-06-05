@@ -18,10 +18,10 @@ import {
   EdgeDataTexture,
   EdgeLabelBackgroundProgram,
   EdgeLabelProgram,
+  FrameTexture,
   LabelBackgroundProgram,
   LabelProgram,
   NodeDataTexture,
-  NodeFrameTexture,
 } from "../rendering";
 import type { AttachmentProgram } from "../rendering";
 import { Settings } from "../settings";
@@ -75,8 +75,9 @@ export type SigmaInternals<
   attachmentManager: AttachmentManager | null;
   attachmentProgram: AttachmentProgram<N, E, G> | null;
   nodeDataTexture: NodeDataTexture | null;
-  nodeFrameTexture: NodeFrameTexture | null;
+  nodeFrameTexture: FrameTexture | null;
   edgeDataTexture: EdgeDataTexture | null;
+  edgeFrameTexture: FrameTexture | null;
   nodeShapeMap: Record<string, number> | null;
   nodeGlobalShapeIds: number[] | null;
   // Sigma methods

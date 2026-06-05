@@ -9,7 +9,7 @@
  * @module
  */
 import { computeAttributeLayout } from "../data-texture";
-import { GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../glsl";
+import { GLSL_READ_FRAME_TEXEL, GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../glsl";
 import { isAttributeSource } from "../nodes";
 import { generateShapeSelectorGLSL, getAllShapeGLSL } from "../shapes";
 import { numberToGLSLFloat } from "../utils";
@@ -37,11 +37,6 @@ const { FLOAT, UNSIGNED_BYTE } = WebGL2RenderingContext;
  */
 export type EdgeShaderGenerationOptions = EdgeProgramOptions;
 
-// Number of floats written per edge by the transform feedback pre-pass.
-export const PREPASS_FLOATS_PER_EDGE = 4;
-// Transform feedback varying names — single interleaved vec4.
-export const PREPASS_TF_VARYING_NAMES = ["pre_clamp"];
-
 // ============================================================================
 // Multi-Path GLSL Generation Helpers
 // ============================================================================
@@ -63,6 +58,8 @@ function collectUniformsMulti(paths: EdgePath[], extremities: EdgeExtremity[], l
     "u_nodeDataTextureWidth",
     "u_edgeDataTexture",
     "u_edgeDataTextureWidth",
+    "u_edgeFrameTexture",
+    "u_edgeFrameTextureWidth",
     // Edge path attribute texture uniforms
     "u_edgeAttributeTexture",
     "u_edgeAttributeTextureWidth",
@@ -282,12 +279,21 @@ ${targetCases}
 }
 
 /**
- * Generates the pre-pass vertex shader for transform feedback.
- * Runs once per edge (gl.drawArrays(POINTS, 0, capacity)) and writes
- * [tStart, tEnd, straightenFactor, pathLength] per edge into a buffer.
- * The main vertex shader reads this as a per-instance vec4 attribute.
+ * Generates the edge frame-pass vertex shader. Runs once per edge as a point
+ * draw (`gl.drawArrays(POINTS, 0, edgeCount)`, `a_edgeIndex = gl_VertexID`),
+ * computes `vec4(tStart, tEnd, straightenFactor, pathLength)` and scatters it
+ * to the edge's texel in the edge-frame texture (the fragment writes the
+ * varying through). The body, label and background programs then read that
+ * texel by `a_edgeIndex`, so the clamp search lives in exactly one place.
+ *
+ * `tStart`/`tEnd` are the *ungated* boundary clamps (always searched); the body
+ * re-applies its extremity gating in-shader, labels use them directly.
  */
-function generatePrePassVertexShader(paths: EdgePath[], extremities: EdgeExtremity[], layers: EdgeLayer[]): string {
+export function generateEdgeFramePassVertexShader(
+  paths: EdgePath[],
+  extremities: EdgeExtremity[],
+  layers: EdgeLayer[],
+): string {
   const attributeLayout = computeAttributeLayout([...paths, ...layers]);
   const textureFetch = generateEdgeAttributeTextureFetch(attributeLayout);
 
@@ -306,10 +312,7 @@ function generatePrePassVertexShader(paths: EdgePath[], extremities: EdgeExtremi
   const maxMinBodyLengthRatio = Math.max(...paths.map((p) => p.minBodyLengthRatio || 0));
 
   // language=GLSL
-  return /*glsl*/ `#version 300 es
-
-// One invocation per edge: reads edge index from the instance buffer
-in float a_edgeIndex;
+  const shader = /*glsl*/ `#version 300 es
 
 // Node and edge data textures
 uniform sampler2D u_nodeDataTexture;
@@ -326,6 +329,10 @@ uniform float u_correctionRatio;
 uniform float u_cameraAngle;
 uniform float u_minEdgeThickness;
 
+// Edge-frame texture dimensions, for scattering each point to its texel
+uniform float u_frameTextureWidth;
+uniform float u_frameTextureHeight;
+
 // Custom path/extremity uniforms
 ${customUniforms.join("\n")}
 
@@ -336,8 +343,8 @@ ${textureFetch.vertexVaryingDeclarations}
 out float v_sourceNodeSize;
 out float v_targetNodeSize;
 
-// Transform feedback output: [tStart, tEnd, straightenFactor, pathLength]
-out vec4 pre_clamp;
+// Scattered output written to the edge-frame texel: [tStart, tEnd, straightenFactor, pathLength]
+out vec4 v_clamp;
 
 // Extremity width factor array (needed for extremityScale computation)
 const float EXTREMITY_WIDTH_FACTORS[${extremities.length}] = float[](${extremityWidthFactors});
@@ -356,8 +363,8 @@ ${generateAllPathSelectors(paths)}
 ${generateAllClampFunctions(paths)}
 
 void main() {
-  // Fetch edge data (2 texels per edge)
-  int edgeIdx = int(a_edgeIndex);
+  // One point per edge-data row; the row index is the edge-frame texel target.
+  int edgeIdx = gl_VertexID;
   int texel0Idx = edgeIdx * 2;
   int texel1Idx = edgeIdx * 2 + 1;
   ivec2 edgeTexCoord0 = ivec2(texel0Idx % u_edgeDataTextureWidth, texel0Idx / u_edgeDataTextureWidth);
@@ -406,13 +413,22 @@ ${textureFetch.varyingAssignments}
   float pixelsThickness = max(a_thickness, u_minEdgeThickness * u_sizeRatio);
   float webGLThickness = pixelsThickness * u_correctionRatio / u_sizeRatio;
 
-  // SDF clamping: find where the edge body meets the node boundaries
-  float tStart = tailLengthRatio > 0.0 ? queryFindSourceClampT(pathId, a_source, a_sourceSize, int(a_sourceShapeId), a_sourceRotateAlign, a_target, 0.0) : 0.0;
-  float tEnd = headLengthRatio > 0.0 ? queryFindTargetClampT(pathId, a_source, a_target, a_targetSize, int(a_targetShapeId), a_targetRotateAlign, 0.0) : 1.0;
+  // SDF clamping: find where the edge body meets the node boundaries. Always
+  // searched (ungated) so labels get a true boundary clamp; the body re-applies
+  // its extremity gating in-shader.
+  float tStart = queryFindSourceClampT(pathId, a_source, a_sourceSize, int(a_sourceShapeId), a_sourceRotateAlign, a_target, 0.0);
+  float tEnd = queryFindTargetClampT(pathId, a_source, a_target, a_targetSize, int(a_targetShapeId), a_targetRotateAlign, 0.0);
+
+  // straightenFactor (frame .z) is consumed only by the body, which runs to the
+  // node center when an extremity is absent. Derive the straightening math from
+  // these gated clamps — not the ungated boundary ones above — so it matches the
+  // geometry it drives. The ungated tStart/tEnd remain what labels read.
+  float bodyTStart = tailLengthRatio > 0.0 ? tStart : 0.0;
+  float bodyTEnd = headLengthRatio > 0.0 ? tEnd : 1.0;
 
   // Path length and zone boundaries (needed for straightening check)
   float pathLength = queryPathLength(pathId, a_source, a_target);
-  float visibleLength = pathLength * (tEnd - tStart);
+  float visibleLength = pathLength * (bodyTEnd - bodyTStart);
 
   float headLength = headLengthRatio * webGLThickness;
   float tailLength = tailLengthRatio * webGLThickness;
@@ -429,10 +445,10 @@ ${textureFetch.varyingAssignments}
   float headLengthT = pathLength > 0.0001 ? headLength / pathLength : 0.0;
   float tailLengthT = pathLength > 0.0001 ? tailLength / pathLength : 0.0;
 
-  float tTailEnd = tStart + tailLengthT;
-  float tHeadStart = tEnd - headLengthT;
+  float tTailEnd = bodyTStart + tailLengthT;
+  float tHeadStart = bodyTEnd - headLengthT;
   if (tTailEnd > tHeadStart) {
-    float mid = (tStart + tEnd) * 0.5;
+    float mid = (bodyTStart + bodyTEnd) * 0.5;
     tTailEnd = mid;
     tHeadStart = mid;
   }
@@ -443,7 +459,7 @@ ${textureFetch.varyingAssignments}
     float maxDeviation = 0.0;
     if (tailLengthT > 0.0001) {
       vec2 tailTang = queryPathTangent(pathId, tTailEnd, a_source, a_target);
-      vec2 tailChord = queryPathPosition(pathId, tStart, a_source, a_target)
+      vec2 tailChord = queryPathPosition(pathId, bodyTStart, a_source, a_target)
                      - queryPathPosition(pathId, tTailEnd, a_source, a_target);
       float tailChordLen = length(tailChord);
       if (tailChordLen > 0.0001) {
@@ -452,7 +468,7 @@ ${textureFetch.varyingAssignments}
     }
     if (headLengthT > 0.0001) {
       vec2 headTang = queryPathTangent(pathId, tHeadStart, a_source, a_target);
-      vec2 headChord = queryPathPosition(pathId, tEnd, a_source, a_target)
+      vec2 headChord = queryPathPosition(pathId, bodyTEnd, a_source, a_target)
                      - queryPathPosition(pathId, tHeadStart, a_source, a_target);
       float headChordLen = length(headChord);
       if (headChordLen > 0.0001) {
@@ -462,7 +478,8 @@ ${textureFetch.varyingAssignments}
     straightenFactor = smoothstep(0.035, 0.5, maxDeviation);
   }
 
-  // When straightening, blend tStart/tEnd toward straight-line clamp positions
+  // When straightening, blend the ungated tStart/tEnd (the label-facing clamps)
+  // toward straight-line clamp positions.
   if (straightenFactor > 0.001) {
     if (tailLengthRatio > 0.0) {
       float srcExtent = a_sourceSize * u_correctionRatio / u_sizeRatio * 2.0;
@@ -496,11 +513,18 @@ ${textureFetch.varyingAssignments}
     }
   }
 
-  pre_clamp = vec4(tStart, tEnd, straightenFactor, pathLength);
-  // gl_Position is unused (RASTERIZER_DISCARD is active) but must be assigned
-  gl_Position = vec4(0.0);
+  v_clamp = vec4(tStart, tEnd, straightenFactor, pathLength);
+
+  // Scatter this point to its edge's texel center in the frame texture.
+  float x = mod(float(edgeIdx), u_frameTextureWidth);
+  float y = floor(float(edgeIdx) / u_frameTextureWidth);
+  vec2 ndc = (vec2(x, y) + 0.5) / vec2(u_frameTextureWidth, u_frameTextureHeight) * 2.0 - 1.0;
+  gl_Position = vec4(ndc, 0.0, 1.0);
+  gl_PointSize = 1.0;
 }
 `;
+
+  return shader;
 }
 
 // Zone constants: tail extremity, body, head extremity
@@ -618,7 +642,6 @@ ${constantAttrDeclarations}
 in float a_edgeIndex;   // Index into edge data texture
 in vec4 a_color;        // Edge color
 in vec4 a_id;           // Edge ID for picking
-in vec4 pre_clamp;      // Pre-computed per-edge values: tStart, tEnd, straightenFactor, pathLength
 
 // Standard uniforms
 uniform mat3 u_matrix;
@@ -635,6 +658,8 @@ uniform sampler2D u_nodeDataTexture;
 uniform int u_nodeDataTextureWidth;
 uniform sampler2D u_edgeDataTexture;
 uniform int u_edgeDataTextureWidth;
+uniform sampler2D u_edgeFrameTexture;
+uniform int u_edgeFrameTextureWidth;
 
 // Edge path attribute texture uniforms
 ${textureFetch.uniformDeclarations}
@@ -688,6 +713,9 @@ ${generateAllPathSelectors(paths)}
 
 // Node-data fetch helper (geometry texel of the two-texel node stride)
 ${GLSL_READ_NODE_DATA}
+
+// Per-edge clamp from the frame-pass (tStart, tEnd, straightenFactor, pathLength)
+${GLSL_READ_FRAME_TEXEL}
 
 void main() {
   // Fetch edge data from edge texture (2 texels per edge)
@@ -744,11 +772,14 @@ ${textureFetch.varyingAssignments}
   float tailWidthFactor = EXTREMITY_WIDTH_FACTORS[tailId];
   float minBodyLengthRatio = ${numberToGLSLFloat(maxMinBodyLengthRatio)};
 
-  // Pre-computed per-edge values from the transform feedback pre-pass
-  float tStart           = pre_clamp.x;
-  float tEnd             = pre_clamp.y;
-  float straightenFactor = pre_clamp.z;
-  float pathLength       = pre_clamp.w;
+  // Per-edge values from the frame-pass texture (read by edge index).
+  // tStart/tEnd are the ungated boundary clamps: re-apply the body's extremity
+  // gating here (no extremity → body runs to the node center, 0/1).
+  vec4 frameClamp = readFrameTexel(u_edgeFrameTexture, u_edgeFrameTextureWidth, edgeIdx);
+  float tStart           = a_tailLengthRatio > 0.0 ? frameClamp.x : 0.0;
+  float tEnd             = a_headLengthRatio > 0.0 ? frameClamp.y : 1.0;
+  float straightenFactor = frameClamp.z;
+  float pathLength       = frameClamp.w;
 
   // Width factor for geometry expansion (use max of both extremities)
   float widthFactor = max(max(headWidthFactor, tailWidthFactor), 1.0);
@@ -1264,7 +1295,6 @@ export function generateEdgeShaders(options: EdgeShaderGenerationOptions): Gener
   return {
     vertexShader: generateVertexShaderMulti(paths, extremities, layers, constantAttributes),
     fragmentShader: generateFragmentShaderMulti(paths, extremities, layers),
-    prePassVertexShader: generatePrePassVertexShader(paths, extremities, layers),
     uniforms: collectUniformsMulti(paths, extremities, layers),
     attributes: collectAttributesMulti(paths, extremities, layers),
     verticesPerEdge: maxVerticesPerEdge,

@@ -31,5 +31,5 @@ export * from "./shapes";
 // Data textures
 export { DataTexture } from "./data-texture";
 export { NodeDataTexture } from "./node-data-texture";
-export { NodeFrameTexture } from "./node-frame-texture";
+export { FrameTexture, type FrameTextureOptions } from "./frame-texture";
 export { EdgeDataTexture } from "./edge-data-texture";

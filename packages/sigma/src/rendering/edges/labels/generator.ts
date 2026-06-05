@@ -153,6 +153,8 @@ uniform sampler2D u_nodeDataTexture; // Shared texture with node position/size/s
 uniform int u_nodeDataTextureWidth;  // Width of 2D node data texture for coordinate calculation
 uniform sampler2D u_edgeDataTexture; // Shared texture with edge data
 uniform int u_edgeDataTextureWidth;  // Width of 2D edge data texture for coordinate calculation
+uniform sampler2D u_edgeFrameTexture; // Per-edge clamp (tStart, tEnd, straightenFactor, pathLength)
+uniform int u_edgeFrameTextureWidth;
 ${isScaledMode ? "uniform float u_zoomSizeRatio;  // Zoom-based size ratio from zoomToSizeRatioFunction" : ""}
 
 // Edge path attribute texture uniforms (for curvature and other path attributes)
@@ -245,11 +247,6 @@ ${textureFetch.varyingAssignments}
   float targetSize = tgtNodeData.z;
   v_sourceNodeSize = sourceSize;
   v_targetNodeSize = targetSize;
-  int sourceShapeId = int(srcNodeData.w);
-  int targetShapeId = int(tgtNodeData.w);
-  // Per-node rotation alignment (0 = viewport, 1 = graph), for boundary clamping.
-  float sourceRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx).r;
-  float targetRotateAlign = readNodeFlags(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx).r;
   float charTextOffset = a_charMetrics.x;
   float charAdvance = a_charMetrics.y;
   float totalTextWidth = a_charMetrics.z;
@@ -275,9 +272,9 @@ ${textureFetch.varyingAssignments}
   // -------------------------------------------------------------------------
   // Step 2: Compute body bounds (truncated at node boundaries + extremities)
   // -------------------------------------------------------------------------
+  vec4 edgeClamp = readFrameTexel(u_edgeFrameTexture, u_edgeFrameTextureWidth, edgeIdx);
   vec3 bodyBounds = computeEdgeLabelBodyBounds(
-    pathId, source, sourceSize, sourceShapeId, sourceRotateAlign,
-    target, targetSize, targetShapeId, targetRotateAlign,
+    edgeClamp.x, edgeClamp.y, edgeClamp.w,
     webGLThickness, headLengthRatio, tailLengthRatio
   );
   float bodyStartDist = bodyBounds.x;
@@ -734,6 +731,8 @@ export function collectEdgeLabelUniforms(
     "u_nodeDataTextureWidth",
     "u_edgeDataTexture",
     "u_edgeDataTextureWidth",
+    "u_edgeFrameTexture",
+    "u_edgeFrameTextureWidth",
     // Edge path attribute texture uniforms
     "u_edgeAttributeTexture",
     "u_edgeAttributeTextureWidth",

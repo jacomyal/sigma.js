@@ -175,19 +175,16 @@ vec4 readNodeFlags(sampler2D nodeDataTexture, int nodeDataTextureWidth, int node
 `;
 
 /**
- * Reads the normalized edge distance for a node from the node-frame texture
- * (an R32F, node-indexed render target written once per frame by the label
- * frame-pass). The value is `findEdgeDistance(dir, 1.0)`: unitless and
- * zoom-independent. Consumers recover pixels locally via
- * `GLSL_NODE_SIZE_TO_PIXELS` + the margin uniform:
- *   labelStart = nodeRadiusPixels * edgeDist + margin
- *
- * Same node index as the node-data texture, so callers reuse `a_nodeIndex`.
+ * Reads an item's texel from a frame texture (a render target written once per
+ * frame by a frame-pass, indexed in lockstep with the matching data texture, so
+ * callers reuse `a_nodeIndex` / `a_edgeIndex`). Always returns the full `vec4`;
+ * R32F callers (node placement) take `.r`. What the channels mean is documented
+ * by the frame-pass that writes them.
  */
-export const GLSL_READ_NODE_FRAME = /*glsl*/ `
-float readNodeFrame(sampler2D frameTexture, int frameTextureWidth, int nodeIndex) {
-  ivec2 coord = ivec2(nodeIndex % frameTextureWidth, nodeIndex / frameTextureWidth);
-  return texelFetch(frameTexture, coord, 0).r;
+export const GLSL_READ_FRAME_TEXEL = /*glsl*/ `
+vec4 readFrameTexel(sampler2D frameTexture, int frameTextureWidth, int index) {
+  ivec2 coord = ivec2(index % frameTextureWidth, index / frameTextureWidth);
+  return texelFetch(frameTexture, coord, 0);
 }
 `;
 
