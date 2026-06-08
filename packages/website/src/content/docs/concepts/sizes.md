@@ -48,6 +48,33 @@ If you want sizes to scale with the node positions at **all zoom levels**, combi
 
 To disable rule #3, use the `autoRescale` setting. Setting `autoRescale` as `false` prevents Sigma from automatically resizing the graph. Then, node positions are interpreted in pixels, for the default zoom level. The graph remains centered in the viewport, though.
 
+### `autoRescaleContent` setting
+
+When `autoRescale` is enabled, sigma fits the graph to the viewport based on **node positions only**. This means nodes
+sitting near the edge of the graph can still get clipped, because their shape and labels extends beyond the fitted area.
+
+The `autoRescaleContent` setting controls what that fit encloses:
+
+- **`"positions"`** _(default)_: only node centers are considered. This is the historical behavior, and the cheapest to
+  compute.
+- **`"nodes"`**: node centers **and sizes**. The fit grows so each node's full disc stays inside the viewport.
+- **`"labels"`**: node centers, sizes, **and labels**. The fit grows so labels stay inside the viewport too.
+
+Each level contains the previous one. The setting is ignored when `autoRescale` is `false`, or when a custom bounding
+box is provided (the bounding box wins).
+
+:::caution
+`autoRescaleContent: "labels"` is **expensive to compute**: sigma measures each node's label box on the CPU and iterates
+until the framing stabilizes. Use it only on small-ish graphs; on large graphs, prefer `"nodes"` or add extra stage
+padding instead.
+:::
+
+### `stagePadding` setting
+
+Whatever `autoRescaleContent` encloses, sigma leaves a margin between it and the viewport edges, controlled by the
+`stagePadding` setting (in pixels, default `30`). Increasing it is the cheapest way to keep node shapes and labels from
+touching the edges, without paying the cost of fitting them precisely.
+
 ### Example
 
 You can try these options in the [Custom size handling](/how-to/technical/custom-sizes/) how-to guide.
