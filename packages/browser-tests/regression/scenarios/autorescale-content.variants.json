@@ -1,0 +1,8 @@
+[
+  { "label": "labels-tall", "query": "autoRescaleContent=labels", "stage": { "width": 460, "height": 680 } },
+  { "label": "labels-wide", "query": "autoRescaleContent=labels", "stage": { "width": 1000, "height": 420 } },
+  { "label": "nodes-tall", "query": "autoRescaleContent=nodes", "stage": { "width": 460, "height": 680 } },
+  { "label": "nodes-wide", "query": "autoRescaleContent=nodes", "stage": { "width": 1000, "height": 420 } },
+  { "label": "positions-tall", "query": "autoRescaleContent=positions", "stage": { "width": 460, "height": 680 } },
+  { "label": "positions-wide", "query": "autoRescaleContent=positions", "stage": { "width": 1000, "height": 420 } }
+]
