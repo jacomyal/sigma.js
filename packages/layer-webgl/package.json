@@ -1,6 +1,6 @@
 {
   "name": "@sigma/layer-webgl",
-  "version": "4.0.0-alpha.1",
+  "version": "4.0.0-alpha.2",
   "description": "A package to help drawing custom WebGL layers with sigma.js",
   "main": "dist/sigma-layer-webgl.cjs.js",
   "module": "dist/sigma-layer-webgl.esm.js",
