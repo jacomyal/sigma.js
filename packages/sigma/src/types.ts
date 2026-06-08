@@ -86,6 +86,17 @@ export interface Dimensions {
 
 export type Extent = [number, number];
 
+/**
+ * Controls what the auto-rescale fit encloses (ignored when `autoRescale` is
+ * `false`):
+ * - `"positions"`: node positions only
+ * - `"nodes"`: node positions and sizes
+ * - `"labels"`: node positions, sizes, and labels
+ *
+ * Each level contains the previous one.
+ */
+export type AutoRescaleContent = "positions" | "nodes" | "labels";
+
 export interface DisplayData {
   label: string | null;
   size: number;

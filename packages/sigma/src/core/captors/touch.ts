@@ -10,6 +10,7 @@ import { Attributes } from "graphology-types";
 import { DEFAULT_SETTINGS, Settings } from "../../settings";
 import Sigma from "../../sigma";
 import { CameraState, Coordinates, Dimensions, TouchCoords } from "../../types";
+import { rotateVec2 } from "../../utils";
 import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
 
 export const TOUCH_SETTINGS_KEYS = [
@@ -326,10 +327,7 @@ export default class TouchCaptor<
         let y = y0 - smallestDimension / 2 / dy;
 
         // Rotate:
-        [x, y] = [
-          x * Math.cos(-newCameraState.angle) - y * Math.sin(-newCameraState.angle),
-          y * Math.cos(-newCameraState.angle) + x * Math.sin(-newCameraState.angle),
-        ];
+        ({ x, y } = rotateVec2({ x, y }, newCameraState.angle));
 
         newCameraState.x = touchGraphPosition.x - x * ratio;
         newCameraState.y = touchGraphPosition.y + y * ratio;

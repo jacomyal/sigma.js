@@ -11,6 +11,7 @@ import TouchCaptor from "./core/captors/touch";
 import { DragManager } from "./core/drag-manager";
 import { EdgeGroupIndex } from "./core/edge-groups";
 import { bindGraphHandlers, bindInteractionHandlers, unbindGraphHandlers } from "./core/event-handlers";
+import { computeFittedExtent } from "./core/fit-extent";
 import {
   Hit,
   KIND_REGISTRY,
@@ -720,18 +721,42 @@ export default class Sigma<
     const settings = this.internals.settings;
     const dimensions = this.getDimensions();
 
-    if (settings.autoRescale !== "once" || !this.autoRescaleFrozen) {
-      this.nodeExtent = this.computeNodeExtent();
-      if (settings.autoRescale === "once") this.autoRescaleFrozen = true;
+    const { autoRescale, autoRescaleContent } = settings;
+
+    // Recompute the node extent, unless "once" has already frozen it:
+    let nodeExtent = this.nodeExtent;
+    if (autoRescale !== "once" || !this.autoRescaleFrozen) {
+      nodeExtent = this.computeNodeExtent();
+      // A custom bounding box overrides the node extent, so fitting it is
+      // useless:
+      if (autoRescale !== false && autoRescaleContent !== "positions" && !this.customBBox)
+        nodeExtent = computeFittedExtent({
+          extent: nodeExtent,
+          coords: this.nodeGraphCoords,
+          nodeData: this.internals.nodeDataCache,
+          dimensions,
+          stagePadding: this.getStagePadding(),
+          zoomToSizeRatioFunction: settings.zoomToSizeRatioFunction,
+          itemSizesReference: settings.itemSizesReference,
+          fitLabels: autoRescaleContent === "labels",
+          nodeLabelBox: (data, radius) => this.labelRenderer.nodeLabelBox(data, radius),
+        });
+      if (autoRescale === "once") this.autoRescaleFrozen = true;
     }
-    if (settings.autoRescale === false) {
+
+    // Without rescaling, 1 graph unit = 1 pixel: keep the extent's center but
+    // resize it to span the viewport.
+    if (autoRescale === false) {
       const { width, height } = dimensions;
-      const { x, y } = this.nodeExtent;
-      this.nodeExtent = {
-        x: [(x[0] + x[1]) / 2 - width / 2, (x[0] + x[1]) / 2 + width / 2],
-        y: [(y[0] + y[1]) / 2 - height / 2, (y[0] + y[1]) / 2 + height / 2],
+      const cx = (nodeExtent.x[0] + nodeExtent.x[1]) / 2;
+      const cy = (nodeExtent.y[0] + nodeExtent.y[1]) / 2;
+      nodeExtent = {
+        x: [cx - width / 2, cx + width / 2],
+        y: [cy - height / 2, cy + height / 2],
       };
     }
+
+    this.nodeExtent = nodeExtent;
     this.normalizationFunction = createNormalizationFunction(this.customBBox || this.nodeExtent);
 
     // NOTE: it is important to compute this matrix after computing the node's extent

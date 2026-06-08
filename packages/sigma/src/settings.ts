@@ -5,7 +5,7 @@
  * The list of settings and some handy functions.
  * @module sigma/settings
  */
-import { AtLeastOne, Coordinates, LabelEventsSetting } from "./types";
+import { AtLeastOne, AutoRescaleContent, Coordinates, LabelEventsSetting } from "./types";
 import { assign } from "./utils";
 
 /**
@@ -49,6 +49,7 @@ export interface Settings {
   zoomToSizeRatioFunction: (ratio: number) => number;
   itemSizesReference: "screen" | "positions";
   autoRescale: boolean | "once";
+  autoRescaleContent: AutoRescaleContent;
 
   // Node drag
   enableNodeDrag: boolean;
@@ -117,6 +118,7 @@ export const DEFAULT_SETTINGS: Settings = {
   zoomToSizeRatioFunction: Math.sqrt,
   itemSizesReference: "positions",
   autoRescale: true,
+  autoRescaleContent: "positions",
 
   // Node drag
   enableNodeDrag: false,

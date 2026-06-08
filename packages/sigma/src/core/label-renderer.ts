@@ -28,6 +28,7 @@ import {
   matrixFromCamera,
   multiplyVec2,
   parseFontString,
+  rotateVec2,
 } from "../utils";
 import { KIND_REGISTRY, pickingIdOf } from "./interactive-kinds";
 import { LabelGrid, edgeLabelsToDisplayFromNodes } from "./labels";
@@ -130,6 +131,71 @@ export class LabelRenderer<
 
     this.labelSizeCache.set(cacheKey, result);
     return result;
+  }
+
+  /**
+   * Axis-aligned bounding box of a node's label in viewport pixels, relative
+   * to the node center (y points down). Mirrors the label vertex shader's
+   * placement (position, margin, angle) and the symmetric
+   * `labelBackgroundPadding` when a background is drawn.
+   * It ignores backdrops/shadows, approximates the node shape as a disc, and
+   * returns null when the node has no visible label.
+   */
+  nodeLabelBox(
+    data: {
+      label?: string | null;
+      labelSize?: number;
+      labelFont?: string;
+      labelPosition?: string;
+      labelAngle?: number;
+      labelBackgroundColor?: string | null;
+      labelBackgroundPadding?: number;
+      visibility?: string;
+      labelVisibility?: string;
+    },
+    nodeRadius: number,
+  ): { minX: number; maxX: number; minY: number; maxY: number } | null {
+    if (data.visibility === "hidden" || data.labelVisibility === "hidden") return null;
+
+    const { width, height, textHeight } = this.measureNodeLabel(data);
+    if (!width) return null;
+
+    const margin = this.internals.primitives?.nodes?.label?.margin ?? DEFAULT_LABEL_MARGIN;
+    const start = nodeRadius + margin;
+    const pad = data.labelBackgroundColor ? (data.labelBackgroundPadding ?? DEFAULT_LABEL_BACKGROUND_PADDING) : 0;
+    const thw = width / 2;
+    const thh = height / 2;
+    const hw = thw + pad;
+    const hh = thh + pad;
+
+    // Box center offset from the node center, before rotation:
+    const thy = textHeight / 2;
+    let cx = 0;
+    let cy = 0;
+    switch (data.labelPosition ?? "right") {
+      case "left":
+        cx = -(start + thw);
+        break;
+      case "above":
+        cy = -(start + thy);
+        break;
+      case "below":
+        cy = start + thy;
+        break;
+      case "over":
+        break;
+      default:
+        cx = start + thw;
+    }
+
+    const angle = data.labelAngle ?? 0;
+    const { x: rcx, y: rcy } = rotateVec2({ x: cx, y: cy }, angle);
+    const ax = Math.abs(Math.cos(angle));
+    const ay = Math.abs(Math.sin(angle));
+    const ex = ax * hw + ay * hh;
+    const ey = ay * hw + ax * hh;
+
+    return { minX: rcx - ex, maxX: rcx + ex, minY: rcy - ey, maxY: rcy + ey };
   }
 
   /**

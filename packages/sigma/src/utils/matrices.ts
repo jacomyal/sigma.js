@@ -67,6 +67,12 @@ export function multiply<T extends number[] | Float32Array>(a: T, b: Float32Arra
   return a;
 }
 
+export function rotateVec2(p: Coordinates, angle: number): Coordinates {
+  const c = Math.cos(angle);
+  const s = Math.sin(angle);
+  return { x: c * p.x + s * p.y, y: -s * p.x + c * p.y };
+}
+
 export function multiplyVec2(a: Float32Array | number[], b: Coordinates, z = 1): Coordinates {
   const a00 = a[0];
   const a01 = a[1];
