@@ -224,13 +224,15 @@ export default class MouseCaptor<
       const shouldRefresh = this.draggedEvents > 0;
       this.draggedEvents = 0;
 
-      // NOTE: this refresh is here to make sure `hideEdgesOnMove` can work
+      // NOTE: this refresh is here to make sure `hideEdgesOnMove` and `hideLabelsOnMove` can work
       // when someone releases camera pan drag after having stopped moving.
       // See commit: https://github.com/jacomyal/sigma.js/commit/cfd9197f70319109db6b675dd7c82be493ca95a2
       // See also issue: https://github.com/jacomyal/sigma.js/issues/1290
       // It could be possible to render instead of scheduling a refresh but for
       // now it seems good enough.
-      if (shouldRefresh && this.renderer.getSetting("hideEdgesOnMove")) this.renderer.refresh();
+      const shouldRestoreDeferredRendering =
+        this.renderer.getSetting("hideEdgesOnMove") || this.renderer.getSetting("hideLabelsOnMove");
+      if (shouldRefresh && shouldRestoreDeferredRendering) this.renderer.refresh();
     }, 0);
     this.emit("mouseup", getMouseCoords(e, this.container));
   }
