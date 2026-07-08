@@ -2,7 +2,10 @@
   "name": "@sigma/website",
   "private": true,
   "scripts": {
+    "fetch-datasets": "node scripts/fetch-datasets.mjs",
+    "prestart": "npm run fetch-datasets",
     "start": "astro dev",
+    "prebuild": "npm run fetch-datasets",
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check --minimumSeverity warning"

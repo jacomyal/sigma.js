@@ -1,0 +1,96 @@
+<div id="sigma-container"></div>
+
+<style>
+  #sigma-container {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import { ForceAtlas2GPULayout } from "@sigma/layout-fa2-gpu";
+  import Graph from "graphology";
+  import clusters from "graphology-generators/random/clusters";
+  import forceAtlas2 from "graphology-layout-forceatlas2";
+  import random from "graphology-layout/random";
+  import seedrandom from "seedrandom";
+  import Sigma from "sigma";
+  import { DEFAULT_STYLES } from "sigma/types";
+
+  import { registerControls } from "../_controls";
+
+  const rng = seedrandom("sigma");
+
+  let layout: ForceAtlas2GPULayout;
+
+  const { order, size, clusterCount, iterationsPerFrame, setToggle } = registerControls({
+    order: { type: "number", label: "Nodes", default: 5000, min: 100, step: 100 },
+    size: { type: "number", label: "Edges", default: 10000, min: 100, step: 100 },
+    clusterCount: { type: "number", label: "Clusters", default: 3, min: 1, step: 1 },
+    iterationsPerFrame: {
+      type: "select",
+      label: "Iterations / frame",
+      default: "auto",
+      options: [
+        { label: "Auto (adaptive)", value: "auto" },
+        { label: "1", value: "1" },
+        { label: "5", value: "5" },
+        { label: "10", value: "10" },
+        { label: "25", value: "25" },
+        { label: "50", value: "50" },
+        { label: "100", value: "100" },
+      ],
+    },
+    fa2: {
+      type: "toggle",
+      label: "Toggle GPU ForceAtlas2",
+      default: false,
+      action: (running) => {
+        if (running) layout.start();
+        else layout.stop();
+      },
+    },
+  });
+
+  // Generate a clustered random graph, with random initial positions, so
+  // that the layout has to untangle everything. Most edges stay
+  // intra-cluster (clusterDensity), so the cluster structure is actually
+  // recoverable from a random start:
+  const graph = clusters(Graph, { order, size, clusters: clusterCount, clusterDensity: 0.9, rng });
+  random.assign(graph, { scale: 5000, rng });
+
+  // Assign colors per cluster and sizes from degree
+  const colors: Record<string, string> = {};
+  for (let i = 0; i < clusterCount; i++) {
+    colors[i] = "#" + Math.floor(rng() * 16777215).toString(16);
+  }
+  let i = 0;
+  graph.forEachNode((node, { cluster }) => {
+    graph.mergeNodeAttributes(node, {
+      size: graph.degree(node) * 5,
+      label: `Node n°${++i}, cluster n°${cluster}`,
+      color: colors[cluster + ""],
+    });
+  });
+
+  const container = document.getElementById("sigma-container") as HTMLElement;
+  const renderer = new Sigma(graph, container, {
+    styles: {
+      edges: [DEFAULT_STYLES.edges, { color: "#e6e6e6" }],
+      nodes: [DEFAULT_STYLES.nodes],
+    },
+  });
+
+  const inferred = forceAtlas2.inferSettings(graph);
+  layout = new ForceAtlas2GPULayout(renderer, {
+    quadTreeTheta: 0.5,
+    iterationsPerFrame: iterationsPerFrame === "auto" ? "auto" : Number(iterationsPerFrame),
+    gravity: inferred.gravity ?? 1,
+    scalingRatio: inferred.scalingRatio ?? 1,
+    slowDown: inferred.slowDown ?? 1,
+    strongGravityMode: inferred.strongGravityMode ?? false,
+    backportInterval: Infinity,
+  });
+
+  layout.on("stopped", () => setToggle("fa2", false));
+</script>

@@ -19,6 +19,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Cache SNAP datasets
+        uses: actions/cache@v4
+        with:
+          path: packages/website/public/data/*.txt.gz
+          key: snap-datasets-${{ hashFiles('packages/website/scripts/datasets.mjs') }}
+
       - name: Build website
         run: npm run website:build
 

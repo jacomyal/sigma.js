@@ -1,6 +1,7 @@
 import starlight from "@astrojs/starlight";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
+import fs from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -25,6 +26,26 @@ export default defineConfig({
       ],
     },
     plugins: [
+      {
+        // Vite's static middleware (sirv) serves ".gz" files with
+        // "Content-Encoding: gzip", so browsers decompress them silently. In
+        // production the CDN serves the raw bytes instead. Serve them raw in
+        // dev too, so both environments behave the same:
+        name: "serve-gz-raw",
+        configureServer(server) {
+          server.middlewares.use((req, res, next) => {
+            const pathname = decodeURIComponent((req.url || "").split("?")[0]);
+            if (!pathname.endsWith(".gz")) return next();
+            const file = path.join(__dirname, "public", path.normalize(pathname));
+            if (!file.startsWith(path.join(__dirname, "public", path.sep)) || !fs.existsSync(file)) return next();
+            res.writeHead(200, {
+              "Content-Type": "application/gzip",
+              "Content-Length": fs.statSync(file).size,
+            });
+            fs.createReadStream(file).pipe(res);
+          });
+        },
+      },
       {
         name: "phosphor-icon-override",
         enforce: "pre",
