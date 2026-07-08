@@ -1,0 +1,53 @@
+{
+  "name": "@sigma/layout-fa2-gpu",
+  "version": "0.0.1-alpha.0",
+  "description": "A GPU-computed ForceAtlas2 layout running directly on sigma.js internal data structures",
+  "main": "dist/sigma-layout-fa2-gpu.cjs.js",
+  "module": "dist/sigma-layout-fa2-gpu.esm.js",
+  "types": "dist/sigma-layout-fa2-gpu.cjs.d.ts",
+  "files": [
+    "/dist"
+  ],
+  "sideEffects": false,
+  "homepage": "https://www.sigmajs.org",
+  "bugs": "http://github.com/jacomyal/sigma.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jacomyal/sigma.js.git",
+    "directory": "packages/layout-fa2-gpu"
+  },
+  "keywords": [
+    "graph",
+    "graphology",
+    "sigma",
+    "forceatlas2",
+    "layout",
+    "gpu"
+  ],
+  "contributors": [
+    {
+      "name": "Alexis Jacomy",
+      "url": "http://github.com/jacomyal"
+    }
+  ],
+  "license": "MIT",
+  "scripts": {
+    "check": "tsc --noEmit"
+  },
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "sigma": ">=4.0.0-alpha.0"
+  },
+  "exports": {
+    ".": {
+      "module": "./dist/sigma-layout-fa2-gpu.esm.js",
+      "import": "./dist/sigma-layout-fa2-gpu.cjs.mjs",
+      "default": "./dist/sigma-layout-fa2-gpu.cjs.js"
+    },
+    "./package.json": "./package.json"
+  }
+}

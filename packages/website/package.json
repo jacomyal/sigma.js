@@ -16,6 +16,7 @@
     "@sigma/layer-leaflet": "*",
     "@sigma/layer-maplibre": "*",
     "@sigma/layer-webgl": "*",
+    "@sigma/layout-fa2-gpu": "*",
     "@sigma/node-border": "*",
     "@sigma/node-image": "*",
     "@sigma/node-piechart": "*",

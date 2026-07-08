@@ -60,6 +60,7 @@
       "packages/layer-leaflet",
       "packages/layer-maplibre",
       "packages/layer-webgl",
+      "packages/layout-fa2-gpu",
       "packages/export-image",
       "packages/utils"
     ],

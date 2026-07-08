@@ -18,6 +18,9 @@
       "path": "./packages/layer-webgl"
     },
     {
+      "path": "./packages/layout-fa2-gpu"
+    },
+    {
       "path": "./packages/node-border"
     },
     {

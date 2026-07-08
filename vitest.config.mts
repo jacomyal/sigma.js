@@ -10,6 +10,7 @@ const UNIT_PACKAGES = [
   "utils",
   "layer-leaflet",
   "layer-maplibre",
+  "layout-fa2-gpu",
 ];
 
 // Packages with type tests (`*.test-d.ts`). Browser (Playwright) tests live in
