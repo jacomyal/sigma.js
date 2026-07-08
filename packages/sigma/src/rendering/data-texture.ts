@@ -285,6 +285,14 @@ export class DataTexture {
   }
 
   /**
+   * Gets the texture height (needed to cover the full texture when rendering
+   * into it).
+   */
+  getTextureHeight(): number {
+    return this.textureHeight;
+  }
+
+  /**
    * Gets the number of texels per item.
    */
   getTexelsPerItem(): number {

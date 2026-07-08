@@ -1121,6 +1121,10 @@ export default class Sigma<
     this.nodeProgram.uploadLayerTexture();
     this.edgeProgram.uploadAttributeTexture();
 
+    // All CPU-side texture uploads are done: GPU-side writers can now write
+    // into the data textures, before anything reads them this frame
+    this.emit("afterTexturesUpload");
+
     // Bind data textures to their respective texture units
     this.internals.nodeDataTexture!.bind(NODE_DATA_TEXTURE_UNIT);
     this.internals.edgeDataTexture!.bind(EDGE_DATA_TEXTURE_UNIT);
@@ -1843,6 +1847,27 @@ export default class Sigma<
   getWebGLContext(): WebGL2RenderingContext {
     if (!this.webGLContext) throw new Error("Sigma: WebGL context is not available");
     return this.webGLContext;
+  }
+
+  /**
+   * Returns the shared node data texture (position, size, shapeId per node).
+   * GPU-side position writers can use it to target their writes (see the
+   * "afterTexturesUpload" event). The texture object is recreated when its
+   * capacity grows, so consumers holding a WebGLTexture handle must re-read it
+   * every frame.
+   */
+  getNodeDataTexture(): NodeDataTexture {
+    if (!this.internals.nodeDataTexture) throw new Error("Sigma: node data texture is not available");
+    return this.internals.nodeDataTexture;
+  }
+
+  /**
+   * Returns the current normalization function, mapping graph coordinates to
+   * the ~[0, 1] framed-graph space stored in the node data texture (and back,
+   * through its `inverse` method).
+   */
+  getNormalizationFunction(): NormalizationFunction {
+    return this.normalizationFunction;
   }
 
   /**

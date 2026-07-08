@@ -310,6 +310,8 @@ export type SigmaAdditionalEvents = {
   nodeDragStart(payload: SigmaNodeDragEventPayload): void;
   nodeDrag(payload: SigmaNodeDragMovePayload): void;
   nodeDragEnd(payload: SigmaNodeDragEventPayload): void;
+  // WebGL lifecycle events:
+  afterTexturesUpload(): void;
 };
 
 export type SigmaEvents = SigmaStageEvents &

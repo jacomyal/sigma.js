@@ -28,6 +28,9 @@ export * from "./utils";
 // Shape registry
 export * from "./shapes";
 
+// GL state snapshot/restore for external code sharing sigma's context
+export { GLStateGuard } from "./gl-state-guard";
+
 // Data textures
 export { DataTexture } from "./data-texture";
 export { NodeDataTexture } from "./node-data-texture";
