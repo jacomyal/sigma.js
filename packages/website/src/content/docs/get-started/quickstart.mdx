@@ -54,7 +54,9 @@ With the CDN links, it's possible to write a single HTML document, with minimal 
       graph.addEdge("1", "2", { size: 5, color: "purple" });
 
       // Instantiate sigma.js and render the graph
-      const renderer = new Sigma(graph, document.getElementById("container"));
+      const renderer = new Sigma(graph, document.getElementById("container"), {
+        settings: { itemSizesReference: "screen" },
+      });
     </script>
   </body>
 </html>
