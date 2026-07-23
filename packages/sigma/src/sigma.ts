@@ -24,6 +24,7 @@ import {
   resetKind,
 } from "./core/interactive-kinds";
 import { LabelRenderer } from "./core/label-renderer";
+import { AsyncPickingReader } from "./core/picking-reader";
 import { SDFAtlasManager } from "./core/sdf-atlas";
 import { SigmaInternals } from "./core/sigma-internals";
 import { StateManager } from "./core/state-manager";
@@ -96,7 +97,6 @@ import {
   createElement,
   createNormalizationFunction,
   getMatrixImpact,
-  getPixelColor,
   getPixelRatio,
   hasBackdrop,
   hasForcedLabel,
@@ -159,6 +159,7 @@ export default class Sigma<
   private pickingFrameBuffer: WebGLFramebuffer | null = null;
   private pickingTexture: WebGLTexture | null = null;
   private pickingDepthBuffer: WebGLRenderbuffer | null = null;
+  private pickingReader: AsyncPickingReader | null = null;
   private activeListeners: PlainObject<Listener> = {};
   private internals: SigmaInternals<N, E, G>;
   private labelRenderer: LabelRenderer<N, E, G>;
@@ -635,23 +636,28 @@ export default class Sigma<
 
   /**
    * Returns the topmost pickable hit at a given viewport position, by reading
-   * one pixel of the picking framebuffer and looking it up in the unified
-   * picking table. Returns null if the pixel is empty.
+   * one pixel of the latest picking snapshot (see AsyncPickingReader) and
+   * looking it up in the unified picking table. Returns null if the pixel is
+   * empty, or if no snapshot has landed yet.
+   *
+   * The snapshot lags behind the displayed frame by the GPU queue latency,
+   * and picking IDs are reassigned (in stable order) at each process cycle:
+   * right after a structural change, a hit can transiently decode against
+   * shifted IDs, until the next snapshot lands.
    */
   private getHitAtPosition(position: Coordinates): Hit | null {
-    const gl = this.webGLContext!;
+    const reader = this.pickingReader;
+    if (!reader) return null;
 
-    // Read from picking framebuffer (scaled by downSizingRatio)
-    gl.bindFramebuffer(gl.FRAMEBUFFER, this.pickingFrameBuffer);
-
-    const color = getPixelColor(
-      gl,
-      this.pickingFrameBuffer,
+    reader.poll();
+    const color = reader.read(
       position.x,
       position.y,
       this.internals.pixelRatio,
       this.internals.settings.pickingDownSizingRatio,
     );
+    if (!color) return null;
+
     const index = colorToIndex(...color);
     return this.pickingState.lookup[index] ?? null;
   }
@@ -1249,8 +1255,10 @@ export default class Sigma<
       );
     }
 
-    // Do not display labels on move per setting
-    if (this.internals.settings.hideLabelsOnMove && moving) return exitRender();
+    // All picking writes are done: enqueue the async readback feeding the
+    // CPU-side snapshot that getHitAtPosition resolves against.
+    if (this.pickingReader && this.pickingFrameBuffer)
+      this.pickingReader.enqueue(this.pickingFrameBuffer, pickingWidth, pickingHeight);
 
     return exitRender();
   }
@@ -1731,6 +1739,7 @@ export default class Sigma<
     this.pickingFrameBuffer = frameBuffer;
     this.pickingTexture = pickingTexture;
     this.pickingDepthBuffer = depthBuffer;
+    this.pickingReader = new AsyncPickingReader(gl);
   }
 
   /**
@@ -3034,6 +3043,12 @@ export default class Sigma<
     if (this.internals.edgeFrameTexture) {
       this.internals.edgeFrameTexture.kill();
       this.internals.edgeFrameTexture = null;
+    }
+
+    // Cleanup async picking reader
+    if (this.pickingReader) {
+      this.pickingReader.kill();
+      this.pickingReader = null;
     }
 
     // Kill WebGL context

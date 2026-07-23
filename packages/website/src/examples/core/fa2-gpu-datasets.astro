@@ -220,7 +220,7 @@
     scalingRatio: inferred.scalingRatio ?? 1,
     slowDown: inferred.slowDown ?? 1,
     strongGravityMode: inferred.strongGravityMode ?? false,
-    backportInterval: 0,
+    backportInterval: Infinity,
   });
 
   layout.on("stopped", () => setToggle("fa2", false));
