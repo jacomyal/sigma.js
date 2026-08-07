@@ -1,6 +1,7 @@
 import Sigma from "sigma";
 
 import { DEFAULT_TO_IMAGE_OPTIONS, ToImageOptions } from "./options";
+import { resolveOverride } from "./utils";
 
 /**
  * This function takes a Sigma instance and some options, and returns a HTMLCanvasElement, with the sigma stage canvas
@@ -27,10 +28,11 @@ export async function drawOnCanvas(
   tmpRoot.style.bottom = "101%";
   document.body.appendChild(tmpRoot);
 
-  // Instantiate sigma with merged options:
+  // Instantiate sigma
   const tempRenderer = new Sigma(sigma.getGraph(), tmpRoot, {
-    ...sigmaOverrides,
-    settings: { ...sigma.getSettings(), ...sigmaOverrides.settings },
+    primitives: resolveOverride(sigma.getPrimitives(), sigmaOverrides.primitives),
+    styles: resolveOverride(sigma.getStyles(), sigmaOverrides.styles),
+    settings: resolveOverride(sigma.getSettings(), sigmaOverrides.settings),
   });
 
   // Copy node, edge, and graph states from source renderer
