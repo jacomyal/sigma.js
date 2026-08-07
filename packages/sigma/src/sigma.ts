@@ -2224,6 +2224,34 @@ export default class Sigma<
   }
 
   /**
+   * Method returning a copy of the styles declaration, as resolved at
+   * construction (i.e. with the defaults applied when none was given).
+   *
+   * The copy is shallow: the rules it points to are the renderer's own, and
+   * must be treated as read-only. Build new arrays and objects rather than
+   * mutating them in place.
+   *
+   * @return {StylesDeclaration} A copy of the styles declaration.
+   */
+  getStyles(): StylesDeclaration<N, E, NS, ES, GS> {
+    return { ...this.stylesDeclaration! };
+  }
+
+  /**
+   * Method returning a copy of the primitives declaration, as resolved at
+   * construction (i.e. with the defaults applied when none was given).
+   *
+   * The copy is shallow: the rules it points to are the renderer's own, and
+   * must be treated as read-only. Build new arrays and objects rather than
+   * mutating them in place.
+   *
+   * @return {PrimitivesDeclaration} A copy of the primitives declaration.
+   */
+  getPrimitives(): PrimitivesDeclaration {
+    return { ...this.internals.primitives! };
+  }
+
+  /**
    * Method setting the value of a given setting key. Note that this will schedule
    * a new render next frame.
    *
