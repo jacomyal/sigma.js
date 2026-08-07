@@ -5,11 +5,14 @@
  * Usage in MDX:
  *   <SigmaExample id="core/events" />
  *   <SigmaExample id="get-started/quickstart" defaultTab="source" />
+ *   <SigmaExample id="cookbook/export-image" controls />
  *
  * Props:
- *   id         — must match a file at src/examples/{id}.astro
- *   height     — iframe height (default "500px")
- *   defaultTab — which tab to show first: "result" (default) or "source"
+ *   id         - must match a file at src/examples/{id}.astro
+ *   height     - iframe height (default "500px")
+ *   defaultTab - which tab to show first: "result" (default) or "source"
+ *   controls   - keep the example's controls bar visible (hidden by default,
+ *                for examples whose controls *are* the demo)
  */
 import { Code } from "astro-expressive-code/components";
 import { Icon } from "astro-icon/components";
@@ -18,9 +21,10 @@ interface Props {
   id: string;
   height?: string;
   defaultTab?: "result" | "source";
+  controls?: boolean;
 }
 
-const { id, height = "500px", defaultTab = "result" } = Astro.props;
+const { id, height = "500px", defaultTab = "result", controls = false } = Astro.props;
 
 let scriptSource = "";
 const sources = import.meta.glob("../examples/**/*.astro", { query: "?raw", eager: true });
@@ -38,7 +42,10 @@ const sourceFirst = defaultTab === "source";
 
 <div class="sigma-example not-content" style={`--panel-height: ${height}`}>
   <div class={`sigma-example-panel sigma-example-result ${sourceFirst ? "" : "active"}`} data-panel="result">
-    <iframe src={`/embed/${id}/?stage-only`} title={`sigma.js example: ${id}`} loading="lazy"></iframe>
+    <iframe
+      src={`/embed/${id}/?stage-only${controls ? "&controls" : ""}`}
+      title={`sigma.js example: ${id}`}
+      loading="lazy"></iframe>
   </div>
   <div class={`sigma-example-panel sigma-example-source ${sourceFirst ? "active" : ""}`} data-panel="source">
     <Code code={scriptSource} lang="typescript" />

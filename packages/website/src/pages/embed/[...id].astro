@@ -40,7 +40,9 @@ const { Component, source } = Astro.props;
     <meta name="theme-color" content="#e22653" />
     <link rel="stylesheet" href="/embed-base.css" />
     <script is:inline>
-      if (new URLSearchParams(location.search).has("stage-only")) document.documentElement.dataset.stageOnly = "";
+      const params = new URLSearchParams(location.search);
+      if (params.has("stage-only")) document.documentElement.dataset.stageOnly = "";
+      if (params.has("controls")) document.documentElement.dataset.controls = "";
     </script>
   </head>
   <body>
@@ -174,11 +176,12 @@ const { Component, source } = Astro.props;
     max-height: none;
   }
 
-  /* Stage-only mode: hide all chrome, show only the rendered example */
+  /* Stage-only mode: hide all chrome, show only the rendered example.
+     `?controls` keeps the controls bar, for examples that are driven by it. */
   html[data-stage-only] .tabs,
   html[data-stage-only] .panel-source,
   html[data-stage-only] .interaction,
-  html[data-stage-only] #controls {
+  html[data-stage-only]:not([data-controls]) #controls {
     display: none !important;
   }
 

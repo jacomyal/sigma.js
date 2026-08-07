@@ -8,11 +8,14 @@
 </style>
 
 <script>
+  import { downloadAsPNG } from "@sigma/export-image";
   import Graph from "graphology";
   import { parse } from "graphology-gexf/browser";
   import Sigma from "sigma";
   import { layerFill, sdfCircle, sdfDiamond } from "sigma/rendering";
   import { DEFAULT_STYLES } from "sigma/types";
+
+  import { registerControls } from "../_controls";
 
   const container = document.getElementById("sigma-container") as HTMLElement;
 
@@ -20,7 +23,7 @@
   const gexf = await res.text();
   const graph = parse(Graph, gexf);
 
-  new Sigma(graph, container, {
+  const renderer = new Sigma(graph, container, {
     primitives: {
       nodes: {
         shapes: [sdfCircle(), sdfDiamond()],
@@ -67,6 +70,16 @@
       itemSizesReference: "positions",
       zoomToSizeRatioFunction: (x: number) => x,
       autoRescale: true,
+    },
+  });
+
+  registerControls({
+    save: {
+      type: "button",
+      label: "Save as PNG",
+      action: () => {
+        downloadAsPNG(renderer, { fileName: "bipartite-network", backgroundColor: "#ffffff" });
+      },
     },
   });
 </script>

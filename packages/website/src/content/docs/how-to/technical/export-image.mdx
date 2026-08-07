@@ -8,10 +8,10 @@ sidebar:
 import SigmaExample from "../../../../components/SigmaExample.astro";
 
 The `@sigma/export-image` package lets you export the current graph visualization as a PNG or JPEG file. It works by
-creating a temporary offscreen renderer, copying the current node/edge/graph states, and drawing the stage canvas onto a
-new output canvas.
+creating a temporary offscreen renderer, copying the primitives, styles and settings declarations as well as the current
+node/edge/graph states, and drawing the stage canvas onto a new output canvas.
 
-<SigmaExample id="cookbook/export-image" height="500px" />
+<SigmaExample id="cookbook/export-image" height="500px" controls />
 
 ## Installation
 
@@ -51,7 +51,34 @@ downloadAsPNG(renderer, { fileName: "my-graph", backgroundColor: "#ffffff" });
 | `width`           | `number \| null`      | `null`          | Output width in pixels (defaults to current renderer width)         |
 | `height`          | `number \| null`      | `null`          | Output height in pixels (defaults to current renderer height)       |
 | `cameraState`     | `CameraState \| null` | `null`          | Override camera state (defaults to current renderer's camera state) |
-| `sigmaOverrides`  | `object`              | `{}`            | Override `primitives`, `styles`, and/or `settings` for the export   |
+| `sigmaOverrides`  | `object`              | `{}`            | Alter `primitives`, `styles`, and/or `settings` for the export      |
+
+## Overriding declarations
+
+The export reuses the source renderer's `primitives`, `styles` and `settings`, so a graph with custom shapes and style
+rules exports exactly as it appears. Use `sigmaOverrides` when the image should differ from the screen.
+
+Each entry accepts an object, whose top-level sections replace the source ones while the others are inherited:
+
+```typescript
+// Same styling as on screen, but without the stage padding:
+downloadAsPNG(renderer, { sigmaOverrides: { settings: { stagePadding: 0 } } });
+```
+
+Or a function, which receives the source declaration and returns the one to use as-is. Use this form to _add_ to what the
+renderer already declares, since it makes the source impossible to leave out:
+
+```typescript
+// Same styling as on screen, plus a rule forcing every label to be drawn:
+downloadAsPNG(renderer, {
+  sigmaOverrides: {
+    styles: (styles) => ({
+      ...styles,
+      nodes: [...(Array.isArray(styles.nodes) ? styles.nodes : [styles.nodes!]), { labelVisibility: "visible" }],
+    }),
+  },
+});
+```
 
 ## Custom dimensions
 
