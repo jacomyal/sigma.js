@@ -3,7 +3,10 @@ title: Quickstart
 description: Install sigma.js and render your first graph.
 ---
 
+import { Code } from "@astrojs/starlight/components";
+
 import SigmaExample from "../../../components/SigmaExample.astro";
+import { GRAPHOLOGY_VERSION, SIGMA_VERSION } from "../../../versions";
 
 ## Installation
 
@@ -12,12 +15,13 @@ import SigmaExample from "../../../components/SigmaExample.astro";
 To quickly integrate sigma.js and graphology into your project, you can use CDN links. Add the following lines to the
 head section of your HTML:
 
-```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/[VERSION]/sigma.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/[VERSION]/graphology.umd.min.js"></script>
-```
+<Code
+  lang="html"
+  code={`<script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/${SIGMA_VERSION}/sigma.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/${GRAPHOLOGY_VERSION}/graphology.umd.min.js"></script>`}
+/>
 
-Replace [VERSION] with the desired version number.
+These links point to the versions this documentation was built for. Change the version numbers to pin other releases.
 
 ## Using a package manager
 
@@ -35,30 +39,33 @@ yarn add sigma graphology
 
 With the CDN links, it's possible to write a single HTML document, with minimal JavaScript code, to render some graph:
 
-```html
-<!doctype html>
+<Code
+  lang="html"
+  code={`<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Quick Sigma.js Example</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/[VERSION]/sigma.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/[VERSION]/graphology.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/${SIGMA_VERSION}/sigma.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/${GRAPHOLOGY_VERSION}/graphology.umd.min.js"></script>
   </head>
   <body style="background: lightgrey">
     <div id="container" style="width: 800px; height: 600px; background: white"></div>
     <script>
       // Create a graphology graph
       const graph = new graphology.Graph();
-      graph.addNode("1", { label: "Node 1", x: 0, y: 0, size: 10, color: "blue" });
-      graph.addNode("2", { label: "Node 2", x: 1, y: 1, size: 20, color: "red" });
-      graph.addEdge("1", "2", { size: 5, color: "purple" });
+      graph.addNode("1", { label: "Node 1", x: 0, y: 0, size: 1, color: "blue" });
+      graph.addNode("2", { label: "Node 2", x: 10, y: 10, size: 2, color: "red" });
+      graph.addEdge("1", "2", { size: 0.5, color: "purple" });
 
       // Instantiate sigma.js and render the graph
-      const renderer = new Sigma(graph, document.getElementById("container"));
+      const renderer = new Sigma(graph, document.getElementById("container"), {
+        settings: { autoRescaleContent: "nodes" },
+      });
     </script>
   </body>
-</html>
-```
+</html>`}
+/>
 
 Since sigma targets more _web applications_ than _web documents_, the rest of this documentation will be assuming it is
 used in a TypeScript environment, with modules support.
