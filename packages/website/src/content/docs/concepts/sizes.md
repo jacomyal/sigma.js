@@ -10,48 +10,61 @@ description: How sigma handles node and edge sizing, and how to customize it.
 The default behavior of Sigma is designed to ensure:
 
 - The **entire graph is visible** and uses the available viewport space efficiently.
-- Like how road thickness on map applications isn't true-to-scale (for better readability), nodes and edges **adjust to the zoom level**, preventing them from becoming too large or too small.
-- It is easy for developers to adjust the node and edge sizes to the viewport.
+- Like how road thickness on map applications isn't true-to-scale (for better readability), nodes and edges **adjust to
+  the zoom level**, preventing them from becoming too large or too small.
+- The same graph data **renders the same way**, whatever the layout scale or the container size.
 
-This approach allows developers to use a variety of graph layouts, ensuring the graph is visible and readable without requiring additional customization.
+This approach allows developers to use a variety of graph layouts, ensuring the graph is visible and readable without
+requiring additional customization.
 
 ### Implementation details
 
 By default, sigma applies the following rules for rendering nodes and edges relative to data sizes:
 
 1. Node and edge sizes **scale with the square root** of the zoom ratio.
-2. Sizes from data are treated as **pixel values**, for the default zoom level.
-3. Node and edge positions are adjusted so that the **graph is rescaled and centered**, fitting optimally in the viewport at the default camera zoom.
+2. Sizes from data are read in the **same coordinate system as node positions**.
+3. Node and edge positions are adjusted so that the **graph is rescaled and centered**, fitting optimally in the
+   viewport at the default camera zoom.
 
 ### Limitations
 
 These opinionated choices bring some limitations:
 
-- Graph appearance can be **inconsistent across different viewports**.
-- Node and edge sizes can be **difficult to predict**, especially in relation to positions, which can lead to overlap on smaller viewports.
+- Sizes are **not pixel values**: the same `size: 1` looks big on a tight layout and small on a spread one.
+- Rule #3 fits node **centers** only, so a big node near the border can be **clipped**. See the `autoRescaleContent`
+  setting below.
 
 ## Customization options
 
 ### `zoomToSizeRatioFunction` setting
 
-To modify rule #1, adjust the `zoomToSizeRatioFunction` setting. This setting takes a transformation function `(ratio: number) => number`. By default, Sigma uses `Math.sqrt`, which keeps nodes and edges reasonably sized when zooming in or out.
+To modify rule #1, adjust the `zoomToSizeRatioFunction` setting. This setting takes a transformation function
+`(ratio: number) => number`. By default, Sigma uses `Math.sqrt`, which keeps nodes and edges reasonably sized when
+zooming in or out.
 
-For instance, using `(ratio) => ratio` will make node and edge sizes scale directly with the zoom, similar to most other graph visualization tools.
+For instance, using `(ratio) => ratio` will make node and edge sizes scale directly with the zoom, similar to most other
+graph visualization tools.
 
 ### `itemSizesReference` setting
 
-To change rule #2, set `itemSizesReference` to **`"positions"`**. This makes sigma interpret node and edge sizes in the same coordinate system as the node positions at the default zoom level.
+Rule #2 is what makes a graph render the same way whatever its extent and container size. To change it, set
+`itemSizesReference` to **`"screen"`**: sizes then become pixel values at the default zoom, as in sigma v3. That was the
+old default, but it means the same data looks different depending on how spread the layout is.
 
-If you want sizes to scale with the node positions at **all zoom levels**, combine this setting with `zoomToSizeRatioFunction: (ratio) => ratio`.
+If you want sizes to scale with the node positions at **all zoom levels**, combine `"positions"` with
+`zoomToSizeRatioFunction: (ratio) => ratio`.
 
 ### `autoRescale` setting
 
-To disable rule #3, use the `autoRescale` setting. Setting `autoRescale` as `false` prevents Sigma from automatically resizing the graph. Then, node positions are interpreted in pixels, for the default zoom level. The graph remains centered in the viewport, though.
+To disable rule #3, use the `autoRescale` setting. Setting `autoRescale` as `false` prevents Sigma from automatically
+resizing the graph. Then, node positions are interpreted in pixels, for the default zoom level. The graph remains
+centered in the viewport, though.
 
 ### `autoRescaleContent` setting
 
 When `autoRescale` is enabled, sigma fits the graph to the viewport based on **node positions only**. This means nodes
 sitting near the edge of the graph can still get clipped, because their shape and labels extends beyond the fitted area.
+Since rule #2 puts sizes in position space, this matters more the bigger your sizes are relative to the layout.
 
 The `autoRescaleContent` setting controls what that fit encloses:
 

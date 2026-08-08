@@ -128,6 +128,13 @@ const renderer = new Sigma(graph, container, {
 - **`hidden` / `forceLabel` attributes**: replaced by `visibility` and `labelVisibility` style properties with `when`
   predicates
 
+## What changed by default
+
+- **`itemSizesReference` now defaults to `"positions"`** (it was `"screen"`): node and edge sizes are read in the same
+  coordinate system as node positions, instead of as pixels at the default zoom. Nodes will look bigger or smaller than
+  in v3 unless your sizes are already on the scale of your layout. Set `itemSizesReference: "screen"` to keep the v3
+  behavior, or see [Node and edge sizes](/concepts/sizes/).
+
 ## What's still available
 
 - **`nodeReducer` / `edgeReducer`**: still work as escape hatches for complex logic that styles cannot express, but

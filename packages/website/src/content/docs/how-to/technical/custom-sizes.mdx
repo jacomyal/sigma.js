@@ -50,13 +50,13 @@ const renderer = new Sigma(graph, container, {
 });
 ```
 
-## Using positions as size reference
+## Using screen pixels as size reference
 
-By default, sizes are in "screen pixels at default zoom ratio" (`itemSizesReference: "screen"`). If you want sizes to be
-in the same coordinate space as node positions, you use `itemSizesReference: "positions"`:
+By default, sizes are in the same coordinate space as node positions (`itemSizesReference: "positions"`). If you want
+sizes to be in "screen pixels at default zoom ratio" instead, use `itemSizesReference: "screen"`:
 
 ```typescript
 const renderer = new Sigma(graph, container, {
-  settings: { itemSizesReference: "positions" },
+  settings: { itemSizesReference: "screen" },
 });
 ```
