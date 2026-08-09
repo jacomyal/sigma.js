@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Downloads the SNAP datasets listed in datasets.mjs into public/data/, as
  * their original gzipped edge lists. Files already on disk are skipped, so
@@ -9,6 +10,7 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { fileURLToPath } from "node:url";
 
+// eslint-disable-next-line import/extensions
 import { DATASETS } from "./datasets.mjs";
 
 const DATA_DIR = fileURLToPath(new URL("../public/data", import.meta.url));
