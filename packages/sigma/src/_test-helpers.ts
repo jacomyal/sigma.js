@@ -59,6 +59,7 @@ ${fragmentShader}`);
 }
 
 export function wait(timeout: number): Promise<void> {
+  if (!timeout) return Promise.resolve();
   return new Promise<void>((resolve) => setTimeout(resolve, timeout));
 }
 

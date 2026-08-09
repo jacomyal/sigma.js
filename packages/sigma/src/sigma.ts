@@ -5,7 +5,7 @@
  */
 import Graph, { Attributes } from "graphology-types";
 
-import Camera from "./core/camera";
+import Camera, { CameraAnimationPayload } from "./core/camera";
 import MouseCaptor from "./core/captors/mouse";
 import TouchCaptor from "./core/captors/touch";
 import { DragManager } from "./core/drag-manager";
@@ -607,7 +607,7 @@ export default class Sigma<
       this.refreshMatrices();
       this.scheduleRender();
     };
-    this.activeListeners.cameraAnimationStart = (from: CameraState, to: CameraState) => {
+    this.activeListeners.cameraAnimationStart = ({ from, to }: CameraAnimationPayload) => {
       if (from.ratio !== to.ratio) this.stateManager.setGraphState({ isZooming: true });
     };
     this.activeListeners.cameraAnimationEnd = () => {
@@ -898,7 +898,7 @@ export default class Sigma<
     this.camera.enabledPanning = settings.enableCameraPanning;
     this.camera.enabledRotation = settings.enableCameraRotation;
     if (settings.cameraPanBoundaries) {
-      this.camera.clean = (state) =>
+      this.camera.constrainState = (state) =>
         this.cleanCameraState(
           state,
           settings.cameraPanBoundaries && typeof settings.cameraPanBoundaries === "object"
@@ -906,9 +906,10 @@ export default class Sigma<
             : {},
         );
     } else {
-      this.camera.clean = null;
+      this.camera.constrainState = null;
     }
-    this.camera.setState(this.camera.validateState(this.camera.getState()));
+    // Re-validate the current state, since the new settings may forbid it:
+    this.camera.setState(this.camera.getState());
 
     // Update captors settings:
     this.mouseCaptor.setSettings(this.internals.settings);
@@ -1063,7 +1064,7 @@ export default class Sigma<
     // TODO: deal with the touch captor here as well
     const mouseCaptor = this.mouseCaptor;
     const moving =
-      this.camera.isAnimated() ||
+      this.camera.isAnimating() ||
       mouseCaptor.isMoving ||
       mouseCaptor.draggedEvents ||
       mouseCaptor.currentWheelDirection;
@@ -1918,6 +1919,7 @@ export default class Sigma<
    * @return {Sigma}
    */
   setCamera(camera: Camera): this {
+    this.camera.cancelAnimation();
     this.unbindCameraHandlers();
     this.camera = camera;
     this.bindCameraHandlers();
@@ -2988,6 +2990,7 @@ export default class Sigma<
     this.removeAllListeners();
 
     // Releasing camera handlers
+    this.camera.cancelAnimation();
     this.unbindCameraHandlers();
 
     // Releasing DOM events & captors

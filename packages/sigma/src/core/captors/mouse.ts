@@ -238,7 +238,7 @@ export default class MouseCaptor<
     const { x, y } = getPosition(e, this.container);
 
     const cameraState = camera.getState(),
-      previousCameraState = camera.getPreviousState() || { x: 0, y: 0 };
+      previousCameraState = camera.getPreviousState();
 
     if (this.isMoving) {
       camera.animate(

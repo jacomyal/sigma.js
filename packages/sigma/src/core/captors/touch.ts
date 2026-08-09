@@ -161,7 +161,7 @@ export default class TouchCaptor<
         if (this.isMoving) {
           const camera = this.renderer.getCamera();
           const cameraState = camera.getState(),
-            previousCameraState = camera.getPreviousState() || { x: 0, y: 0 };
+            previousCameraState = camera.getPreviousState();
 
           camera.animate(
             {

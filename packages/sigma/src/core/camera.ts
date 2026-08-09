@@ -6,51 +6,74 @@
  * @module
  */
 import { CameraState, TypedEventEmitter } from "../types";
-import { ANIMATE_DEFAULTS, AnimateOptions, resolveEasing } from "../utils";
+import { ANIMATE_DEFAULTS, AnimateOptions, resolveEasing, shallowEqual } from "../utils";
 
 /**
  * Defaults.
  */
 const DEFAULT_ZOOMING_RATIO = 1.5;
+export const DEFAULT_CAMERA_STATE: CameraState = { x: 0.5, y: 0.5, angle: 0, ratio: 1 };
+
+/**
+ * Options of the zoom shortcuts: the animation options, plus the zoom factor.
+ */
+export type ZoomOptions = Partial<AnimateOptions> & { factor?: number };
+
+/**
+ * Event payloads.
+ */
+export type CameraAnimationPayload = { from: CameraState; to: CameraState };
+export type CameraAnimationEndPayload = CameraAnimationPayload & { completed: boolean };
 
 /**
  * Event types.
  */
 export type CameraEvents = {
   updated(state: CameraState): void;
-  animationStart(from: CameraState, to: CameraState): void;
-  animationEnd(from: CameraState, to: CameraState, completed: boolean): void;
+  animationStart(payload: CameraAnimationPayload): void;
+  animationEnd(payload: CameraAnimationEndPayload): void;
 };
 
 /**
  * Camera class
  */
 export default class Camera extends TypedEventEmitter<CameraEvents> implements CameraState {
-  x = 0.5;
-  y = 0.5;
-  angle = 0;
-  ratio = 1;
-
   minRatio: number | null = null;
   maxRatio: number | null = null;
+
+  enabled = true;
   enabledZooming = true;
   enabledPanning = true;
   enabledRotation = true;
-  clean: ((state: CameraState) => CameraState) | null = null;
 
+  /**
+   * Hook to constrain each new state, applied at the end of
+   * {@link Camera#validateState}. Owned by Sigma, which derives it from the
+   * `cameraPanBoundaries` setting.
+   * @internal
+   */
+  constrainState: ((state: CameraState) => CameraState) | null = null;
+
+  private state: CameraState = { ...DEFAULT_CAMERA_STATE };
+  private previousState: CameraState = { ...DEFAULT_CAMERA_STATE };
   private nextFrame: number | null = null;
-  private previousState: CameraState | null = null;
-  private enabled = true;
   private currentAnimationFrom: CameraState | null = null;
   private currentAnimationTo: CameraState | null = null;
+  private animationCallback: (() => void) | null = null;
 
-  animationCallback?: () => void;
-
-  constructor() {
-    super();
-
-    // State
-    this.previousState = this.getState();
+  // The state is read-only: it can only be updated through #setState, so that
+  // no update escapes validation and the "updated" event.
+  get x(): number {
+    return this.state.x;
+  }
+  get y(): number {
+    return this.state.y;
+  }
+  get angle(): number {
+    return this.state.angle;
+  }
+  get ratio(): number {
+    return this.state.ratio;
   }
 
   /**
@@ -62,54 +85,17 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
   }
 
   /**
-   * Method used to enable the camera.
-   */
-  enable(): this {
-    this.enabled = true;
-    return this;
-  }
-
-  /**
-   * Method used to disable the camera.
-   */
-  disable(): this {
-    this.enabled = false;
-    return this;
-  }
-
-  /**
    * Method used to retrieve the camera's current state.
    */
   getState(): CameraState {
-    return {
-      x: this.x,
-      y: this.y,
-      angle: this.angle,
-      ratio: this.ratio,
-    };
+    return { ...this.state };
   }
 
   /**
-   * Method used to check whether the camera has the given state.
+   * Method used to retrieve the state the camera had before its last update.
    */
-  hasState(state: CameraState): boolean {
-    return this.x === state.x && this.y === state.y && this.ratio === state.ratio && this.angle === state.angle;
-  }
-
-  /**
-   * Method used to retrieve the camera's previous state.
-   */
-  getPreviousState(): CameraState | null {
-    const state = this.previousState;
-
-    if (!state) return null;
-
-    return {
-      x: state.x,
-      y: state.y,
-      angle: state.angle,
-      ratio: state.ratio,
-    };
+  getPreviousState(): CameraState {
+    return { ...this.previousState };
   }
 
   /**
@@ -123,23 +109,24 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
   }
 
   /**
-   * Method used to check various things to return a legit state candidate.
+   * Method used to merge a state candidate into the current state, dropping
+   * whatever the interaction flags forbid, and constraining the rest.
    */
-  validateState(state: Partial<CameraState>): Partial<CameraState> {
-    const validatedState: Partial<CameraState> = {};
+  validateState(state: Partial<CameraState>): CameraState {
+    const validatedState = this.getState();
     if (this.enabledPanning && typeof state.x === "number") validatedState.x = state.x;
     if (this.enabledPanning && typeof state.y === "number") validatedState.y = state.y;
     if (this.enabledZooming && typeof state.ratio === "number")
       validatedState.ratio = this.getBoundedRatio(state.ratio);
     if (this.enabledRotation && typeof state.angle === "number") validatedState.angle = state.angle;
-    return this.clean ? this.clean({ ...this.getState(), ...validatedState }) : validatedState;
+    return this.constrainState ? this.constrainState(validatedState) : validatedState;
   }
 
   /**
-   * Method used to check whether the camera is currently being animated.
+   * Method used to check whether an animation is currently running.
    */
-  isAnimated(): boolean {
-    return !!this.nextFrame;
+  isAnimating(): boolean {
+    return this.nextFrame !== null;
   }
 
   /**
@@ -148,17 +135,12 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
   setState(state: Partial<CameraState>): this {
     if (!this.enabled) return this;
 
-    // Keeping track of last state
-    this.previousState = this.getState();
-
     const validState = this.validateState(state);
-    if (typeof validState.x === "number") this.x = validState.x;
-    if (typeof validState.y === "number") this.y = validState.y;
-    if (typeof validState.ratio === "number") this.ratio = validState.ratio;
-    if (typeof validState.angle === "number") this.angle = validState.angle;
+    if (shallowEqual(this.state, validState)) return this;
 
-    // Emitting
-    if (!this.hasState(this.previousState)) this.emit("updated", this.getState());
+    this.previousState = this.state;
+    this.state = validState;
+    this.emit("updated", this.getState());
 
     return this;
   }
@@ -172,84 +154,115 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
   }
 
   /**
-   * Method used to animate the camera.
+   * Animates the camera to the given state.
+   *
+   * The returned promise resolves when the animation stops, whether it ran to
+   * completion or was interrupted by a new animation or by
+   * {@link Camera#cancelAnimation}. Read `completed` on the `animationEnd`
+   * event to tell those apart. On a disabled camera it resolves right away.
    */
-  animate(state: Partial<CameraState>, opts: Partial<AnimateOptions>, callback: () => void): void;
-  animate(state: Partial<CameraState>, opts?: Partial<AnimateOptions>): Promise<void>;
-  animate(
-    state: Partial<CameraState>,
-    opts: Partial<AnimateOptions> = {},
-    callback?: () => void,
-  ): void | Promise<void> {
-    if (!callback) return new Promise((resolve) => this.animate(state, opts, resolve));
+  animate(state: Partial<CameraState>, options?: Partial<AnimateOptions>): Promise<void> {
+    if (!this.enabled) return Promise.resolve();
 
-    if (!this.enabled) return;
+    return new Promise((resolve) => this.runAnimation(state, { ...ANIMATE_DEFAULTS, ...options }, resolve));
+  }
 
-    const options: AnimateOptions = {
-      ...ANIMATE_DEFAULTS,
-      ...opts,
-    };
-    const validState = this.validateState(state);
+  /**
+   * Stops the running animation where it is, leaving the camera at its current
+   * state. No-op when nothing is running.
+   */
+  cancelAnimation(): this {
+    if (this.nextFrame !== null) {
+      cancelAnimationFrame(this.nextFrame);
+      this.nextFrame = null;
+    }
 
+    this.resolveAnimation();
+    this.emitAnimationEnd(false);
+
+    return this;
+  }
+
+  /**
+   * Method used to zoom the camera in, by dividing its ratio by `factor`.
+   */
+  zoomIn({ factor = DEFAULT_ZOOMING_RATIO, ...options }: ZoomOptions = {}): Promise<void> {
+    return this.animate({ ratio: this.ratio / factor }, options);
+  }
+
+  /**
+   * Method used to zoom the camera out, by multiplying its ratio by `factor`.
+   */
+  zoomOut({ factor = DEFAULT_ZOOMING_RATIO, ...options }: ZoomOptions = {}): Promise<void> {
+    return this.animate({ ratio: this.ratio * factor }, options);
+  }
+
+  /**
+   * Method used to animate the camera back to its default state.
+   */
+  reset(options?: Partial<AnimateOptions>): Promise<void> {
+    return this.animate(DEFAULT_CAMERA_STATE, options);
+  }
+
+  /**
+   * Drives the animation frame loop. Interrupts whatever was running first, so
+   * a camera never has two animations competing for its state.
+   */
+  private runAnimation(state: Partial<CameraState>, options: AnimateOptions, callback: () => void): void {
     const easing = resolveEasing(options.easing);
 
     // State
     const start = Date.now(),
-      initialState = this.getState();
-    const targetState: CameraState = { ...initialState, ...validState };
+      initialState = this.getState(),
+      targetState = this.validateState(state);
 
     // Function performing the animation
     const fn = () => {
-      const t = (Date.now() - start) / options.duration;
+      // The camera can get disabled mid-animation:
+      if (!this.enabled) {
+        this.cancelAnimation();
+        return;
+      }
+
+      const t = options.duration > 0 ? (Date.now() - start) / options.duration : 1;
 
       // The animation is over:
       if (t >= 1) {
         this.nextFrame = null;
-        this.setState(validState);
+        this.setState(targetState);
+        this.resolveAnimation();
         this.emitAnimationEnd(true);
-
-        if (this.animationCallback) {
-          this.animationCallback.call(null);
-          this.animationCallback = undefined;
-        }
 
         return;
       }
 
       const coefficient = easing(t);
 
-      const newState: Partial<CameraState> = {};
-
-      if (typeof validState.x === "number") newState.x = initialState.x + (validState.x - initialState.x) * coefficient;
-      if (typeof validState.y === "number") newState.y = initialState.y + (validState.y - initialState.y) * coefficient;
-      if (this.enabledRotation && typeof validState.angle === "number")
-        newState.angle = initialState.angle + (validState.angle - initialState.angle) * coefficient;
-      if (typeof validState.ratio === "number")
-        newState.ratio = initialState.ratio + (validState.ratio - initialState.ratio) * coefficient;
-
-      this.setState(newState);
+      this.setState({
+        x: initialState.x + (targetState.x - initialState.x) * coefficient,
+        y: initialState.y + (targetState.y - initialState.y) * coefficient,
+        angle: initialState.angle + (targetState.angle - initialState.angle) * coefficient,
+        ratio: initialState.ratio + (targetState.ratio - initialState.ratio) * coefficient,
+      });
 
       this.nextFrame = requestAnimationFrame(fn);
     };
 
-    const wasAnimating = this.nextFrame !== null;
-    if (wasAnimating) {
-      cancelAnimationFrame(this.nextFrame as number);
-      this.nextFrame = null;
-      this.emitAnimationEnd(false);
-      if (this.animationCallback) this.animationCallback.call(null);
-    }
+    this.cancelAnimation();
 
     this.currentAnimationFrom = initialState;
     this.currentAnimationTo = targetState;
     this.animationCallback = callback;
-    this.emit("animationStart", initialState, targetState);
+    this.emit("animationStart", { from: initialState, to: targetState });
 
-    if (wasAnimating) {
-      this.nextFrame = requestAnimationFrame(fn);
-    } else {
-      fn();
-    }
+    fn();
+  }
+
+  /** Settles the pending `animate` promise, exactly once per animation. */
+  private resolveAnimation(): void {
+    const callback = this.animationCallback;
+    this.animationCallback = null;
+    if (callback) callback();
   }
 
   private emitAnimationEnd(completed: boolean): void {
@@ -258,60 +271,6 @@ export default class Camera extends TypedEventEmitter<CameraEvents> implements C
     if (!from || !to) return;
     this.currentAnimationFrom = null;
     this.currentAnimationTo = null;
-    this.emit("animationEnd", from, to, completed);
-  }
-
-  /**
-   * Method used to zoom the camera.
-   */
-  animatedZoom(factorOrOptions?: number | (Partial<AnimateOptions> & { factor?: number })): Promise<void> {
-    if (!factorOrOptions) return this.animate({ ratio: this.ratio / DEFAULT_ZOOMING_RATIO });
-
-    if (typeof factorOrOptions === "number") return this.animate({ ratio: this.ratio / factorOrOptions });
-
-    return this.animate(
-      {
-        ratio: this.ratio / (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
-      },
-      factorOrOptions,
-    );
-  }
-
-  /**
-   * Method used to unzoom the camera.
-   */
-  animatedUnzoom(factorOrOptions?: number | (Partial<AnimateOptions> & { factor?: number })): Promise<void> {
-    if (!factorOrOptions) return this.animate({ ratio: this.ratio * DEFAULT_ZOOMING_RATIO });
-
-    if (typeof factorOrOptions === "number") return this.animate({ ratio: this.ratio * factorOrOptions });
-
-    return this.animate(
-      {
-        ratio: this.ratio * (factorOrOptions.factor || DEFAULT_ZOOMING_RATIO),
-      },
-      factorOrOptions,
-    );
-  }
-
-  /**
-   * Method used to reset the camera.
-   */
-  animatedReset(options?: Partial<AnimateOptions>): Promise<void> {
-    return this.animate(
-      {
-        x: 0.5,
-        y: 0.5,
-        ratio: 1,
-        angle: 0,
-      },
-      options,
-    );
-  }
-
-  /**
-   * Returns a new Camera instance, with the same state as the current camera.
-   */
-  copy(): Camera {
-    return Camera.from(this.getState());
+    this.emit("animationEnd", { from, to, completed });
   }
 }

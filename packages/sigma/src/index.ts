@@ -16,6 +16,8 @@ import Sigma from "./sigma";
 
 export default Sigma;
 export { Sigma, Camera, MouseCaptor, TouchCaptor, SDFAtlasManager };
+export { DEFAULT_CAMERA_STATE } from "./core/camera";
+export type { CameraAnimationEndPayload, CameraAnimationPayload, CameraEvents, ZoomOptions } from "./core/camera";
 export { DEFAULT_DEPTH_LAYERS, DEFAULT_EDGE_DEPTH_LAYERS, DEFAULT_NODE_DEPTH_LAYERS } from "./primitives/types";
 export { easings } from "./utils/easings";
 export type { Easing } from "./utils/easings";
