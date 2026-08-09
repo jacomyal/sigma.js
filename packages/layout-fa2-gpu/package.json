@@ -1,6 +1,6 @@
 {
   "name": "@sigma/layout-fa2-gpu",
-  "version": "0.0.1-alpha.0",
+  "version": "4.0.0-beta.0",
   "description": "A GPU-computed ForceAtlas2 layout running directly on sigma.js internal data structures",
   "main": "dist/sigma-layout-fa2-gpu.cjs.js",
   "module": "dist/sigma-layout-fa2-gpu.esm.js",
