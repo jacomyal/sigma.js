@@ -81,6 +81,7 @@ export default class MouseCaptor<
   currentWheelDirection: -1 | 0 | 1 = 0;
   lastWheelTriggerTime?: number;
   consecutiveBoundaryWheelEvents = 0;
+  private lastWheelAnimationId = 0;
 
   settings: MouseSettings = DEFAULT_MOUSE_SETTINGS;
 
@@ -420,16 +421,16 @@ export default class MouseCaptor<
       return;
     }
 
-    camera.animate(
-      this.renderer.getViewportZoomedState(getPosition(e, this.container), newRatio),
-      {
+    const animationId = ++this.lastWheelAnimationId;
+    camera
+      .animate(this.renderer.getViewportZoomedState(getPosition(e, this.container), newRatio), {
         easing: "quadraticOut",
         duration: this.settings.zoomDuration,
-      },
-      () => {
-        this.currentWheelDirection = 0;
-      },
-    );
+      })
+      .then(() => {
+        // A newer wheel event has its own animation to clear the direction:
+        if (this.lastWheelAnimationId === animationId) this.currentWheelDirection = 0;
+      });
 
     this.currentWheelDirection = wheelDirection;
     this.lastWheelTriggerTime = now;
