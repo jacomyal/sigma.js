@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { hasNewPartialProps } from "./data";
+import { hasNewPartialProps, shallowEqual } from "./data";
 
 describe("hasNewPartialProps", () => {
   test("returns false when partial is empty", () => {
@@ -47,5 +47,41 @@ describe("hasNewPartialProps", () => {
   test("uses strict equality (no coercion)", () => {
     expect(hasNewPartialProps({ a: 0 }, { a: false as unknown as number })).toBe(true);
     expect(hasNewPartialProps({ a: "" }, { a: 0 as unknown as string })).toBe(true);
+  });
+});
+
+describe("shallowEqual", () => {
+  test("returns true for two empty objects", () => {
+    expect(shallowEqual({}, {})).toBe(true);
+  });
+
+  test("returns true when all values match", () => {
+    expect(shallowEqual({ a: 1, b: "hello", c: true }, { a: 1, b: "hello", c: true })).toBe(true);
+  });
+
+  test("returns false when a value differs", () => {
+    expect(shallowEqual({ a: 1, b: 2 }, { a: 1, b: 3 })).toBe(false);
+  });
+
+  test("checks both directions", () => {
+    expect(shallowEqual<Record<string, number>>({ a: 1 }, { a: 1, b: 2 })).toBe(false);
+    expect(shallowEqual<Record<string, number>>({ a: 1, b: 2 }, { a: 1 })).toBe(false);
+  });
+
+  test("treats missing keys and undefined values as equal", () => {
+    expect(shallowEqual({ a: undefined }, { a: undefined })).toBe(true);
+    expect(shallowEqual<Record<string, undefined>>({ a: undefined }, {})).toBe(true);
+    expect(shallowEqual<Record<string, undefined>>({}, { a: undefined })).toBe(true);
+  });
+
+  test("only compares the top level", () => {
+    const nested = { a: 1 };
+    expect(shallowEqual({ nested }, { nested })).toBe(true);
+    expect(shallowEqual({ nested: { a: 1 } }, { nested: { a: 1 } })).toBe(false);
+  });
+
+  test("uses strict equality (no coercion)", () => {
+    expect(shallowEqual({ a: 0 }, { a: false as unknown as number })).toBe(false);
+    expect(shallowEqual({ a: "" }, { a: 0 as unknown as string })).toBe(false);
   });
 });

@@ -48,6 +48,27 @@ export function hasNewPartialProps<T extends Record<string, unknown>>(current: T
 }
 
 /**
+ * Returns true if both objects have the same own properties, compared with
+ * strict equality. Only checks the top level, and considers a missing key and
+ * an `undefined` value to be equal.
+ */
+export function shallowEqual<T extends object>(a: T, b: T): boolean {
+  const aProps = a as Record<string, unknown>;
+  const bProps = b as Record<string, unknown>;
+
+  for (const k in aProps) {
+    if (!Object.prototype.hasOwnProperty.call(aProps, k)) continue;
+    if (aProps[k] !== bProps[k]) return false;
+  }
+  for (const k in bProps) {
+    if (!Object.prototype.hasOwnProperty.call(bProps, k)) continue;
+    if (bProps[k] !== aProps[k]) return false;
+  }
+
+  return true;
+}
+
+/**
  * Sets whether `key` is a member of `set`. Equivalent to
  * `present ? set.add(key) : set.delete(key)`.
  */
