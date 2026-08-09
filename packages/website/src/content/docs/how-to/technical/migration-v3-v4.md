@@ -306,3 +306,63 @@ primitives: {
   },
 }
 ```
+
+### 6. Rename the camera methods
+
+The camera shortcuts were renamed, and their options simplified. `getState`, `setState` and `updateState` keep their
+signatures.
+
+| v3                                     | v4                                  |
+| -------------------------------------- | ----------------------------------- |
+| `camera.animatedZoom()`                | `camera.zoomIn()`                   |
+| `camera.animatedZoom(2)`               | `camera.zoomIn({ factor: 2 })`      |
+| `camera.animatedZoom({ factor: 2 })`   | `camera.zoomIn({ factor: 2 })`      |
+| `camera.animatedZoom({ duration: d })` | `camera.zoomIn({ duration: d })`    |
+| `camera.animatedUnzoom(2)`             | `camera.zoomOut({ factor: 2 })`     |
+| `camera.animatedReset(opts)`           | `camera.reset(opts)`                |
+| `camera.isAnimated()`                  | `camera.isAnimating()`              |
+| `camera.enable()` / `camera.disable()` | `camera.enabled = true` / `= false` |
+
+The zoom shortcuts no longer accept `number | options`, only an options object.
+
+The state itself became read-only, and a few members moved:
+
+| v3                              | v4                                                |
+| ------------------------------- | ------------------------------------------------- |
+| `camera.x = 0.2`                | `camera.setState({ x: 0.2 })`                     |
+| `camera.hasState(state)`        | Compare `camera.getState()` yourself              |
+| `camera.copy()`                 | `Camera.from(camera.getState())`                  |
+| `camera.clean`                  | The `cameraPanBoundaries` setting                 |
+| `camera.getPreviousState()`     | Never `null`, and only updated on actual changes  |
+| `camera.validateState(partial)` | Same, but always returns a complete `CameraState` |
+
+`clean` is gone as a public hook: use the `cameraPanBoundaries` setting, which sigma applies at the end of
+`validateState()`.
+
+Assigning `camera.x`, `camera.y`, `camera.angle` or `camera.ratio` used to move the camera without validating the state
+or notifying the renderer. They are now read-only: go through `setState()`.
+
+The animation events now take a single payload object:
+
+```typescript
+// v3
+camera.on("animationStart", (from, to) => {});
+camera.on("animationEnd", (from, to, completed) => {});
+
+// v4
+camera.on("animationStart", ({ from, to }) => {});
+camera.on("animationEnd", ({ from, to, completed }) => {});
+```
+
+`animate()` lost its third `callback` argument and always returns a `Promise`:
+
+```typescript
+// v3
+camera.animate({ x: 0.5 }, { duration: 500 }, () => console.log("done"));
+
+// v4
+await camera.animate({ x: 0.5 }, { duration: 500 });
+console.log("done");
+// or
+camera.animate({ x: 0.5 }, { duration: 500 }).then(() => console.log("done"));
+```

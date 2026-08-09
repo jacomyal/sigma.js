@@ -49,14 +49,15 @@ camera.animate({ x: 0.5, y: 0.5, ratio: 0.5 });
 camera.animate({ x: 0.3, y: 0.7, ratio: 0.2 }, { duration: 1000 });
 
 // Reset to default view
-camera.animatedReset();
+camera.reset();
 
-// Zoom in / out by a factor
-camera.animatedZoom(2);
-camera.animatedUnzoom(2);
+// Zoom in / out by a factor (1.5 by default)
+camera.zoomIn();
+camera.zoomOut({ factor: 2 });
 ```
 
-`animate()` returns a `Promise` that resolves when the animation completes.
+`animate()` returns a `Promise` that resolves when the animation stops, whether it completed or was interrupted by a
+new animation or by `camera.cancelAnimation()`. See the [Camera API](/reference/camera-api/) for the full surface.
 
 ## Instant updates
 
@@ -101,4 +102,4 @@ renderer.setSettings({ enableCameraZooming: false });
 renderer.setSettings({ minCameraRatio: 0.5, maxCameraRatio: 3 });
 ```
 
-<SigmaExample id="core/camera-control" height="500px" />
+<SigmaExample id="core/camera-control" height="500px" controls />

@@ -122,6 +122,8 @@ export default defineConfig({
                 typeDoc: {
                   entryFileName: "index",
                   skipErrorChecking: true,
+                  // Keep members tagged `@internal` out of the API reference:
+                  excludeInternal: true,
                 },
               }),
             ]),
