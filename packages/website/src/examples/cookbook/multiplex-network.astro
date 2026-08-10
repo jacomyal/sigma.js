@@ -1,0 +1,134 @@
+<div id="sigma-container"></div>
+
+<style>
+  #sigma-container {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import { layerBorder } from "@sigma/node-border";
+  import Graph from "graphology";
+  import ForceSupervisor from "graphology-layout-force/worker";
+  import circular from "graphology-layout/circular";
+  import Papa from "papaparse";
+  import Sigma from "sigma";
+  import { layerDashed, layerFill, layerPlain, pathCurved, pathLine } from "sigma/rendering";
+  import { DEFAULT_STYLES } from "sigma/types";
+
+  const container = document.getElementById("sigma-container") as HTMLElement;
+
+  // Padgett & Ansell's Florentine families: 16 Renaissance families, tied by
+  // marriage alliances and business relationships. Some pairs have both ties,
+  // which sigma renders as parallel edges.
+  // Source: UCINET data (PADGETT.DAT and PADGW.DAT), mirrored at
+  // https://github.com/bavla/Nets/tree/master/data/Pajek/ucinet
+  const [nodesCsv, edgesCsv] = await Promise.all([
+    fetch("/data/padgett-nodes.csv").then((res) => res.text()),
+    fetch("/data/padgett-edges.csv").then((res) => res.text()),
+  ]);
+  const { data: nodes } = Papa.parse<{ id: string; label: string; wealth: string; priorates: string }>(nodesCsv, {
+    header: true,
+    skipEmptyLines: true,
+  });
+  const { data: edges } = Papa.parse<{ source: string; target: string; type: string }>(edgesCsv, {
+    header: true,
+    skipEmptyLines: true,
+  });
+
+  const graph = new Graph({ multi: true, type: "undirected" });
+  nodes.forEach(({ id, label, wealth }) => {
+    graph.addNode(id, { label, wealth: +wealth });
+  });
+  edges.forEach(({ source, target, type }) => {
+    graph.addEdge(source, target, { type });
+  });
+
+  circular.assign(graph, { scale: 100 });
+
+  const renderer = new Sigma(graph, container, {
+    primitives: {
+      nodes: {
+        layers: [
+          layerFill(),
+          layerBorder({
+            borders: [
+              { size: 0.12, color: "#43302B" },
+              { size: 0.12, color: "#ffffff" },
+              { color: "transparent", fill: true },
+            ],
+          }),
+        ],
+      },
+      edges: {
+        variables: {
+          dashColor: { type: "color", default: "#000" },
+          dashSize: { type: "number", default: 0 },
+          gapColor: { type: "color", default: "transparent" },
+        },
+        paths: [pathLine(), pathCurved()],
+        layers: [
+          layerPlain(),
+          layerDashed({
+            dashColor: { attribute: "dashColor" },
+            dashSize: { attribute: "dashSize", default: 0, mode: "pixels" },
+            gapColor: { attribute: "gapColor" },
+            gapSize: { value: 4, mode: "pixels" },
+          }),
+        ],
+      },
+    },
+    styles: {
+      nodes: [
+        DEFAULT_STYLES.nodes,
+        {
+          color: "#C1553F",
+          size: { attribute: "wealth", min: 4, max: 12, minValue: 0, maxValue: 150 },
+          labelVisibility: "visible",
+          labelPosition: "over",
+          labelFont: "Georgia, serif",
+          labelColor: "#43302B",
+          labelBackgroundColor: "#ffffffaa",
+          cursor: "grab",
+        },
+        {
+          whenState: "isDragged",
+          then: { cursor: "grabbing" },
+        },
+      ],
+      edges: [
+        DEFAULT_STYLES.edges,
+        { size: 1.5, parallelPath: "curved", parallelSpread: 0.5 },
+        {
+          matchData: "type",
+          cases: {
+            marriage: { color: "#E8684A" },
+            business: { color: "transparent", dashColor: "#5B8FF9", gapColor: "#BBD4FF", dashSize: 4 },
+          },
+        },
+      ],
+      stage: [
+        {
+          whenState: "isDragging",
+          then: { cursor: "grabbing" },
+        },
+      ],
+    },
+    settings: {
+      autoRescale: "once",
+      itemSizesReference: "positions",
+      enableNodeDrag: true,
+    },
+  });
+
+  // Force layout: pin nodes while they are being dragged
+  const layout = new ForceSupervisor(graph, {
+    settings: {
+      repulsion: 0.2,
+      attraction: 0.0002,
+    },
+    isNodeFixed: (node) => renderer.getNodeState(node).isDragged,
+  });
+  layout.start();
+</script>
