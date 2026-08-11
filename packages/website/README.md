@@ -23,3 +23,8 @@ $ npm build
 ```
 
 This command generates static content into the `dist` directory and can be served using any static contents hosting service.
+
+### Note on examples
+
+When iframed in doc pages, examples run with the sigma setting `gestureTarget: "shared"`, unlike their displayed source.
+See `src/scripts/sigma-embed-aware.ts` to see how it's done.

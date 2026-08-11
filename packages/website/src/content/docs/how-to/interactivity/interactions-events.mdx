@@ -32,6 +32,21 @@ new Sigma(graph, container, {
 });
 ```
 
+### Graph gestures vs. page scrolling
+
+When sigma is embedded in a scrollable page (such as all examples in this very website), wheel and touch gestures are
+ambiguous: should they zoom the graph, or scroll the page? The `gestureTarget` setting routes them:
+
+- `"graph"` (default): all gestures go to the graph. The page never scrolls over the stage. Best for full-screen
+  applications.
+- `"shared"`: plain gestures go to the page, and the graph is reached with <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + scroll, or
+  two-finger touch. A hint overlay tells users how, with its texts customizable through the `sharedGestureWheelMessage`,
+  `sharedGestureAppleWheelMessage` and `sharedGestureTouchMessage` settings. Best for graphs embedded in articles or
+  dashboards.
+- `"page"`: wheel and touch gestures all go to the page. Clicks, taps and mouse drag-panning still reach the graph.
+
+See the [settings reference](/reference/settings/#gesture-target) for details.
+
 ## Listening for events
 
 Sigma emits events when users interact with nodes, edges, or the stage (background). Listen with `renderer.on()`:

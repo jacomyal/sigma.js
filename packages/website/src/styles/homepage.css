@@ -187,38 +187,6 @@ main {
   position: relative;
   z-index: 1;
 }
-.showcase .overlay {
-  position: absolute;
-  inset: 0;
-  color: white;
-  padding: 3em;
-  font-size: 1.5em;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  cursor: pointer;
-  background: #ffffff66;
-  transition: var(--transition);
-  overflow: hidden;
-}
-.showcase .overlay:hover {
-  background: #ffffff99;
-}
-.showcase .overlay.hide {
-  display: none;
-}
-.showcase .overlay h2 {
-  margin: 0 0 1px;
-}
-.showcase .overlay .bg {
-  display: inline-block;
-  padding: 4px 8px;
-  background: #e22653dd;
-}
-.showcase .overlay:hover .bg {
-  background: var(--ruby);
-}
-
 /**
  * WHY SIGMA:
  */
@@ -381,9 +349,6 @@ footer ul {
   }
   .showcase {
     padding: 0 0 2em;
-  }
-  .showcase .overlay {
-    font-size: 1em;
   }
   .why-sigma .cards {
     grid-template-columns: 1fr;

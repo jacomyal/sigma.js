@@ -111,6 +111,12 @@ On a sigma-owned camera, the last three are rewritten from the `enableCameraZoom
 `enableCameraRotation` settings on every `setSettings()` call: set the settings, not the flags. `enabled` is the one
 flag sigma never touches.
 
+:::note[Enabling camera vs. enabling gestures]
+These flags control whether the camera _state_ can change at all, from gestures and code alike. To control whether
+wheel and touch gestures over the stage belong to the graph or to the surrounding page, use the
+[`gestureTarget` setting](/reference/settings/#gesture-target) instead.
+:::
+
 ## Bounds
 
 | Property   | Type             | Description                                       |

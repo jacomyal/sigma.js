@@ -47,6 +47,18 @@ export default defineConfig({
         },
       },
       {
+        // Route "sigma" (exact match, subpaths untouched) through a wrapper
+        // that defaults iframe-embedded examples to shared gestures. The
+        // importer check lets the wrapper itself import "sigma" normally:
+        name: "sigma-embed-aware",
+        enforce: "pre",
+        resolveId(source, importer) {
+          if (source === "sigma" && !importer?.includes("sigma-embed-aware")) {
+            return path.resolve(__dirname, "src/scripts/sigma-embed-aware.ts");
+          }
+        },
+      },
+      {
         name: "phosphor-icon-override",
         enforce: "pre",
         resolveId(source, importer) {

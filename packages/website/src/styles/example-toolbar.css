@@ -37,11 +37,12 @@
   cursor: default;
 }
 
-/* Right-side links */
+/* Right-side links (kept right even when they are the only child) */
 .example-toolbar-links {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+  margin-left: auto;
 }
 .example-toolbar-sep {
   width: 1px;

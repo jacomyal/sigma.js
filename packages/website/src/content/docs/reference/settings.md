@@ -58,17 +58,43 @@ See [Label events](/reference/events/#label-events) for the full description and
 
 ## Camera
 
-| Setting                          | Type             | Default | Description                                                                                                                    |
-| -------------------------------- | ---------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `enableCameraZooming`            | `boolean`        | `true`  | Allow zooming with the mouse wheel                                                                                             |
-| `enableCameraPanning`            | `boolean`        | `true`  | Allow panning by dragging the background                                                                                       |
-| `enableCameraRotation`           | `boolean`        | `true`  | Allow camera rotation                                                                                                          |
-| `enableCameraMouseRotation`      | `boolean`        | `true`  | Allow mouse-based camera rotation                                                                                              |
-| `minCameraRatio`                 | `number \| null` | `null`  | Minimum zoom level (smaller = more zoomed in). `null` means no limit                                                           |
-| `maxCameraRatio`                 | `number \| null` | `null`  | Maximum zoom level (larger = more zoomed out). `null` means no limit                                                           |
-| `cameraPanBoundaries`            | see below        | `null`  | Constrain the camera panning area                                                                                              |
-| `enableScrollBlocking`           | `boolean`        | `true`  | When zoom hits a min/max bound, block page scroll so wheel events keep targeting sigma                                         |
-| `scrollBlockingReleaseThreshold` | `number`         | `5`     | Number of consecutive wheel events at a zoom boundary still blocked before page scroll is released. `Infinity` never releases. |
+| Setting                          | Type                            | Default                                 | Description                                                                        |
+| -------------------------------- | ------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------- |
+| `enableCameraZooming`            | `boolean`                       | `true`                                  | Allow zooming with the mouse wheel                                                 |
+| `enableCameraPanning`            | `boolean`                       | `true`                                  | Allow panning by dragging the background                                           |
+| `enableCameraRotation`           | `boolean`                       | `true`                                  | Allow camera rotation                                                              |
+| `enableCameraMouseRotation`      | `boolean`                       | `true`                                  | Allow mouse-based camera rotation                                                  |
+| `minCameraRatio`                 | `number \| null`                | `null`                                  | Minimum zoom level (smaller = more zoomed in). `null` means no limit               |
+| `maxCameraRatio`                 | `number \| null`                | `null`                                  | Maximum zoom level (larger = more zoomed out). `null` means no limit               |
+| `cameraPanBoundaries`            | see below                       | `null`                                  | Constrain the camera panning area                                                  |
+| `gestureTarget`                  | `"graph" \| "shared" \| "page"` | `"graph"`                               | Where wheel and touch gestures are routed (see below)                              |
+| `sharedGestureWheelMessage`      | `string`                        | `"Use Ctrl + scroll to zoom the graph"` | Hint shown on plain wheel when `gestureTarget` is `"shared"`. `""` disables it     |
+| `sharedGestureAppleWheelMessage` | `string`                        | `"Use ⌘ + scroll to zoom the graph"`    | Same, on Apple devices                                                             |
+| `sharedGestureTouchMessage`      | `string`                        | `"Use two fingers to move the graph"`   | Hint shown on one-finger drag when `gestureTarget` is `"shared"`. `""` disables it |
+
+### Gesture target
+
+The `gestureTarget` setting solves the conflict between interacting with the graph and scrolling the page:
+
+- `"graph"` (default): all gestures go to the graph. The page never scrolls over the stage.
+- `"shared"`: plain gestures go to the page (wheel scrolls, one-finger touch pans). The graph is reached with Ctrl/⌘ + wheel (trackpad pinches work too) and two-finger touch. A hint overlay tells users how.
+- `"page"`: wheel and touch gestures all go to the page. Clicks, taps and mouse drag-panning still reach the graph.
+
+In `"shared"` mode, the hint overlay is a single `<div class="sigma-gesture-hint">` appended to the sigma container,
+shown while plain gestures hit the stage. Its texts come from the `sharedGestureWheelMessage` (or
+`sharedGestureAppleWheelMessage` on Apple devices, where the modifier is `⌘`) and `sharedGestureTouchMessage`
+settings. Its default look comes from a small `<style>` element injected in the container,
+scoped (CSS `@scope`) so its rules cannot affect anything outside of it, and layered (CSS `@layer`) so any unlayered
+CSS rule of yours overrides it, no `!important` needed. Each at-rule is only used when the browser supports it; on
+older browsers the bare rules are injected instead, and custom CSS competes on normal specificity. For instance:
+
+```css
+.sigma-gesture-hint {
+  background: rgba(255, 255, 255, 0.7);
+  color: #333;
+  font-style: italic;
+}
+```
 
 ### Camera pan boundaries
 

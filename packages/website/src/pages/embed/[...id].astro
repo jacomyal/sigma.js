@@ -4,6 +4,10 @@
  * Renders an example with its source code side-by-side (>1200px) or as tabs.
  * Each example gets a permalink at /embed/{id}/.
  * Also used as the iframe source in doc pages.
+ *
+ * When iframed in doc pages, examples run with the sigma setting
+ * `gestureTarget: "shared"`, unlike their displayed source.
+ * See src/scripts/sigma-embed-aware.ts to see how it's done.
  */
 import { Code } from "astro-expressive-code/components";
 
