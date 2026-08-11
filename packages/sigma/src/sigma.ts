@@ -1487,7 +1487,7 @@ export default class Sigma<
   private clearNodeIndices(): void {
     // labelGrid & nodeExtent are only managed/populated in the process function
     this.labelRenderer.resetLabelGrid();
-    this.nodeExtent = { x: [0, 1], y: [0, 1] };
+    if (!this.autoRescaleFrozen) this.nodeExtent = { x: [0, 1], y: [0, 1] };
     this.internals.nodeDataCache = {};
     this.nodeGraphCoords = {};
     this.edgeProgramIndex = {};
@@ -1971,6 +1971,9 @@ export default class Sigma<
 
     // Installing new graph
     this.internals.graph = graph;
+
+    // The extent frozen by autoRescale "once" belongs to the previous graph:
+    this.autoRescaleFrozen = false;
 
     // Binding new handlers
     this.bindGraphHandlers();
