@@ -1,6 +1,7 @@
 import Graph from "graphology";
 import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
+import { Coordinates } from "sigma/types";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test } from "vitest";
 
@@ -162,6 +163,26 @@ describe("Sigma touch gesture routing", () => {
     const hint = sigma.getContainer().querySelector(".sigma-gesture-hint");
     expect(hint).not.toBeNull();
     expect(hint?.textContent).toBe(sigma.getSetting("sharedGestureTouchMessage"));
+  });
+
+  test<SigmaTestContext>("with gestureTarget 'shared', single-finger node drags still work", async ({
+    sigma,
+    graph,
+    target,
+  }) => {
+    sigma.setSetting("gestureTarget", "shared");
+    sigma.setSetting("enableNodeDrag", true);
+    const initialCameraState = { ...sigma.getCamera().getState() };
+    const start = { ...sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates), id: ID_A };
+
+    await simulateTouchEvent(target, "touchstart", [start]);
+    await simulateTouchEvent(target, "touchmove", [add(start, { x: 30, y: 30 })]);
+    await simulateTouchEvent(target, "touchend", []);
+
+    // The node moved, the camera did not, and no hint was shown:
+    expect(graph.getNodeAttribute("n1", "x")).not.toBe(0);
+    expect(sigma.getCamera().getState()).toEqual(initialCameraState);
+    expect(sigma.getContainer().querySelector(".sigma-gesture-hint")).toBeNull();
   });
 
   test<SigmaTestContext>("with gestureTarget 'shared', two-finger gestures still pan the camera", async ({

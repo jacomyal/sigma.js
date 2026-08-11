@@ -124,8 +124,6 @@ export default class TouchCaptor<
   handleStart(e: TouchEvent): void {
     if (!this.enabled) return;
 
-    if (this.doesCapture(e.touches.length)) e.preventDefault();
-
     const touches = getTouchesArray(e.touches);
     this.touchMode = touches.length;
 
@@ -144,6 +142,8 @@ export default class TouchCaptor<
     this.emit("touchdown", getTouchCoords(e, this.lastTouches, this.container));
     this.lastTouches = touches;
     this.lastTouchesPositions = this.startTouchesPositions;
+
+    if (e.cancelable && (this.doesCapture(e.touches.length) || this.renderer._hasNodeDrag())) e.preventDefault();
   }
 
   handleLeave(e: TouchEvent): void {

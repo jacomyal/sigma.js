@@ -2150,6 +2150,14 @@ export default class Sigma<
   }
 
   /**
+   * Internal: whether a node is being dragged.
+   */
+  _hasNodeDrag(): boolean {
+    const { dragManager } = this.internals;
+    return !!(dragManager.pendingNode || dragManager.session);
+  }
+
+  /**
    * Internal: display the shared-gestures hint. Called by captors when a plain
    * gesture reaches the stage while `gestureTarget` is "shared".
    */
