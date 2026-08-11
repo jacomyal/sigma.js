@@ -6,7 +6,7 @@ import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
-import { rotate, simulateDoubleClick, simulateMouseEvent } from "../../_test-helpers";
+import { rotate, simulateDoubleClick, simulateMouseEvent, wait } from "../../_test-helpers";
 
 interface SigmaTestContext {
   sigma: Sigma;
@@ -173,5 +173,126 @@ describe("Sigma right-click mouse rotation", () => {
     await simulateMouseEvent(target, "mouseup", end, { button: 2 });
 
     expect(camera.getState().angle).toBeCloseTo(Math.PI / 2, 6);
+  });
+});
+
+describe("Sigma wheel gesture routing", () => {
+  function dispatchWheel(target: HTMLElement, options: { deltaY?: number; ctrlKey?: boolean } = {}): WheelEvent {
+    const event = new WheelEvent("wheel", { deltaY: -120, cancelable: true, bubbles: true, ...options });
+    target.dispatchEvent(event);
+    return event;
+  }
+
+  test<SigmaTestContext>("with gestureTarget 'graph' (default), wheel events are captured and zoom the camera", async ({
+    sigma,
+    target,
+  }) => {
+    const initialRatio = sigma.getCamera().getState().ratio;
+
+    const event = dispatchWheel(target);
+
+    expect(event.defaultPrevented).toBe(true);
+    await vi.waitFor(() => expect(sigma.getCamera().getState().ratio).toBeLessThan(initialRatio));
+  });
+
+  test<SigmaTestContext>("with gestureTarget 'graph', wheel events stay captured at the zoom boundary", async ({
+    sigma,
+    target,
+  }) => {
+    // The camera starts at ratio 1, so zooming in is impossible:
+    sigma.setSetting("minCameraRatio", 1);
+
+    const event = dispatchWheel(target);
+
+    expect(event.defaultPrevented).toBe(true);
+    await wait(50);
+    expect(sigma.getCamera().getState().ratio).toBe(1);
+  });
+
+  test<SigmaTestContext>("with gestureTarget 'page', wheel events are left to the page", async ({ sigma, target }) => {
+    sigma.setSetting("gestureTarget", "page");
+    const initialRatio = sigma.getCamera().getState().ratio;
+
+    const event = dispatchWheel(target);
+
+    expect(event.defaultPrevented).toBe(false);
+    await wait(50);
+    expect(sigma.getCamera().getState().ratio).toBe(initialRatio);
+  });
+
+  test<SigmaTestContext>("with gestureTarget 'shared', plain wheel events are left to the page and show the hint", async ({
+    sigma,
+    target,
+  }) => {
+    sigma.setSetting("gestureTarget", "shared");
+    // Neutralize the platform detection, so this test runs everywhere:
+    sigma.setSetting("sharedGestureWheelMessage", "Test wheel message");
+    sigma.setSetting("sharedGestureAppleWheelMessage", "Test wheel message");
+
+    const initialRatio = sigma.getCamera().getState().ratio;
+    const event = dispatchWheel(target);
+
+    expect(event.defaultPrevented).toBe(false);
+    const hint = sigma.getContainer().querySelector(".sigma-gesture-hint");
+    expect(hint).not.toBeNull();
+    expect(hint?.textContent).toBe("Test wheel message");
+    await wait(50);
+    expect(sigma.getCamera().getState().ratio).toBe(initialRatio);
+  });
+
+  test<SigmaTestContext>("with gestureTarget 'shared', Ctrl + wheel events are captured and zoom the camera", async ({
+    sigma,
+    target,
+  }) => {
+    sigma.setSetting("gestureTarget", "shared");
+    const initialRatio = sigma.getCamera().getState().ratio;
+
+    const event = dispatchWheel(target, { ctrlKey: true });
+
+    expect(event.defaultPrevented).toBe(true);
+    await vi.waitFor(() => expect(sigma.getCamera().getState().ratio).toBeLessThan(initialRatio));
+  });
+
+  test<SigmaTestContext>("handlers receive wheel events even when they are routed to the page", async ({
+    sigma,
+    target,
+  }) => {
+    const handler = vi.fn();
+    sigma.getMouseCaptor().on("wheel", handler);
+
+    sigma.setSetting("gestureTarget", "page");
+    dispatchWheel(target);
+    expect(handler).toHaveBeenCalledTimes(1);
+
+    sigma.setSetting("gestureTarget", "shared");
+    dispatchWheel(target);
+    expect(handler).toHaveBeenCalledTimes(2);
+  });
+
+  test<SigmaTestContext>("handlers calling preventSigmaDefault take the wheel event over", async ({
+    sigma,
+    target,
+  }) => {
+    sigma.getMouseCaptor().on("wheel", (coords) => coords.preventSigmaDefault());
+    const initialRatio = sigma.getCamera().getState().ratio;
+
+    const event = dispatchWheel(target);
+
+    // Sigma neither zooms nor blocks the page:
+    expect(event.defaultPrevented).toBe(false);
+    await wait(50);
+    expect(sigma.getCamera().getState().ratio).toBe(initialRatio);
+  });
+
+  test<SigmaTestContext>("with gestureTarget 'shared', preventSigmaDefault also suppresses the hint", async ({
+    sigma,
+    target,
+  }) => {
+    sigma.setSetting("gestureTarget", "shared");
+    sigma.getMouseCaptor().on("wheel", (coords) => coords.preventSigmaDefault());
+
+    dispatchWheel(target);
+
+    expect(sigma.getContainer().querySelector(".sigma-gesture-hint")).toBeNull();
   });
 });

@@ -15,6 +15,7 @@ import Captor, { getPosition, getTouchCoords, getTouchesArray } from "./captor";
 
 export const TOUCH_SETTINGS_KEYS = [
   "dragTimeout",
+  "gestureTarget",
   "inertiaDuration",
   "inertiaRatio",
   "doubleClickTimeout",
@@ -95,6 +96,15 @@ export default class TouchCaptor<
     };
   }
 
+  // Returns true when the event is captured by the graph in practice, and
+  // false else.
+  private doesCapture(touchCount: number): boolean {
+    const { gestureTarget } = this.settings;
+    if (gestureTarget === "graph") return true;
+    if (gestureTarget === "page") return false;
+    return touchCount >= 2;
+  }
+
   // Syncs isPanning/isZooming graph-state flags from the current gesture.
   // Pinch (touchMode === 2) is a zoom gesture; single-finger drag with actual
   // movement is a pan. Anything else clears both.
@@ -114,7 +124,7 @@ export default class TouchCaptor<
   handleStart(e: TouchEvent): void {
     if (!this.enabled) return;
 
-    e.preventDefault();
+    if (this.doesCapture(e.touches.length)) e.preventDefault();
 
     const touches = getTouchesArray(e.touches);
     this.touchMode = touches.length;
@@ -139,7 +149,7 @@ export default class TouchCaptor<
   handleLeave(e: TouchEvent): void {
     if (!this.enabled || !this.startTouchesPositions.length) return;
 
-    if (e.cancelable) e.preventDefault();
+    if (e.cancelable && this.doesCapture(this.touchMode)) e.preventDefault();
 
     if (this.movingTimeout) {
       this.isMoving = false;
@@ -152,8 +162,6 @@ export default class TouchCaptor<
       case 2:
         if (e.touches.length === 1) {
           this.handleStart(e);
-
-          e.preventDefault();
           break;
         }
       /* falls through */
@@ -198,7 +206,8 @@ export default class TouchCaptor<
           this.emit("doubletap", touchCoords);
           this.lastTap = null;
 
-          if (!touchCoords.sigmaDefaultPrevented) {
+          // Only zoom on "doubletap" when gestures don't target the page:
+          if (!touchCoords.sigmaDefaultPrevented && this.settings.gestureTarget !== "page") {
             const camera = this.renderer.getCamera();
             const newRatio = camera.getBoundedRatio(camera.getState().ratio / this.settings.doubleClickZoomingRatio);
 
@@ -224,7 +233,8 @@ export default class TouchCaptor<
   handleMove(e: TouchEvent): void {
     if (!this.enabled || !this.startTouchesPositions.length) return;
 
-    e.preventDefault();
+    const captured = this.doesCapture(e.touches.length);
+    if (captured) e.preventDefault();
 
     const touches = getTouchesArray(e.touches);
     const touchesPositions = touches.map((touch) => getPosition(touch, this.container));
@@ -252,6 +262,11 @@ export default class TouchCaptor<
 
     // If there was no move, do not trigger touch moves behavior
     if (!this.hasMoved) {
+      return;
+    }
+
+    if (!captured) {
+      if (this.settings.gestureTarget === "shared") this.renderer._showGestureHint("touch");
       return;
     }
 

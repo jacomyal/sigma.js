@@ -80,10 +80,9 @@ export function cleanMouseCoords(e: MouseCoords | TouchCoords): MouseCoords {
  * @return {object}
  */
 export function getWheelCoords(e: WheelEvent, dom: HTMLElement): WheelCoords {
-  return {
-    ...getMouseCoords(e, dom),
-    delta: getWheelDelta(e),
-  };
+  const res = getMouseCoords(e, dom) as WheelCoords;
+  res.delta = getWheelDelta(e);
+  return res;
 }
 
 const MAX_TOUCHES = 2;

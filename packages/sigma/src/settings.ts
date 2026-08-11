@@ -66,10 +66,6 @@ export interface Settings {
   minCameraRatio: null | number;
   maxCameraRatio: null | number;
   enableCameraZooming: boolean;
-  enableScrollBlocking: boolean;
-  // When scroll blocking is enabled, controls how many consecutive wheel events at a zoom boundary
-  // are still blocked before page scroll is released. Use Infinity to never release (always block).
-  scrollBlockingReleaseThreshold: number;
   enableCameraPanning: boolean;
   enableCameraRotation: boolean;
   enableCameraMouseRotation: boolean;
@@ -77,6 +73,10 @@ export interface Settings {
     | null
     | true
     | AtLeastOne<{ tolerance: number; boundaries: { x: [number, number]; y: [number, number] } }>;
+  gestureTarget: "graph" | "shared" | "page";
+  sharedGestureWheelMessage: string;
+  sharedGestureAppleWheelMessage: string;
+  sharedGestureTouchMessage: string;
 
   // Lifecycle
   allowInvalidContainer: boolean;
@@ -135,12 +135,14 @@ export const DEFAULT_SETTINGS: Settings = {
   minCameraRatio: null,
   maxCameraRatio: null,
   enableCameraZooming: true,
-  enableScrollBlocking: true,
-  scrollBlockingReleaseThreshold: 5,
   enableCameraPanning: true,
   enableCameraRotation: true,
   enableCameraMouseRotation: true,
   cameraPanBoundaries: null,
+  gestureTarget: "graph",
+  sharedGestureWheelMessage: "Use Ctrl + scroll to zoom the graph",
+  sharedGestureAppleWheelMessage: "Use ⌘ + scroll to zoom the graph",
+  sharedGestureTouchMessage: "Use two fingers to move the graph",
 
   // Lifecycle
   allowInvalidContainer: false,

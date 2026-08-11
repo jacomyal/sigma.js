@@ -12,6 +12,7 @@ import { DragManager } from "./core/drag-manager";
 import { EdgeGroupIndex } from "./core/edge-groups";
 import { bindGraphHandlers, bindInteractionHandlers, unbindGraphHandlers } from "./core/event-handlers";
 import { computeFittedExtent } from "./core/fit-extent";
+import GestureHint from "./core/gesture-hint";
 import {
   Hit,
   KIND_REGISTRY,
@@ -154,6 +155,7 @@ export default class Sigma<
   private container: HTMLElement;
   private stageCanvas: HTMLCanvasElement = null!;
   private mouseLayer: HTMLElement = null!;
+  private gestureHint: GestureHint | null = null;
   private extraElements: PlainObject<HTMLElement> = {};
   private webGLContext: WebGL2RenderingContext | null = null;
   private pickingFrameBuffer: WebGLFramebuffer | null = null;
@@ -910,6 +912,15 @@ export default class Sigma<
     }
     // Re-validate the current state, since the new settings may forbid it:
     this.camera.setState(this.camera.getState());
+
+    // Native touch scrolling must stay possible when gestures are routed to
+    // the page ("pan-x pan-y" still lets sigma capture two-finger pinches):
+    this.mouseLayer.style.touchAction =
+      settings.gestureTarget === "graph" ? "none" : settings.gestureTarget === "shared" ? "pan-x pan-y" : "auto";
+    if (settings.gestureTarget !== "shared" && this.gestureHint) {
+      this.gestureHint.kill();
+      this.gestureHint = null;
+    }
 
     // Update captors settings:
     this.mouseCaptor.setSettings(this.internals.settings);
@@ -2139,6 +2150,18 @@ export default class Sigma<
   }
 
   /**
+   * Internal: display the shared-gestures hint. Called by captors when a plain
+   * gesture reaches the stage while `gestureTarget` is "shared".
+   */
+  _showGestureHint(gesture: "wheel" | "touch"): void {
+    const settings = this.internals.settings;
+    if (settings.gestureTarget !== "shared") return;
+
+    this.gestureHint = this.gestureHint || new GestureHint(this.container);
+    this.gestureHint.show(gesture, settings);
+  }
+
+  /**
    * Method to update multiple nodes' states at once.
    *
    * @param  {string[]} keys - The nodes' keys.
@@ -3077,6 +3100,8 @@ export default class Sigma<
     }
 
     // Remove all DOM elements (stage is in extraElements)
+    this.gestureHint?.kill();
+    this.gestureHint = null;
     this.mouseLayer.remove();
     for (const id in this.extraElements) {
       this.extraElements[id].remove();

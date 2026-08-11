@@ -145,3 +145,65 @@ describe("Sigma multi-touch management", () => {
     expectObjectsToBeClose(newCameraState, expectedCameraState);
   });
 });
+
+describe("Sigma touch gesture routing", () => {
+  test<SigmaTestContext>("with gestureTarget 'shared', single-finger drags are left to the page and show the hint", async ({
+    sigma,
+    target,
+  }) => {
+    sigma.setSetting("gestureTarget", "shared");
+    const initialCameraState = { ...sigma.getCamera().getState() };
+
+    await simulateTouchEvent(target, "touchstart", [T_A]);
+    await simulateTouchEvent(target, "touchmove", [add(T_A, { x: 50, y: 50 })]);
+    await simulateTouchEvent(target, "touchend", []);
+
+    expect(sigma.getCamera().getState()).toEqual(initialCameraState);
+    const hint = sigma.getContainer().querySelector(".sigma-gesture-hint");
+    expect(hint).not.toBeNull();
+    expect(hint?.textContent).toBe(sigma.getSetting("sharedGestureTouchMessage"));
+  });
+
+  test<SigmaTestContext>("with gestureTarget 'shared', two-finger gestures still pan the camera", async ({
+    sigma,
+    target,
+  }) => {
+    sigma.setSetting("gestureTarget", "shared");
+    const camera = sigma.getCamera();
+    const initialCameraState = camera.getState();
+
+    const diff = { x: 100, y: 100 };
+    const expectedCameraState = {
+      ...initialCameraState,
+      ...sigma.viewportToFramedGraph(remove(sigma.framedGraphToViewport(initialCameraState), diff)),
+    };
+
+    await simulateTouchEvent(target, "touchstart", [T_A]);
+    await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
+    await simulateTouchEvent(target, "touchmove", [add(T_A, diff), add(T_B, diff)]);
+    await simulateTouchEvent(target, "touchend", [add(T_B, diff)]);
+    await simulateTouchEvent(target, "touchend", []);
+
+    expectObjectsToBeClose(camera.getState(), expectedCameraState);
+  });
+
+  test<SigmaTestContext>("with gestureTarget 'page', touch gestures never reach the camera", async ({
+    sigma,
+    target,
+  }) => {
+    sigma.setSetting("gestureTarget", "page");
+    const initialCameraState = { ...sigma.getCamera().getState() };
+
+    await simulateTouchEvent(target, "touchstart", [T_A]);
+    await simulateTouchEvent(target, "touchmove", [add(T_A, { x: 50, y: 50 })]);
+    await simulateTouchEvent(target, "touchend", []);
+
+    await simulateTouchEvent(target, "touchstart", [T_A]);
+    await simulateTouchEvent(target, "touchstart", [T_A, T_B]);
+    await simulateTouchEvent(target, "touchmove", [add(T_A, { x: 50, y: 50 }), add(T_B, { x: 50, y: 50 })]);
+    await simulateTouchEvent(target, "touchend", []);
+
+    expect(sigma.getCamera().getState()).toEqual(initialCameraState);
+    expect(sigma.getContainer().querySelector(".sigma-gesture-hint")).toBeNull();
+  });
+});
