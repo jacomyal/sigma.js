@@ -49,6 +49,12 @@ export type MouseCaptorEvents = {
   wheel(coordinates: WheelCoords): void;
 };
 
+// Touch pointers belong to the touch captor, handling them here would count
+// each gesture twice:
+function isTouchPointer(e: Event): boolean {
+  return e instanceof PointerEvent && e.pointerType === "touch";
+}
+
 /**
  * Mouse captor class.
  *
@@ -87,7 +93,6 @@ export default class MouseCaptor<
     super(container, renderer);
 
     // Binding methods
-    this.handleClick = this.handleClick.bind(this);
     this.handleRightClick = this.handleRightClick.bind(this);
     this.handleDown = this.handleDown.bind(this);
     this.handleUp = this.handleUp.bind(this);
@@ -96,30 +101,32 @@ export default class MouseCaptor<
     this.handleLeave = this.handleLeave.bind(this);
     this.handleEnter = this.handleEnter.bind(this);
 
-    // Binding events
-    container.addEventListener("click", this.handleClick, { capture: false });
+    // Binding pointer events (filtered on non-touch pointers) rather than
+    // mouse events:
+    // The compatibility mouse events fired by browsers after taps would else
+    // make each tap count twice, once per captor. Clicks are derived from
+    // pointerup for the same reason
     container.addEventListener("contextmenu", this.handleRightClick, { capture: false });
-    container.addEventListener("mousedown", this.handleDown, { capture: false });
+    container.addEventListener("pointerdown", this.handleDown, { capture: false });
     container.addEventListener("wheel", this.handleWheel, { capture: false, passive: false });
-    container.addEventListener("mouseleave", this.handleLeave, { capture: false });
-    container.addEventListener("mouseenter", this.handleEnter, { capture: false });
+    container.addEventListener("pointerleave", this.handleLeave, { capture: false });
+    container.addEventListener("pointerenter", this.handleEnter, { capture: false });
 
-    document.addEventListener("mousemove", this.handleMove, { capture: false });
-    document.addEventListener("mouseup", this.handleUp, { capture: false });
+    document.addEventListener("pointermove", this.handleMove, { capture: false });
+    document.addEventListener("pointerup", this.handleUp, { capture: false });
   }
 
   kill(): void {
     const container = this.container;
 
-    container.removeEventListener("click", this.handleClick);
     container.removeEventListener("contextmenu", this.handleRightClick);
-    container.removeEventListener("mousedown", this.handleDown);
+    container.removeEventListener("pointerdown", this.handleDown);
     container.removeEventListener("wheel", this.handleWheel);
-    container.removeEventListener("mouseleave", this.handleLeave);
-    container.removeEventListener("mouseenter", this.handleEnter);
+    container.removeEventListener("pointerleave", this.handleLeave);
+    container.removeEventListener("pointerenter", this.handleEnter);
 
-    document.removeEventListener("mousemove", this.handleMove);
-    document.removeEventListener("mouseup", this.handleUp);
+    document.removeEventListener("pointermove", this.handleMove);
+    document.removeEventListener("pointerup", this.handleUp);
   }
 
   handleClick(e: MouseEvent): void {
@@ -178,7 +185,7 @@ export default class MouseCaptor<
   }
 
   handleDown(e: MouseEvent): void {
-    if (!this.enabled) return;
+    if (!this.enabled || isTouchPointer(e)) return;
 
     // We only start dragging on left button
     if (e.button === 0) {
@@ -209,7 +216,7 @@ export default class MouseCaptor<
   }
 
   handleUp(e: MouseEvent): void {
-    if (!this.enabled || (!this.isMouseDown && !this.isRightMouseDown)) return;
+    if (!this.enabled || isTouchPointer(e) || (!this.isMouseDown && !this.isRightMouseDown)) return;
 
     // Right-click rotation: just reset state, no inertia
     if (this.isRightMouseDown) {
@@ -270,10 +277,13 @@ export default class MouseCaptor<
       if (shouldRefresh && this.renderer.getSetting("hideEdgesOnMove")) this.renderer.refresh();
     }, 0);
     this.emit("mouseup", getMouseCoords(e, this.container));
+
+    // A left-button release over the container is a click:
+    if (e.target === this.container || e.composedPath()[0] === this.container) this.handleClick(e);
   }
 
   handleMove(e: MouseEvent): void {
-    if (!this.enabled) return;
+    if (!this.enabled || isTouchPointer(e)) return;
 
     const mouseCoords = getMouseCoords(e, this.container);
 
@@ -361,10 +371,12 @@ export default class MouseCaptor<
   }
 
   handleLeave(e: MouseEvent): void {
+    if (isTouchPointer(e)) return;
     this.emit("mouseleave", getMouseCoords(e, this.container));
   }
 
   handleEnter(e: MouseEvent): void {
+    if (isTouchPointer(e)) return;
     this.emit("mouseenter", getMouseCoords(e, this.container));
   }
 

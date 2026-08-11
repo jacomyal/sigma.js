@@ -126,16 +126,16 @@ export async function simulateTouchEvent(element: HTMLElement, type: TouchEventT
   await wait(10);
 }
 
-export type MouseEventType = "mousedown" | "mouseup" | "mousemove" | "click";
+export type PointerEventType = "pointerdown" | "pointerup" | "pointermove";
 export async function simulateMouseEvent(
   element: HTMLElement,
-  type: MouseEventType,
+  type: PointerEventType,
   position: Coordinates,
   options?: { button?: number },
 ) {
-  const target = type === "mousedown" || type === "click" ? element : document;
-  target.dispatchEvent(
-    new MouseEvent(type, {
+  element.dispatchEvent(
+    new PointerEvent(type, {
+      pointerType: "mouse",
       clientX: position.x,
       clientY: position.y,
       button: options?.button ?? 0,
@@ -149,12 +149,17 @@ export async function simulateMouseEvent(
 
 export async function simulateDoubleClick(element: HTMLElement, position: Coordinates) {
   const init = {
+    pointerType: "mouse",
     clientX: position.x,
     clientY: position.y,
     bubbles: true,
     cancelable: true,
   };
-  element.dispatchEvent(new MouseEvent("click", init));
-  element.dispatchEvent(new MouseEvent("click", init));
+
+  element.dispatchEvent(new PointerEvent("pointerdown", init));
+  element.dispatchEvent(new PointerEvent("pointerup", init));
+  element.dispatchEvent(new PointerEvent("pointerdown", init));
+  element.dispatchEvent(new PointerEvent("pointerup", init));
+
   await wait(10);
 }

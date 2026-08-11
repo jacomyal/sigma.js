@@ -6,7 +6,7 @@ import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
-import { rotate, simulateDoubleClick, simulateMouseEvent, wait } from "../../_test-helpers";
+import { rotate, simulateDoubleClick, simulateMouseEvent, simulateTouchEvent, wait } from "../../_test-helpers";
 
 interface SigmaTestContext {
   sigma: Sigma;
@@ -134,9 +134,9 @@ describe("Sigma right-click mouse rotation", () => {
     const start = { x: center.x + 50, y: center.y };
     const end = rotate(start, center, Math.PI / 2);
 
-    await simulateMouseEvent(target, "mousedown", start, { button: 2 });
-    await simulateMouseEvent(target, "mousemove", end, { button: 2 });
-    await simulateMouseEvent(target, "mouseup", end, { button: 2 });
+    await simulateMouseEvent(target, "pointerdown", start, { button: 2 });
+    await simulateMouseEvent(target, "pointermove", end, { button: 2 });
+    await simulateMouseEvent(target, "pointerup", end, { button: 2 });
 
     expect(camera.getState()).toEqual(initialState);
   });
@@ -149,9 +149,9 @@ describe("Sigma right-click mouse rotation", () => {
     const start = { x: center.x + 50, y: center.y };
     const end = rotate(start, center, Math.PI / 4);
 
-    await simulateMouseEvent(target, "mousedown", start, { button: 2 });
-    await simulateMouseEvent(target, "mousemove", end, { button: 2 });
-    await simulateMouseEvent(target, "mouseup", end, { button: 2 });
+    await simulateMouseEvent(target, "pointerdown", start, { button: 2 });
+    await simulateMouseEvent(target, "pointermove", end, { button: 2 });
+    await simulateMouseEvent(target, "pointerup", end, { button: 2 });
 
     expect(camera.getState().ratio).toBe(initialState.ratio);
     expect(camera.getState().x).toBe(initialState.x);
@@ -168,9 +168,9 @@ describe("Sigma right-click mouse rotation", () => {
     const start = { x: center.x + 50, y: center.y };
     const end = rotate(start, center, Math.PI / 2);
 
-    await simulateMouseEvent(target, "mousedown", start, { button: 2 });
-    await simulateMouseEvent(target, "mousemove", end, { button: 2 });
-    await simulateMouseEvent(target, "mouseup", end, { button: 2 });
+    await simulateMouseEvent(target, "pointerdown", start, { button: 2 });
+    await simulateMouseEvent(target, "pointermove", end, { button: 2 });
+    await simulateMouseEvent(target, "pointerup", end, { button: 2 });
 
     expect(camera.getState().angle).toBeCloseTo(Math.PI / 2, 6);
   });
@@ -294,5 +294,54 @@ describe("Sigma wheel gesture routing", () => {
     dispatchWheel(target);
 
     expect(sigma.getContainer().querySelector(".sigma-gesture-hint")).toBeNull();
+  });
+});
+
+describe("Sigma touch compatibility events", () => {
+  function dispatchTapCompatibilityEvents(target: HTMLElement, position: Coordinates): void {
+    const init = { pointerType: "touch", clientX: position.x, clientY: position.y, bubbles: true, cancelable: true };
+    target.dispatchEvent(new PointerEvent("pointerdown", init));
+    target.dispatchEvent(new PointerEvent("pointerup", init));
+    target.dispatchEvent(new MouseEvent("mousedown", init));
+    target.dispatchEvent(new MouseEvent("mouseup", init));
+    target.dispatchEvent(new MouseEvent("click", init));
+  }
+
+  test<SigmaTestContext>("compatibility mouse events after a tap don't produce a second click", async ({
+    sigma,
+    target,
+  }) => {
+    // Off the n1-n2 diagonal, so the tap hits the stage:
+    const position = { x: STAGE_WIDTH * 0.8, y: STAGE_HEIGHT * 0.2 };
+    let clicks = 0;
+    sigma.on("clickStage", () => clicks++);
+
+    await simulateTouchEvent(target, "touchstart", [{ ...position, id: 1 }]);
+    await simulateTouchEvent(target, "touchend", []);
+    dispatchTapCompatibilityEvents(target, position);
+    await wait(50);
+
+    expect(clicks).toBe(1);
+  });
+
+  test<SigmaTestContext>("compatibility mouse events after a double tap don't zoom twice", async ({
+    sigma,
+    target,
+  }) => {
+    const position = { x: STAGE_WIDTH * 0.8, y: STAGE_HEIGHT * 0.2 };
+    const touch = { ...position, id: 1 };
+    const expectedRatio = 1 / sigma.getSetting("doubleClickZoomingRatio");
+
+    await simulateTouchEvent(target, "touchstart", [touch]);
+    await simulateTouchEvent(target, "touchend", []);
+    await simulateTouchEvent(target, "touchstart", [touch]);
+    await simulateTouchEvent(target, "touchend", []);
+    dispatchTapCompatibilityEvents(target, position);
+    dispatchTapCompatibilityEvents(target, position);
+
+    // The camera zooms from the "doubletap" only, and stays there:
+    await vi.waitFor(() => expect(sigma.getCamera().getState().ratio).toBeCloseTo(expectedRatio, 6));
+    await wait(100);
+    expect(sigma.getCamera().getState().ratio).toBeCloseTo(expectedRatio, 6);
   });
 });
