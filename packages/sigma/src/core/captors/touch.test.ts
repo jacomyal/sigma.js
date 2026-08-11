@@ -31,7 +31,7 @@ const GRAPH: Pick<SerializedGraph, "nodes" | "edges"> = {
 
 beforeEach<SigmaTestContext>(async (context) => {
   const graph = new Graph();
-  graph.import(GRAPH);
+  graph.import(structuredClone(GRAPH));
   const container = createElement("div", { width: `${STAGE_WIDTH}px`, height: `${STAGE_HEIGHT}px` }) as HTMLDivElement;
   document.body.append(container);
 
@@ -175,7 +175,10 @@ describe("Sigma touch gesture routing", () => {
     const initialCameraState = { ...sigma.getCamera().getState() };
     const start = { ...sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates), id: ID_A };
 
+    // The drag session starts on the first move (with a zero displacement),
+    // so the node only moves effectively from the second touchmove on:
     await simulateTouchEvent(target, "touchstart", [start]);
+    await simulateTouchEvent(target, "touchmove", [add(start, { x: 15, y: 15 })]);
     await simulateTouchEvent(target, "touchmove", [add(start, { x: 30, y: 30 })]);
     await simulateTouchEvent(target, "touchend", []);
 
