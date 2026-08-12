@@ -6,6 +6,9 @@
  * This file also acts as the CI cache manifest: the workflow keys its cache
  * of public/data/ on a hash of this file, so editing the dataset list below
  * invalidates the cache and triggers a fresh download.
+ *
+ * Label counts describe the merged undirected graph the example builds,
+ * not SNAP's raw directed stats.
  */
 export const DATASETS = {
   "ca-grqc": {
@@ -13,7 +16,7 @@ export const DATASETS = {
     file: "ca-GrQc.txt.gz",
   },
   "wiki-vote": {
-    label: "Wikipedia adminship votes (7.1k nodes, 104k edges)",
+    label: "Wikipedia adminship votes (7.1k nodes, 101k edges)",
     file: "wiki-Vote.txt.gz",
   },
   "ca-astroph": {
@@ -25,19 +28,19 @@ export const DATASETS = {
     file: "email-Enron.txt.gz",
   },
   "soc-epinions": {
-    label: "Epinions social network (75.9k nodes, 509k edges)",
+    label: "Epinions social network (75.9k nodes, 406k edges)",
     file: "soc-Epinions1.txt.gz",
   },
   amazon0302: {
-    label: "Amazon co-purchases (262k nodes, 1.2M edges)",
+    label: "Amazon co-purchases (262k nodes, 900k edges)",
     file: "amazon0302.txt.gz",
   },
   "web-notredame": {
-    label: "Notre Dame web pages (326k nodes, 1.5M edges)",
+    label: "Notre Dame web pages (326k nodes, 1.1M edges)",
     file: "web-NotreDame.txt.gz",
   },
   "web-stanford": {
-    label: "Stanford web pages (282k nodes, 2.3M edges)",
+    label: "Stanford web pages (282k nodes, 2M edges)",
     file: "web-Stanford.txt.gz",
   },
 };

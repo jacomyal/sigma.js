@@ -2,7 +2,7 @@
   <div id="sigma-container"></div>
   <div id="loader">
     <div class="loader-box">
-      <div id="loader-label">Loading…</div>
+      <div id="loader-label">Loading...</div>
       <div class="loader-bar"><div id="loader-bar-fill"></div></div>
       <div id="loader-counts"></div>
     </div>
@@ -114,9 +114,10 @@
 
   /**
    * Streams a SNAP edge list ("#" comments, then one "source target" pair
-   * per line) into a graph, reporting progress as edges arrive.
+   * per line) into a graph, reporting progress as lines are parsed (the
+   * "# Edges:" header counts file lines, not merged edges).
    */
-  async function loadEdgeList(url: string, onProgress: (edges: number, total: number | null) => void): Promise<Graph> {
+  async function loadEdgeList(url: string, onProgress: (graph: Graph, ratio: number | null) => void): Promise<Graph> {
     const graph = new Graph({ type: "undirected" });
     const res = await fetch(url);
     if (!res.ok || !res.body) throw new Error(`Cannot fetch ${url} (HTTP ${res.status})`);
@@ -159,7 +160,7 @@
 
       for (const line of lines) handleLine(line);
 
-      onProgress(edges, total);
+      onProgress(graph, total ? edges / total : null);
       // reader.read() resolves as a microtask, which never lets the page
       // paint. So, explicitly wait for a frame from time to time so the
       // progress bar actually shows up:
@@ -177,14 +178,16 @@
   }
 
   const info = DATASETS[dataset as keyof typeof DATASETS] ?? DATASETS["soc-epinions"];
-  loaderLabel.textContent = `Loading ${info.label}…`;
+  loaderLabel.textContent = `Loading ${info.label}...`;
 
-  const graph = await loadEdgeList(`/data/${info.file}`, (edges, total) => {
-    if (total) {
-      loaderFill.style.width = `${Math.min(100, (edges / total) * 100)}%`;
-      loaderCounts.textContent = `${edges.toLocaleString("en-US")} / ${total.toLocaleString("en-US")} edges`;
+  const graph = await loadEdgeList(`/data/${info.file}`, (graph, ratio) => {
+    const counts = `${graph.order.toLocaleString("en-US")} nodes, ${graph.size.toLocaleString("en-US")} edges`;
+    if (ratio !== null) {
+      const percent = Math.min(100, ratio * 100);
+      loaderFill.style.width = `${percent}%`;
+      loaderCounts.textContent = `${counts} - ${Math.round(percent)}%`;
     } else {
-      loaderCounts.textContent = `${edges.toLocaleString("en-US")} edges`;
+      loaderCounts.textContent = counts;
     }
   }).catch((error) => {
     loaderLabel.textContent = "Failed to load dataset";
@@ -192,7 +195,7 @@
     throw error;
   });
 
-  loaderLabel.textContent = "Preparing graph…";
+  loaderLabel.textContent = "Preparing graph...";
   await new Promise((resolve) => requestAnimationFrame(resolve));
 
   const rng = seedrandom("sigma");
