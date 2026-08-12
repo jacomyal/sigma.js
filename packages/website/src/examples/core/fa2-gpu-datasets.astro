@@ -199,7 +199,7 @@
   await new Promise((resolve) => requestAnimationFrame(resolve));
 
   const rng = seedrandom("sigma");
-  random.assign(graph, { scale: 50000, center: 0, rng });
+  random.assign(graph, { scale: Math.sqrt(graph.order) * 100, center: 0, rng });
   graph.updateEachNodeAttributes((node, attrs) => ({
     ...attrs,
     size: (1 + Math.log1p(graph.degree(node))) * 10,
@@ -213,6 +213,10 @@
       edges: [DEFAULT_STYLES.edges, { color: "#e6e6e6" }],
       nodes: [DEFAULT_STYLES.nodes, { labelVisibility: "hidden" }],
     },
+    settings: {
+      enableNodeDrag: true,
+      autoRescale: "once",
+    },
   });
 
   const inferred = forceAtlas2.inferSettings(graph);
@@ -224,6 +228,13 @@
     slowDown: inferred.slowDown ?? 1,
     strongGravityMode: inferred.strongGravityMode ?? false,
     backportInterval: 0,
+  });
+
+  renderer.on("nodeDragStart", ({ allDraggedNodes }) => {
+    allDraggedNodes.forEach((node) => layout.setNodeFixed(node, true));
+  });
+  renderer.on("nodeDragEnd", ({ allDraggedNodes }) => {
+    allDraggedNodes.forEach((node) => layout.setNodeFixed(node, false));
   });
 
   layout.on("stopped", () => setToggle("fa2", false));
