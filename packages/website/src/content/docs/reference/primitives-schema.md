@@ -183,10 +183,17 @@ Each edge picks an extremity via the `head` and `tail` style properties, using t
 
 Edge layer factories composited together.
 
-| Factory              | Package           | Description                                                                                   |
-| -------------------- | ----------------- | --------------------------------------------------------------------------------------------- |
-| `layerPlain()`       | `sigma/rendering` | Solid edge body                                                                               |
-| `layerDashed(opts?)` | `sigma/rendering` | Dashed overlay. Options: `dashSize`, `gapSize`, `dashColor`, `dashOffset`, `solidExtremities` |
+| Factory               | Package           | Description                                                                                   |
+| --------------------- | ----------------- | --------------------------------------------------------------------------------------------- |
+| `layerPlain(opts?)`   | `sigma/rendering` | Solid edge body. Options: `color`                                                             |
+| `layerDashed(opts?)`  | `sigma/rendering` | Dashed overlay. Options: `dashSize`, `gapSize`, `dashColor`, `dashOffset`, `solidExtremities` |
+| `layerGradient(opts)` | `sigma/rendering` | Gradient along color stops. Options: `stops` (required, CSS-like offsets), `enabled`          |
+
+Layer color options (`color`, `dashColor`, `gapColor`, gradient stop colors) accept an `EdgeColorValue`:
+
+- a constant CSS color string;
+- `{ attribute, default? }` to read a per-edge color from edge data;
+- `{ node: "source" | "target" }` to use an endpoint node's color, read live from the node data texture so it stays in sync with node styles.
 
 ### label
 

@@ -13,91 +13,80 @@
   import {
     extremityArrow,
     layerDashed,
+    layerFill,
+    layerGradient,
     layerPlain,
     pathCurved,
     pathCurvedS,
     pathLine,
     pathStepCurved,
+    sdfCircle,
+    sdfTriangle,
   } from "sigma/rendering";
   import { DEFAULT_STYLES } from "sigma/types";
 
   const container = document.getElementById("sigma-container") as HTMLElement;
 
-  const graph = new Graph();
+  const SOURCE_COLOR = "#7E3D9C";
+  const TARGET_COLOR = "#ED8666";
 
-  const COL_SPACING = 120;
-  const ROW_SPACING = 80;
-  const NODE_SPACING = 60;
-  const EDGE_SIZE = 6;
+  // Each row has its own path:
+  const PATHS = ["straight", "curved", "stepCurved", "curvedS"] as const;
 
-  const ROW_COLORS = ["#5B8FF9", "#61DDAA", "#F6903D", "#E8684A"];
-
-  const PATH_NAMES = ["straight", "curved", "stepCurved", "curvedS"] as const;
-
-  const COLUMN_CONFIGS = [
-    {},
+  // Each column shows edges fillings and extremities in its own way:
+  const COLUMNS = [
+    { useGradient: true },
     { head: "arrow" },
-    { head: "arrow", tail: "arrow" },
-    { dashSize: 5, backgroundColor: "white" },
-    { head: "arrow", dashSize: 10, dashColor: "blue" },
+    { head: "arrow", tail: "arrow", useGradient: true },
+    { dashSize: 5, dashColor: "#ffffff99" },
+    { head: "arrow", dashSize: 10, dashColor: "#ffffff99", useGradient: true },
   ];
 
-  for (let rowIdx = 0; rowIdx < PATH_NAMES.length; rowIdx++) {
-    const pathName = PATH_NAMES[rowIdx];
-    const rowColor = ROW_COLORS[rowIdx];
-
-    for (let colIdx = 0; colIdx < COLUMN_CONFIGS.length; colIdx++) {
-      const colConfig = COLUMN_CONFIGS[colIdx];
-      const cellX = colIdx * COL_SPACING;
-      const cellY = -rowIdx * ROW_SPACING;
-
-      const sourceId = `${pathName}-${colIdx}-source`;
-      graph.addNode(sourceId, {
-        x: cellX - NODE_SPACING / 2,
-        y: cellY,
+  const graph = new Graph();
+  PATHS.forEach((path, row) => {
+    COLUMNS.forEach((config, col) => {
+      const [x, y] = [col * 120, -row * 80];
+      const source = graph.addNode(`${path}-${col}-source`, { x: x - 30, y, color: SOURCE_COLOR });
+      const target = graph.addNode(`${path}-${col}-target`, {
+        x: x + 30,
+        y: y + 30,
+        color: TARGET_COLOR,
+        shape: "triangle",
       });
-
-      const targetId = `${pathName}-${colIdx}-target`;
-      graph.addNode(targetId, {
-        x: cellX + NODE_SPACING / 2,
-        y: cellY + NODE_SPACING / 2,
-      });
-
-      graph.addEdge(sourceId, targetId, {
-        size: EDGE_SIZE,
-        color: colConfig.backgroundColor || rowColor,
-        dashColor: colConfig.dashColor || rowColor,
-        dashSize: colConfig.dashSize || 0,
-        curvature: pathName === "curved" ? 0.3 : 0,
-        path: pathName,
-        head: colConfig.head,
-        tail: colConfig.tail,
-      });
-    }
-  }
+      graph.addEdge(source, target, { size: 6, path, curvature: path === "curved" ? 0.3 : 0, ...config });
+    });
+  });
 
   new Sigma(graph, container, {
     primitives: {
+      nodes: {
+        shapes: [sdfCircle(), sdfTriangle()],
+        layers: [layerFill()],
+      },
       edges: {
         variables: {
           dashColor: { type: "color", default: "#000" },
           dashSize: { type: "number", default: 0 },
+          useGradient: { type: "boolean", default: false },
         },
         paths: [pathLine(), pathCurved(), pathStepCurved(), pathCurvedS()],
         extremities: [extremityArrow()],
         layers: [
-          layerPlain(),
+          layerPlain({ color: { node: "source" } }),
+          layerGradient({
+            stops: [{ node: "source" }, { node: "target" }],
+            enabled: { attribute: "useGradient" },
+          }),
           layerDashed({
             dashColor: { attribute: "dashColor" },
-            dashSize: { attribute: "dashSize", default: 0, mode: "pixels" },
-            gapColor: 0,
-            gapSize: { value: 10, mode: "pixels" },
+            dashSize: { attribute: "dashSize" },
+            gapSize: { value: 10 },
           }),
         ],
       },
     },
     styles: {
-      nodes: [DEFAULT_STYLES.nodes, { size: 12, color: "darkgrey" }],
+      nodes: [DEFAULT_STYLES.nodes, { size: 12, shape: { attribute: "shape" } }],
       edges: [
         DEFAULT_STYLES.edges,
         { path: { attribute: "path" }, head: { attribute: "head" }, tail: { attribute: "tail" } },

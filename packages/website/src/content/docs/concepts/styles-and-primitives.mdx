@@ -5,7 +5,8 @@ description: The v4 declarative system for controlling how nodes and edges look.
 
 import SigmaExample from "../../../components/SigmaExample.astro";
 
-The styles and primitives system is sigma v4's primary mechanism for controlling visual appearance. It replaces the old `nodeProgramClasses` / `edgeProgramClasses` approach with a declarative, composable system.
+The styles and primitives system is sigma v4's primary mechanism for controlling visual appearance. It replaces the old
+`nodeProgramClasses` / `edgeProgramClasses` approach with a declarative, composable system.
 
 The two concepts serve different roles:
 
@@ -14,7 +15,9 @@ The two concepts serve different roles:
 
 ## Primitives
 
-Primitives define the rendering pipeline. They tell sigma which shapes, layers, paths, and extremities to compile into WebGL programs. Sigma generates one single optimized program for all nodes and another one for all edges from the entire declaration.
+Primitives define the rendering pipeline. They tell sigma which shapes, layers, paths, and extremities to compile into
+WebGL programs. Sigma generates one single optimized program for all nodes and another one for all edges from the entire
+declaration.
 
 ### Node primitives
 
@@ -46,9 +49,15 @@ new Sigma(graph, container, {
 });
 ```
 
-**Shapes** describe all the shapes nodes can have in a graph. The built-in shapes are `sdfCircle()`, `sdfSquare()`, `sdfTriangle()`, and `sdfDiamond()` (with `sdf` standing for [Signed Distance Field](https://en.wikipedia.org/wiki/Signed_distance_function)). The page [Styling nodes > Shapes](/how-to/nodes/shapes/#custom-shapes) shows how to write a custom SDF shape for sigma. Finally, all declared shapes are compiled into a single program, and each node picks its shape through the `shape` style property.
+**Shapes** describe all the shapes nodes can have in a graph. The built-in shapes are `sdfCircle()`, `sdfSquare()`,
+`sdfTriangle()`, and `sdfDiamond()` (with `sdf` standing for
+[Signed Distance Field](https://en.wikipedia.org/wiki/Signed_distance_function)). The page
+[Styling nodes > Shapes](/how-to/nodes/shapes/#custom-shapes) shows how to write a custom SDF shape for sigma. Finally,
+all declared shapes are compiled into a single program, and each node picks its shape through the `shape` style
+property.
 
-**Layers** describe how the shape is filled (simple color, borders, images, etc...). They are composited from back to front to build up the node's appearance. Built-in layer types include:
+**Layers** describe how the shape is filled (simple color, borders, images, etc...). They are composited from back to
+front to build up the node's appearance. Built-in layer types include:
 
 | Layer             | Package                | Description                                  |
 | ----------------- | ---------------------- | -------------------------------------------- |
@@ -57,7 +66,8 @@ new Sigma(graph, container, {
 | `layerImage()`    | `@sigma/node-image`    | Image or pictogram rendered inside the shape |
 | `layerPiechart()` | `@sigma/node-piechart` | Pie chart slices                             |
 
-Layers automatically disable themselves when they have no data. For example, an `image` layer on a node with no `image` attribute renders as transparent. This means all nodes share the same WebGL program regardless of which layers they use.
+Layers automatically disable themselves when they have no data. For example, an `image` layer on a node with no `image`
+attribute renders as transparent. This means all nodes share the same WebGL program regardless of which layers they use.
 
 ### Edge primitives
 
@@ -82,15 +92,20 @@ new Sigma(graph, container, {
 });
 ```
 
-**Paths** control the geometric route an edge takes between its endpoints. Built-in paths include `pathLine()`, `pathCurved()`, `pathStep()`, `pathStepCurved()`, and `pathCurvedS()`.
+**Paths** control the geometric route an edge takes between its endpoints. Built-in paths include `pathLine()`,
+`pathCurved()`, `pathStep()`, `pathStepCurved()`, and `pathCurvedS()`.
 
-**Extremities** are shapes drawn at the endpoints of edges. The built-in extremity is `extremityArrow()`. Omit the array or leave it empty for no extremity.
+**Extremities** are shapes drawn at the endpoints of edges. The built-in extremity is `extremityArrow()`. Omit the array
+or leave it empty for no extremity.
 
-**Layers** describe how the path is filled (simple color, dashed, etc...). As for nodes, they are composited from back to front to build up the edge's appearance. Built-in layer types include `layerPlain()` and `layerDashed()`.
+**Layers** describe how the path is filled (simple color, dashed, gradient, etc...). As for nodes, they are composited
+from back to front to build up the edge's appearance. Built-in layer types include `layerPlain()`, `layerDashed()` and
+`layerGradient()`.
 
 ### Depth layers
 
-The `depthLayers` array controls the rendering order of elements. Elements assigned to a later depth layer render on top of earlier ones. Within a depth layer, sigma always paints in the same order: edges, edge labels, nodes, node labels.
+The `depthLayers` array controls the rendering order of elements. Elements assigned to a later depth layer render on top
+of earlier ones. Within a depth layer, sigma always paints in the same order: edges, edge labels, nodes, node labels.
 
 ```typescript
 new Sigma(graph, container, {
@@ -122,7 +137,8 @@ For the full model (paint order within a bucket, `labelDepth`, and migration rec
 
 ## Variables
 
-Variables are custom typed attributes declared in the primitives. They bridge the gap between graph data and WebGL rendering.
+Variables are custom typed attributes declared in the primitives. They bridge the gap between graph data and WebGL
+rendering.
 
 ```typescript
 import { layerBorder } from "@sigma/node-border";
@@ -151,9 +167,12 @@ new Sigma(graph, container, {
 });
 ```
 
-Each variable has a `type` (`"number"`, `"color"`, `"string"`, `"boolean"`) and a `default` value. When a style references `{ attribute: "borderSize" }`, sigma reads the value from the node's graph attributes via the declared variable. If the attribute is missing, the default is used instead.
+Each variable has a `type` (`"number"`, `"color"`, `"string"`, `"boolean"`) and a `default` value. When a style
+references `{ attribute: "borderSize" }`, sigma reads the value from the node's graph attributes via the declared
+variable. If the attribute is missing, the default is used instead.
 
-Variables that are declared in primitives also become available as style properties, so you can set them through the styles system:
+Variables that are declared in primitives also become available as style properties, so you can set them through the
+styles system:
 
 ```typescript
 new Sigma(graph, container, {
@@ -174,7 +193,8 @@ new Sigma(graph, container, {
 
 ## Styles
 
-Styles are ordered rules that determine how nodes and edges look. They map graph attributes, element state, and graph state to visual properties.
+Styles are ordered rules that determine how nodes and edges look. They map graph attributes, element state, and graph
+state to visual properties.
 
 ### Value types
 
@@ -242,7 +262,8 @@ A style property can be set using several value types:
 
 ### Rule-level conditionals
 
-When you need to change multiple properties based on the same condition, use a rule-level conditional. The `whenState` clause gates the entire rule:
+When you need to change multiple properties based on the same condition, use a rule-level conditional. The `whenState`
+clause gates the entire rule:
 
 ```typescript
 new Sigma(graph, container, {
@@ -266,7 +287,8 @@ Rules are evaluated in order. Later rules override earlier ones for any properti
 
 ### Rule-level match
 
-When you need to branch styles on a categorical attribute (e.g. node type), use `matchData`/`cases` instead of function predicates:
+When you need to branch styles on a categorical attribute (e.g. node type), use `matchData`/`cases` instead of function
+predicates:
 
 ```typescript
 new Sigma(graph, container, {
@@ -288,7 +310,8 @@ new Sigma(graph, container, {
 ```
 
 :::note
-This is more efficient than function-based `when` predicates, because sigma knows the rule only depends on graph attributes, not interaction state. See the [Style value types](/reference/style-value-types/#rule-level-match) reference for details.
+This is more efficient than function-based `when` predicates, because sigma knows the rule only depends on graph
+attributes, not interaction state. See the [Style value types](/reference/style-value-types/#rule-level-match) reference for details.
 :::
 
 ### Predicates
@@ -327,7 +350,8 @@ matchData: "type";
 when: (attributes, state, graphState, graph) => graphState.hasActiveSubgraph && state.isActive;
 ```
 
-For the complete list of built-in state flags, see the [State flags](/reference/state-flags/) reference. For all available style properties, see the [Style properties](/reference/style-properties/) reference.
+For the complete list of built-in state flags, see the [State flags](/reference/state-flags/) reference. For all
+available style properties, see the [Style properties](/reference/style-properties/) reference.
 
 ## Full example
 
