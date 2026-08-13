@@ -148,6 +148,17 @@ ${GLSL_READ_NODE_FLAGS}
 void main() {
   // Fetch node geometry: vec4(x, y, size, shapeId).
   int nodeIdx = int(a_nodeIndex);
+
+  // Hidden nodes are flagged with a negative row by NodeProgram.process(). Push
+  // the whole quad outside the clip volume: every vertex lands at the same
+  // out-of-range position, so the primitive is fully clipped and rasterizes
+  // nothing — neither to the frame buffer nor to the picking buffer.
+  if (nodeIdx < 0) {
+    gl_Position = vec4(2.0, 0.0, 0.0, 1.0);
+    v_id = vec4(0.0);
+    return;
+  }
+
   vec4 nodeData = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, nodeIdx);
   vec2 a_position = nodeData.xy;
   float a_size = nodeData.z;

@@ -19,6 +19,17 @@ const GROWTH_FACTOR = 1.5;
 const MAX_TEXTURE_WIDTH = 4096;
 
 /**
+ * Sentinel written to `a_nodeIndex` / `a_edgeIndex` for hidden items.
+ *
+ * Programs zero out a hidden item's whole vertex buffer slot, but 0 is a *valid*
+ * texture row, so a zeroed slot is indistinguishable from "item at row 0" — the
+ * shader would happily render the hidden instance using item 0's geometry and
+ * attributes. Flagging the row with a negative value lets the vertex shader
+ * detect the case and discard the primitive instead.
+ */
+export const HIDDEN_ITEM_INDEX = -1;
+
+/**
  * Base class for GPU data textures.
  *
  * The texture is a 2D RGBA32F texture where each item uses TEXELS_PER_ITEM texels.

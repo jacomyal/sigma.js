@@ -15,6 +15,7 @@ import { colorToArray, floatColor, indexToColor, rgbaToFloat } from "../../utils
 import {
   AttrDescriptor,
   AttributeLayout,
+  HIDDEN_ITEM_INDEX,
   ItemAttributeTexture,
   buildAttrDescriptors,
   computeAttributeLayout,
@@ -301,11 +302,15 @@ export function createEdgeProgram<
       edgeTextureIndex: number,
     ): void {
       let i = offset * this.STRIDE;
-      // Hidden source/target/edge zero out the slot so the GPU draws nothing.
+      // Hidden source/target/edge zero out the slot so the GPU draws nothing,
+      // then a_edgeIndex is flagged as HIDDEN_ITEM_INDEX: zero is a *valid*
+      // texture row, so leaving it at 0 would make the shader render this
+      // instance as a copy of edge 0 (and overwrite its picking ID).
       if (data.visibility === "hidden" || sourceData.visibility === "hidden" || targetData.visibility === "hidden") {
         for (let l = i + this.STRIDE; i < l; i++) {
           this.floats[i] = 0;
         }
+        this.floats[offset * this.STRIDE] = HIDDEN_ITEM_INDEX;
         return;
       }
       this.processVisibleItem(indexToColor(edgeIndex), i, sourceData, targetData, data, edgeTextureIndex);

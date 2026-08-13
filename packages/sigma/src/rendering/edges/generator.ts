@@ -722,6 +722,18 @@ void main() {
   // Texel 0: sourceNodeIndex, targetNodeIndex, thickness, reserved
   // Texel 1: headLengthRatio, tailLengthRatio, pathId, (headId << 4) | tailId
   int edgeIdx = int(a_edgeIndex);
+
+  // Hidden edges are flagged with a negative row by EdgeProgram.process(). Push
+  // the whole primitive outside the clip volume: every vertex lands at the same
+  // out-of-range position, so it is fully clipped and rasterizes nothing —
+  // neither to the frame buffer nor to the picking buffer.
+  if (edgeIdx < 0) {
+    gl_Position = vec4(2.0, 0.0, 0.0, 1.0);
+    v_color = vec4(0.0);
+    v_id = vec4(0.0);
+    return;
+  }
+
   int texel0Idx = edgeIdx * 2;
   int texel1Idx = edgeIdx * 2 + 1;
   ivec2 edgeTexCoord0 = ivec2(texel0Idx % u_edgeDataTextureWidth, texel0Idx / u_edgeDataTextureWidth);

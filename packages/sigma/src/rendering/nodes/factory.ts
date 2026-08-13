@@ -15,6 +15,7 @@ import { LabelDisplayData, NodeDisplayData, RenderParams } from "../../types";
 import { indexToColor } from "../../utils";
 import {
   AttrDescriptor,
+  HIDDEN_ITEM_INDEX,
   ItemAttributeTexture,
   buildAttrDescriptors,
   computeAttributeLayout,
@@ -297,11 +298,15 @@ export function createNodeProgram<
 
     process(nodeIndex: number, offset: number, data: NodeDisplayData, textureIndex: number, nodeKey: string): void {
       let i = offset * this.STRIDE;
-      // Hidden nodes get zeroed out so the GPU draws nothing for them.
+      // Hidden nodes get zeroed out so the GPU draws nothing for them, then
+      // a_nodeIndex is flagged as HIDDEN_ITEM_INDEX: zero is a *valid* texture
+      // row, so leaving it at 0 would make the shader render this instance as a
+      // copy of item 0 (and overwrite its picking ID with a_id = 0).
       if (data.visibility === "hidden") {
         for (let l = i + this.STRIDE; i < l; i++) {
           this.floats[i] = 0;
         }
+        this.floats[offset * this.STRIDE] = HIDDEN_ITEM_INDEX;
         return;
       }
       this.processVisibleItem(indexToColor(nodeIndex), i, data, textureIndex, nodeKey);
