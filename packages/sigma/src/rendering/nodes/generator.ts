@@ -107,6 +107,7 @@ export function generateVertexShader(shapes: SDFShape[], layers: FragmentLayer[]
 // Standard node attributes (per instance) - minimal buffer usage
 in float a_nodeIndex;  // Index into node data texture AND layer attribute texture
 in vec4 a_id;          // Node ID for picking
+in float a_opacity;    // Node opacity, applied once to the final fragment
 
 // Constant attributes (per vertex, same for all instances)
 in vec2 a_quadCorner;  // (-1,-1), (1,-1), (1,1), (-1,1) for quad corners
@@ -133,6 +134,7 @@ ${layerUniforms}
 // Standard varyings
 out vec2 v_uv;                    // Normalized coordinates [-1, 1]
 out vec4 v_id;
+out float v_opacity;
 out float v_antialiasingWidth;    // Width for antialiasing in UV space
 out float v_pixelSize;            // Node size in pixels (for pixel-mode borders)
 out float v_pixelToUV;            // Conversion factor: multiply by this to convert screen pixels to UV units
@@ -205,6 +207,7 @@ ${fetchCode}
 
   // Pass ID to fragment shader
   v_id = a_id;
+  v_opacity = a_opacity;
 
   // Pass pixel size for layers that need pixel-mode calculations
   // Multiply by 2 because 'size' is half-width (offset from center), not full diameter
@@ -308,6 +311,7 @@ precision highp float;
 // Standard varyings
 in vec2 v_uv;
 in vec4 v_id;
+in float v_opacity;
 in float v_antialiasingWidth;
 in float v_pixelSize;
 in float v_pixelToUV;
@@ -392,9 +396,9 @@ ${layerCalls}
     if (context.sdf > u_pickingPadding * v_pixelToUV) discard;
     fragColor = v_id;
   #else
-    // Visual pass: apply antialiasing at shape boundary
+    // Visual pass: apply antialiasing at shape boundary, node opacity once
     // smoothstep provides smooth transition from opaque to transparent
-    float alpha = smoothstep(context.aaWidth, -context.aaWidth, context.sdf);
+    float alpha = smoothstep(context.aaWidth, -context.aaWidth, context.sdf) * v_opacity;
     // Mix with transparent to fade both color AND alpha together (avoids bright halo)
     fragColor = mix(vec4(0.0), color, alpha);
   #endif
@@ -439,18 +443,19 @@ export function collectUniforms(shapes: SDFShape[], layers: FragmentLayer[]): st
 
 /**
  * Collects all attributes for the buffer.
- * Note: Position, size, and layer attributes are fetched from textures,
- * so only nodeIndex and id are needed as per-instance buffer attributes.
+ * Note: Position, size, and layer attributes are fetched from textures;
+ * only per-instance buffer attributes remain here.
  */
 export function collectAttributes(_layers: FragmentLayer[]): AttributeSpecification[] {
   const { UNSIGNED_BYTE, FLOAT } = WebGL2RenderingContext;
 
-  // Only nodeIndex and id remain in the buffer
   // - a_nodeIndex: index into both node data texture and layer attribute texture
   // - a_id: node ID for picking (must stay in buffer for immediate access)
+  // - a_opacity: node opacity, applied once to the final composited fragment
   return [
     { name: "a_nodeIndex", size: 1, type: FLOAT },
     { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+    { name: "a_opacity", size: 1, type: FLOAT },
   ];
 }
 

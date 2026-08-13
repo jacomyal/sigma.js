@@ -642,6 +642,7 @@ ${constantAttrDeclarations}
 in float a_edgeIndex;   // Index into edge data texture
 in vec4 a_color;        // Edge color
 in vec4 a_id;           // Edge ID for picking
+in float a_opacity;     // Edge opacity
 
 // Standard uniforms
 uniform mat3 u_matrix;
@@ -669,6 +670,7 @@ ${customUniforms.join("\n")}
 
 // Standard varyings
 out vec4 v_color;
+out float v_opacity;
 out vec4 v_id;
 out float v_thickness;       // Edge body thickness (in consistent units)
 out float v_maxWidthFactor;  // Max width factor for geometry expansion
@@ -899,6 +901,7 @@ ${textureFetch.varyingAssignments}
   // Pass varyings to fragment shader
   v_color = a_color;
   v_color.a *= bias;
+  v_opacity = a_opacity;
   v_id = a_id;
   v_thickness = webGLThickness;
   v_maxWidthFactor = widthFactor;
@@ -982,6 +985,7 @@ precision highp float;
 
 // Standard varyings
 in vec4 v_color;
+in float v_opacity;
 in vec4 v_id;
 in float v_thickness;       // Edge body thickness
 in float v_maxWidthFactor;  // Max width factor for geometry expansion
@@ -1182,8 +1186,8 @@ ${
     if (finalSDF > u_pickingPadding * aaWidthWebGL) discard;
     fragColor = v_id;
   #else
-    // Visual pass: anti-aliased edge with layers
-    float alpha = smoothstep(aaWidthWebGL, -aaWidthWebGL, finalSDF);
+    // Visual pass: anti-aliased edge with layers, edge opacity applied once
+    float alpha = smoothstep(aaWidthWebGL, -aaWidthWebGL, finalSDF) * v_opacity;
     if (alpha < 0.01) discard;
 
     // Apply layers sequentially with "over" compositing
@@ -1333,5 +1337,6 @@ function collectAttributesMulti(
     { name: "a_edgeIndex", size: 1, type: FLOAT },
     { name: "a_color", size: 4, type: UNSIGNED_BYTE, normalized: true },
     { name: "a_id", size: 4, type: UNSIGNED_BYTE, normalized: true },
+    { name: "a_opacity", size: 1, type: FLOAT },
   ];
 }

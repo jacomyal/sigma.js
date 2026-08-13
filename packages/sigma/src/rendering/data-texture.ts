@@ -554,7 +554,6 @@ export function packAttributes(
   data: Record<string, unknown>,
   packed: Float32Array,
   color: string,
-  opacity: number,
   lifecycles: Map<number, { getAttributeData?: (data: Record<string, unknown>, sourceName: string) => unknown }>,
   lifecycleIndexOffset: number,
 ): void {
@@ -579,7 +578,7 @@ export function packAttributes(
       packed[off] = r / 255;
       packed[off + 1] = g / 255;
       packed[off + 2] = b / 255;
-      packed[off + 3] = (a / 255) * opacity;
+      packed[off + 3] = a / 255;
     } else if (d.size === 1) {
       packed[off] = typeof value === "number" ? value : d.defaultNum;
     } else {

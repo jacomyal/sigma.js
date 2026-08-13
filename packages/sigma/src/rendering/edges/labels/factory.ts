@@ -482,7 +482,7 @@ export function createEdgeLabelProgram<
       if (this.edgeAttributeTexture && !data.hidden && data.text) {
         this.edgeAttributeTexture.allocate(labelKey);
         const packed = this.packedAttributeData;
-        packAttributes(this.attrDescriptors, data.edgeAttributes, packed, "", 1, NO_LIFECYCLES, 0);
+        packAttributes(this.attrDescriptors, data.edgeAttributes, packed, "", NO_LIFECYCLES, 0);
         this.edgeAttributeTexture.updateAllAttributes(labelKey, packed);
       }
 

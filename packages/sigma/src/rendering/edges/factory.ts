@@ -11,7 +11,7 @@ import { Attributes } from "graphology-types";
 
 import Sigma from "../../sigma";
 import { EdgeDisplayData, NodeDisplayData, RenderParams } from "../../types";
-import { colorToArray, floatColor, indexToColor, rgbaToFloat } from "../../utils";
+import { floatColor, indexToColor } from "../../utils";
 import {
   AttrDescriptor,
   AttributeLayout,
@@ -328,15 +328,10 @@ export function createEdgeProgram<
 
       // Core vertex buffer writes
       floats[startIndex++] = edgeTextureIndex;
-      const opacity = data.opacity ?? 1;
-      if (opacity < 1) {
-        const [r, g, b, a] = colorToArray(data.color);
-        floats[startIndex++] = rgbaToFloat(r, g, b, (a * opacity) | 0, true);
-      } else {
-        floats[startIndex++] = floatColor(data.color);
-      }
+      floats[startIndex++] = floatColor(data.color);
       // a_id is a packed picking ID, it should be stored as an int
       ints[startIndex++] = edgeIndex;
+      floats[startIndex++] = data.opacity ?? 1;
 
       // Pack attributes into texture via pre-computed descriptors
       const packed = this.packedAttributeData;
@@ -345,7 +340,6 @@ export function createEdgeProgram<
         data as unknown as Record<string, unknown>,
         packed,
         data.color,
-        opacity,
         this.layerLifecycles,
         this.lifecycleIndexOffset,
       );

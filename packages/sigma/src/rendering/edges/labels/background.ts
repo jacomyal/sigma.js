@@ -381,7 +381,7 @@ export function createEdgeLabelBackgroundProgram<
       if (this.edgeAttributeTexture && attributeLayout.floatsPerItem > 0) {
         attrIndex = this.edgeAttributeTexture.allocate(labelKey);
         const packed = this.packedAttributeData;
-        packAttributes(attrDescriptors, data.edgeAttributes, packed, "", 1, NO_LIFECYCLES, 0);
+        packAttributes(attrDescriptors, data.edgeAttributes, packed, "", NO_LIFECYCLES, 0);
         this.edgeAttributeTexture.updateAllAttributes(labelKey, packed);
       }
 

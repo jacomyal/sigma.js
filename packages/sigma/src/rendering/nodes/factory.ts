@@ -321,10 +321,11 @@ export function createNodeProgram<
     ) {
       const { floats, ints } = this;
 
-      // Buffer: only a_nodeIndex and a_id
+      // Buffer: a_nodeIndex, a_id and a_opacity
       floats[startIndex++] = textureIndex;
       // a_id is a packed picking ID, it should be stored as an int
       ints[startIndex++] = nodeIndex;
+      floats[startIndex++] = data.opacity ?? 1;
 
       // Pack layer attributes via pre-computed descriptors
       if (layerAttributeLayout.floatsPerItem === 0) return;
@@ -335,7 +336,6 @@ export function createNodeProgram<
         data as unknown as Record<string, unknown>,
         packed,
         data.color,
-        data.opacity ?? 1,
         this.layerLifecycles,
         0,
       );
