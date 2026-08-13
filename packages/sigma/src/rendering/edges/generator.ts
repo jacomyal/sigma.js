@@ -9,7 +9,7 @@
  * @module
  */
 import { computeAttributeLayout } from "../data-texture";
-import { GLSL_READ_FRAME_TEXEL, GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../glsl";
+import { GLSL_READ_FRAME_TEXEL, GLSL_READ_NODE_COLOR, GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../glsl";
 import { isAttributeSource } from "../nodes";
 import { generateShapeSelectorGLSL, getAllShapeGLSL } from "../shapes";
 import { numberToGLSLFloat } from "../utils";
@@ -630,6 +630,9 @@ function generateVertexShaderMulti(
   // Generate min body length ratio (use max across all paths)
   const maxMinBodyLengthRatio = Math.max(...paths.map((p) => p.minBodyLengthRatio || 0));
 
+  // Node-color varyings are only emitted when a layer reads them
+  const needsNodeColors = layers.some((layer) => layer.needsNodeColors);
+
   // language=GLSL
   const glsl = /*glsl*/ `#version 300 es
 
@@ -685,7 +688,13 @@ out float v_edgeLength;
 out vec2 v_position;         // World position of the vertex (for position-based distance)
 out float v_sourceNodeSize;  // Source node size (mirrored in labels/generator.ts as plain float)
 out float v_targetNodeSize;  // Target node size (mirrored in labels/generator.ts as plain float)
-
+${
+  needsNodeColors
+    ? `
+out vec4 v_sourceColor;
+out vec4 v_targetColor;`
+    : ""
+}
 // Zone varyings
 out float v_zone;            // 0=tail, 1=body, 2=head
 out float v_zoneT;           // Position within zone [0,1]
@@ -715,7 +724,7 @@ ${generateAllPathSelectors(paths)}
 
 // Node-data fetch helper (geometry texel of the two-texel node stride)
 ${GLSL_READ_NODE_DATA}
-
+${needsNodeColors ? GLSL_READ_NODE_COLOR : ""}
 // Per-edge clamp from the frame-pass (tStart, tEnd, straightenFactor, pathLength)
 ${GLSL_READ_FRAME_TEXEL}
 
@@ -773,6 +782,13 @@ ${textureFetch.varyingAssignments}
   // Assign node size varyings early (path functions like loops need them during clamping)
   v_sourceNodeSize = a_sourceSize;
   v_targetNodeSize = a_targetSize;
+${
+  needsNodeColors
+    ? `
+  v_sourceColor = readNodeColor(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx);
+  v_targetColor = readNodeColor(u_nodeDataTexture, u_nodeDataTextureWidth, tgtIdx);`
+    : ""
+}
 
   // Convert thickness to WebGL units
   float minThickness = u_minEdgeThickness;
@@ -971,6 +987,9 @@ function generateFragmentShaderMulti(paths: EdgePath[], extremities: EdgeExtremi
   // Generate base ratio array for extremities (shared pool for head/tail)
   const extremityBaseRatios = extremities.map((e) => numberToGLSLFloat(e.baseRatio ?? 0.5)).join(", ");
 
+  // Node-color varyings are only emitted when a layer reads them
+  const needsNodeColors = layers.some((layer) => layer.needsNodeColors);
+
   // Generate layer function calls with "over" compositing (like node layers)
   const layerCalls = layers
     .map((layer, index) => {
@@ -1000,7 +1019,13 @@ in float v_edgeLength;
 in vec2 v_position;          // World position of the fragment
 in float v_sourceNodeSize;   // Source node size (mirrored in labels/generator.ts as plain float)
 in float v_targetNodeSize;   // Target node size (mirrored in labels/generator.ts as plain float)
-
+${
+  needsNodeColors
+    ? `
+in vec4 v_sourceColor;
+in vec4 v_targetColor;`
+    : ""
+}
 // Zone varyings
 in float v_zone;            // 0=tail, 1=body, 2=head
 in float v_zoneT;           // Position within zone [0,1]

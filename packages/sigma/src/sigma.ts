@@ -1585,6 +1585,7 @@ export default class Sigma<
       data.size,
       this.getNodeShapeId(data),
       ...nodeRotationFlags(data),
+      data.color,
     );
     const textureIndex = this.internals.nodeDataTexture!.getIndex(node);
     this.nodeProgram.process(pickingIdOf(this.pickingState, "node", node), position, data, textureIndex, node);
@@ -2491,6 +2492,7 @@ export default class Sigma<
         newData.size,
         shapeId,
         ...nodeRotationFlags(newData),
+        newData.color,
       );
       if (oldDepth && newData.depth !== oldDepth) {
         this.updateNodeDepthRanges(node, oldDepth, newData.depth);
@@ -2515,6 +2517,7 @@ export default class Sigma<
     const oldAttachment = data.labelAttachment;
     const oldRotationAlignment = data.rotationAlignment;
     const oldLabelRotationAlignment = data.labelRotationAlignment;
+    const oldColor = data.color;
 
     evaluateNodeStyle(
       this.stylesDeclaration!.nodes as Record<string, unknown>,
@@ -2552,13 +2555,14 @@ export default class Sigma<
     setMembership(this.internals.nodesWithForcedLabels, node, hasForcedLabel(data));
     setMembership(this.internals.nodesWithBackdrop, node, hasBackdrop(data));
 
-    // Node data texture only if position/size/shape/rotation changed
+    // Node data texture only if position/size/shape/rotation/color changed
     if (
       rawPositionChanged ||
       data.size !== oldSize ||
       data.shape !== oldShape ||
       data.rotationAlignment !== oldRotationAlignment ||
-      data.labelRotationAlignment !== oldLabelRotationAlignment
+      data.labelRotationAlignment !== oldLabelRotationAlignment ||
+      data.color !== oldColor
     ) {
       let shapeId: number;
       if (
@@ -2571,7 +2575,15 @@ export default class Sigma<
       } else {
         shapeId = getShapeId(data.shape || "circle");
       }
-      this.internals.nodeDataTexture!.updateNode(node, data.x, data.y, data.size, shapeId, ...nodeRotationFlags(data));
+      this.internals.nodeDataTexture!.updateNode(
+        node,
+        data.x,
+        data.y,
+        data.size,
+        shapeId,
+        ...nodeRotationFlags(data),
+        data.color,
+      );
     }
 
     // Update the depth bucket. A depth change is reflected immediately via

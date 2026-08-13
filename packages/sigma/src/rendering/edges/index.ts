@@ -66,10 +66,14 @@ export {
 export {
   layerDashed,
   layerPlain,
+  resolveEdgeColorValue,
   type DashSize,
   type DashSizeMode,
+  type EdgeColorValue,
   type LayerDashedOptions,
+  type LayerPlainOptions,
   type GapFilling,
+  type ResolvedEdgeColor,
   type SolidExtremities,
   type SolidMargin,
 } from "./layers";

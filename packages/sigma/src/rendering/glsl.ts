@@ -175,6 +175,25 @@ vec4 readNodeFlags(sampler2D nodeDataTexture, int nodeDataTextureWidth, int node
 `;
 
 /**
+ * Reads a node's color from the node-data texture (texel 1):
+ *   .b = RGB packed as r*65536 + g*256 + b (integer < 2^24, exact in float32)
+ *   .a = the color's alpha in [0, 1]
+ * Returns a straight-alpha (non-premultiplied) vec4. Same node index as
+ * readNodeData.
+ */
+export const GLSL_READ_NODE_COLOR = /*glsl*/ `
+vec4 readNodeColor(sampler2D nodeDataTexture, int nodeDataTextureWidth, int nodeIndex) {
+  int t = nodeIndex * ${NODE_DATA_TEXELS_PER_NODE} + 1;
+  ivec2 coord = ivec2(t % nodeDataTextureWidth, t / nodeDataTextureWidth);
+  vec4 texel = texelFetch(nodeDataTexture, coord, 0);
+  float r = floor(texel.b / 65536.0);
+  float g = floor(mod(texel.b, 65536.0) / 256.0);
+  float b = mod(texel.b, 256.0);
+  return vec4(r / 255.0, g / 255.0, b / 255.0, texel.a);
+}
+`;
+
+/**
  * Reads an item's texel from a frame texture (a render target written once per
  * frame by a frame-pass, indexed in lockstep with the matching data texture, so
  * callers reuse `a_nodeIndex` / `a_edgeIndex`). Always returns the full `vec4`;

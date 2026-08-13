@@ -6,9 +6,10 @@
  *
  * @module
  */
-import { colorToVec4 } from "../../../utils";
-import { ValueSource, Vec3, Vec4 } from "../../nodes";
+import { Vec3 } from "../../nodes";
+import { numberToGLSLFloat } from "../../utils";
 import { EdgeLayer } from "../types";
+import { EdgeColorValue, resolveEdgeColorValue } from "./color-value";
 
 /**
  * Mode for border size specification.
@@ -29,12 +30,10 @@ export type DashSize =
 
 /**
  * Specifies how gaps between dashes should be rendered.
- * - 0: Fully transparent gaps
- * - number (0-1): Same color as dash but with this opacity
- * - string: CSS color for gaps (constant for all edges)
- * - { attribute, default? }: Per-edge attribute name for gap color
+ * - number (0-1): Same color as dash but with this opacity (0 = transparent)
+ * - EdgeColorValue: constant color, per-edge attribute, or node color
  */
-export type GapFilling = number | ValueSource<string>;
+export type GapFilling = number | EdgeColorValue;
 
 /**
  * Specifies which extremities should be rendered solid (not dashed).
@@ -57,13 +56,12 @@ export interface LayerDashedOptions {
   dashSize?: DashSize;
 
   /**
-   * Custom dash color:
-   * - String: Fixed color value (e.g., "#ff0000")
-   * - Object with `attribute`: Read from node attribute (e.g., { attribute: "fillColor" })
+   * Dash color: constant color, per-edge attribute, or node color reference
+   * (e.g. `{ node: "source" }`).
    *
    * @default { attribute: "color" }
    */
-  dashColor?: ValueSource<string>;
+  dashColor?: EdgeColorValue;
 
   /**
    * Offset to shift the dash pattern along the edge.
@@ -79,10 +77,9 @@ export interface LayerDashedOptions {
 
   /**
    * How gaps should be filled:
-   * - 0: Fully transparent gaps (default)
-   * - number (0-1): Same color as dash but with this opacity
-   * - string: CSS color for gaps (constant for all edges)
-   * - { attribute: string }: Per-edge attribute name for gap color
+   * - number (0-1): Same color as dash but with this opacity (0 = fully
+   *   transparent, the default)
+   * - EdgeColorValue: constant color, per-edge attribute, or node color
    *
    * Default: 0
    */
@@ -119,14 +116,6 @@ export interface LayerDashedOptions {
    */
   solidMargin?: SolidMargin;
 }
-
-/**
- * Gap mode constants for shader.
- */
-const GAP_MODE_OPACITY = 0;
-const GAP_MODE_CONSTANT_COLOR = 1;
-const GAP_MODE_ATTRIBUTE_COLOR = 2;
-type GapMode = 0 | 1 | 2;
 
 /**
  * Parses the solidExtremities option.
@@ -180,12 +169,7 @@ export function layerDashed(options?: LayerDashedOptions): EdgeLayer {
   const solidExtremities = parseSolidExtremities(opts.solidExtremities);
   const solidMargin = parseSolidMargin(opts.solidMargin);
 
-  // Parse custom dash color if provided
-  const hasCustomColor = typeof dashColor === "string";
-  let constantDashColor: Vec4 = [0, 0, 0, 0];
-  if (hasCustomColor) {
-    constantDashColor = colorToVec4(dashColor);
-  }
+  const dashResolved = resolveEdgeColorValue(dashColor, "dashColor");
 
   // Encode mode as vec3: 0.0 = pixels, 1.0 = ratio (relative to thickness)
   const sizeMode = [sizes.dashSize, sizes.gapSize, sizes.dashOffset].map((dashSize) =>
@@ -204,66 +188,20 @@ export function layerDashed(options?: LayerDashedOptions): EdgeLayer {
     },
     // Solid margin: vec2(tail margin in pixels, head margin in pixels)
     { name: "u_solidMargin", type: "vec2", value: [solidMargin.tail, solidMargin.head] },
-    // Custom dash color: vec4 (premultiplied alpha) and mode flag
-    { name: "u_dashColor", type: "vec4", value: constantDashColor },
   ];
 
-  const attributes: EdgeLayer["attributes"] = [];
+  const attributes: EdgeLayer["attributes"] = [...dashResolved.attributes];
+  let needsNodeColors = dashResolved.needsNodeColors;
+
+  // Gap color: either an opacity applied to the dash color, or its own source
   let gapColorGLSL: string;
-  let gapMode: GapMode;
-
-  // Opacity mode for gaps:
   if (typeof gapColor === "number") {
-    gapMode = GAP_MODE_OPACITY;
-    uniforms.push({ name: "u_gapOpacity", type: "float", value: gapColor });
-    // language=GLSL
-    gapColorGLSL = /*glsl*/ `
-  float gapAlpha = dashColor.a * u_gapOpacity;
-  gapColor = vec4(dashColor.rgb, gapAlpha);
-    `;
-  }
-
-  // Constant color mode for gaps:
-  else if (typeof gapColor === "string") {
-    gapMode = GAP_MODE_CONSTANT_COLOR;
-    uniforms.push({
-      name: "u_gapColor",
-      type: "vec4",
-      value: colorToVec4(gapColor),
-    });
-    // language=GLSL
-    gapColorGLSL = /*glsl*/ `
-  gapColor = u_gapColor;
-    `;
-  }
-
-  // Attribute color mode for gaps:
-  else {
-    gapMode = GAP_MODE_ATTRIBUTE_COLOR;
-    attributes.push({
-      name: "a_gapColor",
-      size: 4,
-      type: WebGL2RenderingContext.UNSIGNED_BYTE,
-      normalized: true,
-      source: gapColor.attribute,
-      defaultValue: gapColor.default,
-    });
-    // language=GLSL
-    gapColorGLSL = /*glsl*/ `
-  gapColor = v_gapColor;
-    `;
-  }
-
-  uniforms.push({ name: "u_gapMode", type: "float", value: gapMode });
-
-  if (typeof dashColor === "object" && "attribute" in dashColor) {
-    attributes.push({
-      name: "a_dashColor",
-      size: 4,
-      type: WebGL2RenderingContext.UNSIGNED_BYTE,
-      normalized: true,
-      source: dashColor.attribute,
-    });
+    gapColorGLSL = `vec4(dashColor.rgb, dashColor.a * ${numberToGLSLFloat(gapColor)})`;
+  } else {
+    const gapResolved = resolveEdgeColorValue(gapColor, "gapColor");
+    gapColorGLSL = gapResolved.glsl;
+    attributes.push(...gapResolved.attributes);
+    needsNodeColors = needsNodeColors || gapResolved.needsNodeColors;
   }
 
   // Track which parameters use attributes for conditional GLSL generation
@@ -307,22 +245,16 @@ export function layerDashed(options?: LayerDashedOptions): EdgeLayer {
 //   u_gapSize: size of gaps between dashes (or default when using attribute)
 //   u_dashOffset: offset to shift the pattern (or default when using attribute)
 //   u_sizeMode: vec3 indicating if values are thickness-relative (x=dash, y=gap, z=offset)
-//   u_gapMode: 0.0=opacity, 1.0=constant color, 2.0=attribute color
-//   u_gapOpacity: opacity for gap when gapMode=0
-//   u_gapColor: color for gap when gapMode=1
 //   u_align: pattern alignment (0=start, 0.5=center, 1=end)
 //   u_solidExtremities: vec2(tail, head) - 1.0 means solid, 0.0 means dashed
 //   u_solidMargin: vec2(tail, head) - extra solid margin in pixels
-//   u_dashColor: custom dash color (premultiplied alpha)
-${typeof dashColor === "object" && "attribute" in dashColor ? "// Varying: v_dashColor for per-edge dash color" : ""}
-${gapMode === GAP_MODE_ATTRIBUTE_COLOR ? "// Varying: v_gapColor for per-edge gap color" : ""}
 ${hasDashSizeAttr ? "// Varying: v_dashSize for per-edge dash size" : ""}
 ${hasGapSizeAttr ? "// Varying: v_gapSize for per-edge gap size" : ""}
 ${hasDashOffsetAttr ? "// Varying: v_dashOffset for per-edge dash offset" : ""}
 
 vec4 layer_dashed(EdgeContext ctx) {
-  // Get dash color (either custom or edge color)
-  vec4 dashColor = ${hasCustomColor ? "u_dashColor" : "v_dashColor"};
+  // Dash color (straight alpha, matching v_color and blendOver)
+  vec4 dashColor = ${dashResolved.glsl};
 
   // Check for solid zones first (extremities and margins)
   // v_zone: 0=tail extremity, 1=body, 2=head extremity
@@ -417,10 +349,8 @@ vec4 layer_dashed(EdgeContext ctx) {
   // aaWidth is in world units, same as our distance
   float dashAlpha = smoothstep(-ctx.aaWidth, ctx.aaWidth, sdf);
 
-  // Determine gap color based on mode (using float comparisons for compatibility)
-  // Note: All colors must be non-premultiplied (straight alpha) to match v_color and blendOver
-  vec4 gapColor;
-${gapColorGLSL}
+  // Gap color (straight alpha, like the dash color)
+  vec4 gapColor = ${gapColorGLSL};
 
   // Blend between gap and dash colors
   return mix(gapColor, dashColor, dashAlpha);
@@ -432,5 +362,6 @@ ${gapColorGLSL}
     glsl,
     uniforms,
     attributes,
+    needsNodeColors,
   };
 }

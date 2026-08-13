@@ -365,6 +365,14 @@ export interface EdgeLayer {
   attributes: AttributeSpecification[];
 
   /**
+   * When true, the shaders expose `v_sourceColor` and `v_targetColor`
+   * varyings carrying the source and target node colors (straight alpha),
+   * read from the node data texture. They stay in sync with node styles
+   * without any per-edge data.
+   */
+  needsNodeColors?: boolean;
+
+  /**
    * Optional lifecycle factory for layers that need async resources.
    */
   lifecycle?: (context: EdgeLifecycleContext) => EdgeLifecycleHooks;
