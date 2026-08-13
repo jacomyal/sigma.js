@@ -65,12 +65,15 @@ export {
 // Layers (edge body appearance)
 export {
   layerDashed,
+  layerGradient,
   layerPlain,
   resolveEdgeColorValue,
   type DashSize,
   type DashSizeMode,
   type EdgeColorValue,
+  type GradientStop,
   type LayerDashedOptions,
+  type LayerGradientOptions,
   type LayerPlainOptions,
   type GapFilling,
   type ResolvedEdgeColor,

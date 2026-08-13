@@ -534,7 +534,7 @@ export function buildAttrDescriptors(
         packedOffset: offset,
         size: attr.size,
         isColor: attr.size === 4 && !!attr.normalized,
-        defaultNum: typeof attr.defaultValue === "number" ? attr.defaultValue : 0,
+        defaultNum: typeof attr.defaultValue === "number" ? attr.defaultValue : attr.defaultValue === true ? 1 : 0,
         defaultColor: typeof attr.defaultValue === "string" ? attr.defaultValue : "",
         sourceIndex: srcIdx,
         hasLifecycleHook: !!hooks?.getAttributeData,
@@ -580,7 +580,8 @@ export function packAttributes(
       packed[off + 2] = b / 255;
       packed[off + 3] = a / 255;
     } else if (d.size === 1) {
-      packed[off] = typeof value === "number" ? value : d.defaultNum;
+      // Booleans pack as 1/0 so flag-like attributes work without coercion
+      packed[off] = typeof value === "number" ? value : typeof value === "boolean" ? (value ? 1 : 0) : d.defaultNum;
     } else {
       const arr = Array.isArray(value) ? value : null;
       if (arr) {

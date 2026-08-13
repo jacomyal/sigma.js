@@ -1,7 +1,7 @@
 import { DataTexture } from "sigma/rendering";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ItemAttributeTexture, computeAttributeLayout } from "./data-texture";
+import { ItemAttributeTexture, buildAttrDescriptors, computeAttributeLayout, packAttributes } from "./data-texture";
 
 class TestDataTexture extends DataTexture {
   constructor(gl: WebGL2RenderingContext, initialCapacity?: number) {
@@ -159,6 +159,30 @@ describe("DataTexture", () => {
       expect(smallTexture.getCapacity()).toBeGreaterThan(initialCapacity);
       expect(smallTexture.getCount()).toBe(initialCapacity + 5);
     });
+  });
+});
+
+describe("packAttributes", () => {
+  const NO_LIFECYCLES = new Map();
+
+  function pack(attr: { name: string; size: number; source?: string; defaultValue?: unknown }, data: object) {
+    const sources = [{ attributes: [attr] }];
+    const layout = computeAttributeLayout(sources as never);
+    const descriptors = buildAttrDescriptors(sources as never, layout);
+    const packed = new Float32Array(layout.floatsPerItem);
+    packAttributes(descriptors, data as Record<string, unknown>, packed, "#000", NO_LIFECYCLES, 0);
+    return packed;
+  }
+
+  test("packs boolean attribute values as 1/0", () => {
+    const attr = { name: "a_enabled", size: 1, source: "enabled", defaultValue: true };
+    expect(pack(attr, { enabled: true })[0]).toBe(1);
+    expect(pack(attr, { enabled: false })[0]).toBe(0);
+  });
+
+  test("falls back to a boolean default when the attribute is missing", () => {
+    expect(pack({ name: "a_enabled", size: 1, source: "enabled", defaultValue: true }, {})[0]).toBe(1);
+    expect(pack({ name: "a_enabled", size: 1, source: "enabled", defaultValue: false }, {})[0]).toBe(0);
   });
 });
 

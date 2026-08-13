@@ -90,10 +90,10 @@ export interface AttributeSpecification {
 
   /**
    * Default value to use when the source attribute is missing from node data.
-   * For size=1: a number
+   * For size=1: a number or boolean (packed as 1/0)
    * For size=4 with normalized: a CSS color string (e.g., "#ff0000")
    */
-  defaultValue?: number | string;
+  defaultValue?: number | boolean | string;
 }
 
 /**
