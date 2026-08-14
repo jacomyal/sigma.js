@@ -28,12 +28,13 @@ import { Settings } from "../settings";
 import { CameraState, Coordinates, Dimensions, EdgeDisplayData, NodeDisplayData } from "../types";
 import { BaseEdgeState, BaseNodeState } from "../types/styles";
 import { DragManager } from "./drag-manager";
+import { HoverResolver } from "./hover-resolver";
 import type { Hit, PickingState } from "./interactive-kinds";
 import { StyleAnalysis } from "./styles";
 
 /**
  * Variance escape hatch for code that operates on internals without caring
- * about the concrete N/E/G types — picking, hover, event dispatch. Use this
+ * about the concrete N/E/G types: picking, hover, event dispatch... Use this
  * in signatures where a specific `SigmaInternals<N, E, G>` should flow in
  * without a cast.
  */
@@ -63,6 +64,7 @@ export type SigmaInternals<
     getNodeState(key: string): BaseNodeState;
   };
   dragManager: DragManager;
+  hoverResolver: HoverResolver;
   nodeStyleAnalysis: StyleAnalysis;
   // Picking state (rebuilt after each indexation)
   pickingState: PickingState;

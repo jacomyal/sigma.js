@@ -4,9 +4,15 @@ import Sigma from "sigma";
 import { Coordinates } from "sigma/types";
 import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { userEvent } from "vitest/browser";
 
-import { rotate, simulateDoubleClick, simulateMouseEvent, simulateTouchEvent, wait } from "../../_test-helpers";
+import {
+  hoverNode,
+  rotate,
+  simulateDoubleClick,
+  simulateMouseEvent,
+  simulateTouchEvent,
+  wait,
+} from "../../_test-helpers";
 
 interface SigmaTestContext {
   sigma: Sigma;
@@ -85,16 +91,13 @@ describe("Sigma mouse management", () => {
 
   test<SigmaTestContext>("it should dispatch an 'enterNode' event when the mouse is hover the node", async ({
     sigma,
-    graph,
-    container,
   }) => {
-    const position = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
     let triggeredEventsCount = 0;
     sigma.on("enterNode", () => {
       triggeredEventsCount++;
     });
 
-    await userEvent.hover(container, { position, timeout: 5000 });
+    await hoverNode(sigma, "n1");
     expect(triggeredEventsCount).toBe(1);
     expect(sigma["stateManager"].hovered?.key).toBe("n1");
     expect(sigma["stateManager"].hovered?.kind).toBe("node");
@@ -102,12 +105,8 @@ describe("Sigma mouse management", () => {
 
   test<SigmaTestContext>("it should not throw when `setGraph` is called while a node is hovered (issue #1486)", async ({
     sigma,
-    graph,
-    container,
   }) => {
-    const position = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
-
-    await userEvent.hover(container, { position, timeout: 5000 });
+    await hoverNode(sigma, "n1");
     const newGraph = new Graph();
     newGraph.import({
       nodes: [

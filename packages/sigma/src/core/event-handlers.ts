@@ -27,20 +27,48 @@ type RefreshOpts = {
 };
 
 /**
- * Resolves the picking pixel at `event` to a hit, applies the kind's per-verb
- * routing (extend/separate/false for labels, identity otherwise), and drops
- * hits the kind rejects via `isHitValid` (e.g. hidden nodes).
+ * Applies the kind's per-verb routing (extend/separate/false for labels,
+ * identity otherwise), and drops hits the kind rejects via `isHitValid`
+ * (e.g. hidden nodes).
  */
-function resolveEventHit(i: AnyInternals, event: { x: number; y: number }, verb: MouseInteraction): Hit | null {
-  let hit = i.getHitAtPosition(event);
+function routeHit(i: AnyInternals, hit: Hit | null, verb: MouseInteraction): Hit | null {
   if (hit) hit = resolveForVerb(i, hit, verb);
   if (hit && !isHitValid(i, hit)) hit = null;
   return hit;
 }
 
+/** Resolves the picking pixel at `event` to a routed hit. */
+function resolveEventHit(i: AnyInternals, event: { x: number; y: number }, verb: MouseInteraction): Hit | null {
+  return routeHit(i, i.getHitAtPosition(event), verb);
+}
+
 function sameHit(a: Hit | null, b: Hit | null): boolean {
   if (!a || !b) return a === b;
   return a.kind === b.kind && a.key === b.key;
+}
+
+/**
+ * Routes a raw hit through the "enter" verb, then applies the leave/enter
+ * transition. Called when an async picking read completes.
+ */
+export function updateHover(i: AnyInternals, rawHit: Hit | null, event: MouseCoords): void {
+  const baseEvent: SigmaEventPayload = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
+  const hit = routeHit(i, rawHit, "enter");
+
+  const { stateManager } = i;
+  const prev = stateManager.hovered;
+  if (sameHit(prev, hit)) return;
+
+  if (prev) {
+    setHover(i, prev, false);
+    i.emit(eventName(prev.kind, "leave"), eventPayload(prev, baseEvent));
+  }
+  stateManager.setHovered(hit);
+  if (hit) {
+    setHover(i, hit, true);
+    i.emit(eventName(hit.kind, "enter"), eventPayload(hit, baseEvent));
+  }
+  i.updateContainerCursor();
 }
 
 export function bindInteractionHandlers<
@@ -56,26 +84,9 @@ export function bindInteractionHandlers<
   activeListeners.handleResize = () => internals.scheduleRefresh();
   window.addEventListener("resize", activeListeners.handleResize);
 
-  // Hover detection: one resolution, one enter/leave transition.
+  // Hover detection: just record the position, resolution is asynchronous
   activeListeners.handleMove = (e: MouseCoords | TouchCoords): void => {
-    const event = cleanMouseCoords(e);
-    const baseEvent: SigmaEventPayload = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
-
-    const { stateManager } = internals;
-    const hit = resolveEventHit(internals, event, "enter");
-    const prev = stateManager.hovered;
-    if (sameHit(prev, hit)) return;
-
-    if (prev) {
-      setHover(internals, prev, false);
-      internals.emit(eventName(prev.kind, "leave"), eventPayload(prev, baseEvent));
-    }
-    stateManager.setHovered(hit);
-    if (hit) {
-      setHover(internals, hit, true);
-      internals.emit(eventName(hit.kind, "enter"), eventPayload(hit, baseEvent));
-    }
-    internals.updateContainerCursor();
+    internals.hoverResolver.pointerMoved(cleanMouseCoords(e));
   };
 
   // Drag movement (body-level, fires even outside the canvas)
@@ -108,14 +119,8 @@ export function bindInteractionHandlers<
     const event = cleanMouseCoords(e);
     const baseEvent: SigmaEventPayload = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
 
-    const { stateManager } = internals;
-    const prev = stateManager.hovered;
-    if (prev) {
-      stateManager.setHovered(null);
-      setHover(internals, prev, false);
-      internals.emit(eventName(prev.kind, "leave"), eventPayload(prev, baseEvent));
-      internals.updateContainerCursor();
-    }
+    internals.hoverResolver.pointerLeft();
+    updateHover(internals, null, event);
     internals.emit("leaveStage", baseEvent);
   };
 

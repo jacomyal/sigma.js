@@ -1,5 +1,15 @@
+import Sigma from "sigma";
 import { Coordinates } from "sigma/types";
-import { expect } from "vitest";
+import { expect, vi } from "vitest";
+
+/**
+ * Moves the pointer over `node` and waits for its async hover resolution.
+ */
+export async function hoverNode(sigma: Sigma, node: string): Promise<void> {
+  const position = sigma.graphToViewport(sigma.getGraph().getNodeAttributes(node) as Coordinates);
+  await simulateMouseEvent(sigma.getMouseLayer(), "pointermove", position);
+  await vi.waitFor(() => expect(sigma.getNodeState(node).isHovered).toBe(true), { timeout: 5000 });
+}
 
 /**
  * Creates a WebGL2 context for testing shader compilation.

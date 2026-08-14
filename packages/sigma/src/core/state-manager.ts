@@ -151,6 +151,13 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     this.clearHoveredFor("edge", key);
   }
 
+  pruneNodes(keep: (key: string) => boolean): void {
+    for (const key of this.nodeStates.keys()) if (!keep(key)) this.removeNode(key);
+  }
+  pruneEdges(keep: (key: string) => boolean): void {
+    for (const key of this.edgeStates.keys()) if (!keep(key)) this.removeEdge(key);
+  }
+
   clearNodes(): void {
     this.nodeStates.clear();
     this.dirtyNodes.clear();

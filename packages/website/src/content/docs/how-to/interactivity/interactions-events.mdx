@@ -63,7 +63,7 @@ renderer.on("enterNode", ({ node }) => {
 });
 
 renderer.on("leaveNode", ({ node }) => {
-  console.log("Entering node", node);
+  console.log("Leaving node", node);
 });
 
 renderer.on("clickStage", () => {
@@ -71,7 +71,12 @@ renderer.on("clickStage", () => {
 });
 ```
 
-Every event payload includes an `event` object with `x`, `y` coordinates and `original` (the native `MouseEvent` or `TouchEvent`).
+Every event payload includes an `event` object with `x`, `y` coordinates and `original` (the native `MouseEvent` or
+`TouchEvent`).
+
+Hover events (`enterNode`, `leaveNode` and their edge and label counterparts) are resolved asynchronously from the last
+rendered frame: they fire a frame after the pointer moves, and also when the _scene_ moves under a still pointer. A
+node drifting away from the cursor during a layout animation fires `leaveNode` without any mouse movement.
 
 ## Enabling edge events
 

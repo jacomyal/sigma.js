@@ -10,9 +10,10 @@ import MouseCaptor from "./core/captors/mouse";
 import TouchCaptor from "./core/captors/touch";
 import { DragManager } from "./core/drag-manager";
 import { EdgeGroupIndex } from "./core/edge-groups";
-import { bindGraphHandlers, bindInteractionHandlers, unbindGraphHandlers } from "./core/event-handlers";
+import { bindGraphHandlers, bindInteractionHandlers, unbindGraphHandlers, updateHover } from "./core/event-handlers";
 import { computeFittedExtent } from "./core/fit-extent";
 import GestureHint from "./core/gesture-hint";
+import { HoverResolver } from "./core/hover-resolver";
 import {
   Hit,
   KIND_REGISTRY,
@@ -413,6 +414,15 @@ export default class Sigma<
     const sigma = this as unknown as Sigma<N, E, G>;
     const gl = this.webGLContext!;
 
+    // Resolves hover from the picking framebuffer, asynchronously
+    const hoverResolver = new HoverResolver({
+      gl,
+      getFrameBuffer: () => this.pickingFrameBuffer,
+      getPixelRatio: () => this.internals.pixelRatio,
+      getDownSizingRatio: () => this.internals.settings.pickingDownSizingRatio,
+      onIndex: (index, event) => updateHover(this.internals, this.pickingState.lookup[index] ?? null, event),
+    });
+
     const {
       nodeProgram,
       labelProgram,
@@ -466,6 +476,7 @@ export default class Sigma<
       graph,
       stateManager: this.stateManager,
       dragManager,
+      hoverResolver,
       nodeStyleAnalysis,
       pickingState: this.pickingState,
       labelProgram,
@@ -1024,6 +1035,7 @@ export default class Sigma<
     // Allocate label IDs after node/edge IDs. On a nodes-only refresh the
     // cached edge IDs in the picking state are preserved.
     allocateLabelIds(this.pickingState, this.internals);
+    this.internals.hoverResolver.invalidate();
     this.pendingProcess = "none";
     this.emit("afterProcess");
   }
@@ -1037,6 +1049,8 @@ export default class Sigma<
     this.emit("beforeRender");
 
     const exitRender = () => {
+      // Re-resolve hover: the scene may have moved under a still pointer
+      this.internals.hoverResolver.frameRendered();
       this.emit("afterRender");
       return this;
     };
@@ -1965,13 +1979,9 @@ export default class Sigma<
   setGraph(graph: Graph<N, E, G>): this {
     if (graph === this.internals.graph) return this;
 
-    // If the previously hovered item no longer exists in the new graph, clear it.
-    const hit = this.stateManager.hovered;
-    if (hit) {
-      const baseKind = KIND_REGISTRY[hit.kind].parent ?? hit.kind;
-      const stillExists = baseKind === "node" ? graph.hasNode(hit.key) : graph.hasEdge(hit.key);
-      if (!stillExists) this.stateManager.setHovered(null);
-    }
+    // Keep states of items that exist in the new graph, drop the rest
+    this.stateManager.pruneNodes((node) => graph.hasNode(node));
+    this.stateManager.pruneEdges((edge) => graph.hasEdge(edge));
 
     // Unbinding handlers on the current graph
     this.unbindGraphHandlers();
@@ -3043,6 +3053,7 @@ export default class Sigma<
     window.removeEventListener("resize", this.activeListeners.handleResize);
     this.mouseCaptor.kill();
     this.touchCaptor.kill();
+    this.internals.hoverResolver.kill();
 
     // Releasing graph handlers
     this.unbindGraphHandlers();

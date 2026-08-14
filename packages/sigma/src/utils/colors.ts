@@ -1,4 +1,5 @@
 import { Vec4 } from "../rendering";
+import { pickingPixelCoords } from "./coordinates";
 
 export const HTML_COLORS: Record<string, string> = {
   black: "#000000",
@@ -296,8 +297,7 @@ export function getPixelColor(
   pixelRatio: number,
   downSizingRatio: number,
 ): [number, number, number, number] {
-  const bufferX = Math.floor((x / downSizingRatio) * pixelRatio);
-  const bufferY = Math.floor(gl.drawingBufferHeight / downSizingRatio - (y / downSizingRatio) * pixelRatio);
+  const [bufferX, bufferY] = pickingPixelCoords(gl, x, y, pixelRatio, downSizingRatio);
 
   const pixel = new Uint8Array(4);
   gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);

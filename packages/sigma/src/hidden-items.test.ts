@@ -4,7 +4,7 @@ import Sigma from "sigma";
 import { pathCurved, pathLine } from "sigma/rendering";
 import { Coordinates, DEFAULT_STYLES } from "sigma/types";
 import { createElement } from "sigma/utils";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 import { simulateMouseEvent, wait } from "./_test-helpers";
 
@@ -32,7 +32,8 @@ async function hover(sigma: Sigma, position: Coordinates): Promise<string[]> {
   sigma.addListener("enterEdge", onEnterEdge);
 
   await simulateMouseEvent(sigma.getMouseLayer(), "pointermove", sigma.graphToViewport(position));
-  await wait(50);
+  // No hit is a valid outcome: let the caller assert on the result
+  await vi.waitFor(() => expect(entered.length).toBeGreaterThan(0), { timeout: 5000 }).catch(() => undefined);
 
   sigma.removeListener("enterNode", onEnterNode);
   sigma.removeListener("enterEdge", onEnterEdge);

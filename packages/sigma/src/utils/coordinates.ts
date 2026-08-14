@@ -103,3 +103,18 @@ export function getMatrixImpact(
   const { x, y } = multiplyVec2(matrix, { x: Math.cos(cameraState.angle), y: Math.sin(cameraState.angle) }, 0);
   return 1 / Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) / viewportDimensions.width;
 }
+
+/**
+ * Converts viewport coordinates to picking framebuffer pixels.
+ */
+export function pickingPixelCoords(
+  gl: WebGL2RenderingContext,
+  x: number,
+  y: number,
+  pixelRatio: number,
+  downSizingRatio: number,
+): [number, number] {
+  const bufferX = Math.floor((x / downSizingRatio) * pixelRatio);
+  const bufferY = Math.floor(gl.drawingBufferHeight / downSizingRatio - (y / downSizingRatio) * pixelRatio);
+  return [bufferX, bufferY];
+}

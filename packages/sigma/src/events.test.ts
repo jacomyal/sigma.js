@@ -3,10 +3,10 @@ import { SerializedGraph } from "graphology-types";
 import Sigma from "sigma";
 import { Coordinates, SigmaEventType } from "sigma/types";
 import { createElement } from "sigma/utils";
-import { afterEach, beforeEach, describe, expect, test } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
-import { add, simulateTouchEvent, wait } from "./_test-helpers";
+import { add, hoverNode, simulateTouchEvent, wait } from "./_test-helpers";
 
 interface SigmaTestContext {
   sigma: Sigma;
@@ -96,11 +96,7 @@ describe("Sigma interaction events", () => {
     expect(triggeredEvents).toEqual(["downNode", "upNode", "clickNode", "downNode", "upNode", "doubleClickNode"]);
   });
 
-  test<SigmaTestContext>("hovering a node should hover it and cancel other nodes hovering", async ({
-    sigma,
-    graph,
-    container,
-  }) => {
+  test<SigmaTestContext>("hovering a node should hover it and cancel other nodes hovering", async ({ sigma }) => {
     const hoveredNodes = new Set<string>();
     sigma.on("enterNode", ({ node }) => {
       hoveredNodes.add(node);
@@ -109,19 +105,27 @@ describe("Sigma interaction events", () => {
       hoveredNodes.delete(node);
     });
 
-    await userEvent.hover(container, {
-      position: sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates),
-      timeout: 5000,
-    });
-
+    await hoverNode(sigma, "n1");
     expect.soft(Array.from(hoveredNodes)).toEqual(["n1"]);
 
-    await userEvent.hover(container, {
-      position: sigma.graphToViewport(graph.getNodeAttributes("n2") as Coordinates),
-      timeout: 5000,
-    });
-
+    await hoverNode(sigma, "n2");
     expect.soft(Array.from(hoveredNodes)).toEqual(["n2"]);
+  });
+
+  test<SigmaTestContext>("a node moving away from a still cursor should stop being hovered", async ({
+    sigma,
+    graph,
+  }) => {
+    const left: string[] = [];
+    sigma.on("leaveNode", ({ node }) => left.push(node));
+
+    await hoverNode(sigma, "n1");
+
+    // Move the node away from the still cursor
+    graph.setNodeAttribute("n1", "x", 1000);
+    await vi.waitFor(() => expect(sigma.getNodeState("n1").isHovered).toBe(false), { timeout: 5000 });
+
+    expect(left).toEqual(["n1"]);
   });
 
   test<SigmaTestContext>("touching a node should hover it and cancel other nodes hovering", async ({
@@ -141,15 +145,13 @@ describe("Sigma interaction events", () => {
     await simulateTouchEvent(target, "touchstart", [touch1]);
     await simulateTouchEvent(target, "touchmove", [touch1]);
     await simulateTouchEvent(target, "touchend", []);
-
-    expect.soft(Array.from(hoveredNodes)).toEqual(["n1"]);
+    await vi.waitFor(() => expect(Array.from(hoveredNodes)).toEqual(["n1"]), { timeout: 5000 });
 
     const touch2 = { ...sigma.graphToViewport(graph.getNodeAttributes("n2") as Coordinates), id: 1 };
     await simulateTouchEvent(target, "touchstart", [touch2]);
     await simulateTouchEvent(target, "touchmove", [touch2]);
     await simulateTouchEvent(target, "touchend", []);
-
-    expect.soft(Array.from(hoveredNodes)).toEqual(["n2"]);
+    await vi.waitFor(() => expect(Array.from(hoveredNodes)).toEqual(["n2"]), { timeout: 5000 });
   });
 
   test<SigmaTestContext>("touching the stage then releasing it should trigger a clickStage", async ({
@@ -409,7 +411,7 @@ describe("Sigma per-interaction label events: mixed click=extend + enter=separat
     const nodePos = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
     for (const dx of [30, 40, 50, 60]) {
       await userEvent.hover(container, { position: { x: nodePos.x + dx, y: nodePos.y } });
-      await wait(10);
+      await wait(50);
       if (labelEnters.length) break;
     }
     for (const dx of [30, 40, 50, 60]) {
