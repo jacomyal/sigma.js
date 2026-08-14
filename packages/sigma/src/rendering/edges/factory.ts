@@ -350,8 +350,9 @@ export function createEdgeProgram<
         this.lifecycleIndexOffset,
       );
 
-      // Use numeric key directly — avoids string allocation per edge
-      this.edgeAttributeTexture!.updateAllAttributes(edgeTextureIndex, packed);
+      // The shader reads this texture by edgeIdx, so rows must match
+      // EdgeDataTexture rows, while a keyed allocator drifts on hidden edges.
+      this.edgeAttributeTexture!.updateAllAttributesAtRow(edgeTextureIndex, packed);
     }
 
     setUniforms(params: RenderParams, programInfo: ProgramInfo): void {

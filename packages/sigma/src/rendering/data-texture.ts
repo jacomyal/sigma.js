@@ -449,6 +449,23 @@ export class ItemAttributeTexture extends DataTexture {
 
     this.markDirty(index);
   }
+
+  /**
+   * Writes all attributes at an explicit row, bypassing key allocation.
+   * For rows owned by another allocator (e.g. EdgeDataTexture).
+   */
+  updateAllAttributesAtRow(row: number, packedData: ArrayLike<number>): void {
+    if (row >= this.capacity) this.resize(row + 1);
+
+    const baseOffset = row * this.TEXELS_PER_ITEM * 4;
+    const length = Math.min(packedData.length, this.floatsPerItem);
+
+    for (let i = 0; i < length; i++) {
+      this.data[baseOffset + i] = packedData[i];
+    }
+
+    this.markDirty(row);
+  }
 }
 
 /**

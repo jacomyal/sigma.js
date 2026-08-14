@@ -1,6 +1,8 @@
 import { DataTexture } from "sigma/rendering";
 import { beforeEach, describe, expect, test } from "vitest";
 
+import { ItemAttributeTexture, computeAttributeLayout } from "./data-texture";
+
 class TestDataTexture extends DataTexture {
   constructor(gl: WebGL2RenderingContext, initialCapacity?: number) {
     super(gl, 2, initialCapacity);
@@ -157,5 +159,39 @@ describe("DataTexture", () => {
       expect(smallTexture.getCapacity()).toBeGreaterThan(initialCapacity);
       expect(smallTexture.getCount()).toBe(initialCapacity + 5);
     });
+  });
+});
+
+describe("ItemAttributeTexture", () => {
+  // One vec4 attribute -> one texel per item, so row r lives at floats [r*4, r*4+4)
+  const layout = computeAttributeLayout([{ attributes: [{ name: "a_value", size: 4 }] }] as never);
+
+  class TestItemAttributeTexture extends ItemAttributeTexture {
+    getData(): Float32Array {
+      return this.data;
+    }
+  }
+
+  test("updateAllAttributesAtRow writes at the exact row, gaps included", () => {
+    const texture = new TestItemAttributeTexture(createMockGL(), layout, 16);
+
+    // Skipping row 0 mirrors a hidden edge: later rows must not shift down
+    texture.updateAllAttributesAtRow(1, [10, 11, 12, 13]);
+    texture.updateAllAttributesAtRow(2, [20, 21, 22, 23]);
+
+    expect(Array.from(texture.getData().slice(0, 4))).toEqual([0, 0, 0, 0]);
+    expect(Array.from(texture.getData().slice(4, 8))).toEqual([10, 11, 12, 13]);
+    expect(Array.from(texture.getData().slice(8, 12))).toEqual([20, 21, 22, 23]);
+  });
+
+  test("updateAllAttributesAtRow grows capacity and keeps existing rows", () => {
+    const texture = new TestItemAttributeTexture(createMockGL(), layout, 4);
+
+    texture.updateAllAttributesAtRow(1, [10, 11, 12, 13]);
+    texture.updateAllAttributesAtRow(64, [40, 41, 42, 43]);
+
+    expect(texture.getCapacity()).toBeGreaterThan(64);
+    expect(Array.from(texture.getData().slice(4, 8))).toEqual([10, 11, 12, 13]);
+    expect(Array.from(texture.getData().slice(64 * 4, 64 * 4 + 4))).toEqual([40, 41, 42, 43]);
   });
 });
