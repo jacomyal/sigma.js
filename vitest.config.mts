@@ -1,5 +1,9 @@
 import { playwright } from "@vitest/browser-playwright";
+import process from "node:process";
 import { defineConfig, defineProject } from "vitest/config";
+
+// 8 browser providers each add a SIGTERM listener
+process.setMaxListeners(20);
 
 // Packages with browser-mode unit tests (`*.test.ts`):
 const UNIT_PACKAGES = [
