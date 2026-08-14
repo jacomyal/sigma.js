@@ -71,10 +71,11 @@
         layers: [
           layerPlain(),
           layerDashed({
+            cap: "round",
             dashColor: { attribute: "dashColor" },
             dashSize: { attribute: "dashSize", default: 0, mode: "pixels" },
             gapColor: { attribute: "gapColor" },
-            gapSize: { value: 4, mode: "pixels" },
+            gapSize: { value: 3, mode: "pixels" },
           }),
         ],
       },
@@ -99,12 +100,12 @@
       ],
       edges: [
         DEFAULT_STYLES.edges,
-        { size: 1.5, parallelPath: "curved", parallelSpread: 0.5 },
+        { parallelPath: "curved", parallelSpread: 0.5 },
         {
           matchData: "type",
           cases: {
-            marriage: { color: "#E8684A" },
-            business: { color: "transparent", dashColor: "#5B8FF9", gapColor: "#BBD4FF", dashSize: 4 },
+            marriage: { color: "#E8684A", size: 1.5 },
+            business: { color: "transparent", dashColor: "#5B8FF9", dashSize: 2, size: 2 },
           },
         },
       ],

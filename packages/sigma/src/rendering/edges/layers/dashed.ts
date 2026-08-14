@@ -36,6 +36,14 @@ export type DashSize =
 export type GapFilling = number | EdgeColorValue;
 
 /**
+ * Shape of dash ends.
+ * - "butt": Straight ends, dashes span the full edge thickness
+ * - "round": Round caps, carved inside the dash length
+ */
+export type DashCap = "butt" | "round";
+export const DEFAULT_DASH_CAP: DashCap = "butt";
+
+/**
  * Specifies which extremities should be rendered solid (not dashed).
  */
 export type SolidExtremities = boolean | "head" | "tail";
@@ -84,6 +92,18 @@ export interface LayerDashedOptions {
    * Default: 0
    */
   gapColor?: GapFilling;
+
+  /**
+   * Shape of dash ends:
+   * - "butt": Straight ends, dashes span the full edge thickness (default)
+   * - "round": Round caps, carved inside the dash length so a dash never
+   *   exceeds its `dashSize`. Dashes shorter than the edge thickness
+   *   degenerate to circles, so `cap: "round"` with a small `dashSize`
+   *   (e.g. `{ value: 1, mode: "relative" }`) renders dotted edges.
+   *
+   * Default: "butt"
+   */
+  cap?: DashCap;
 
   /**
    * Controls where the dash pattern is anchored along the edge:
@@ -166,6 +186,7 @@ export function layerDashed(options?: LayerDashedOptions): EdgeLayer {
     dashOffset: opts.dashOffset ?? { value: 0, mode: "pixels" },
   };
   const align = opts.align ?? 0.5;
+  const cap = opts.cap ?? DEFAULT_DASH_CAP;
   const solidExtremities = parseSolidExtremities(opts.solidExtremities);
   const solidMargin = parseSolidMargin(opts.solidMargin);
 
@@ -330,20 +351,26 @@ vec4 layer_dashed(EdgeContext ctx) {
   // This avoids the unstable mod(dashedLength, patternLength) operation
   float posInPattern = mod(adjustedDistFromSource - anchorDist + dashOffset, patternLength);
 
+  // Signed longitudinal distance to the nearest dash center, wrapping across
+  // pattern repetitions so both dash edges antialias correctly
+  float longFromCenter =
+    mod(posInPattern - dashSize * 0.5 + patternLength * 0.5, patternLength) - patternLength * 0.5;
+
   // Compute signed distance field for the dash
   // Positive inside dash, negative inside gap
-  float sdf;
-  if (posInPattern < dashSize) {
-    // Inside dash region [0, dashSize)
-    float distToDashStart = posInPattern;
-    float distToDashEnd = dashSize - posInPattern;
-    sdf = min(distToDashStart, distToDashEnd);
-  } else {
-    // Inside gap region [dashSize, patternLength)
-    float distFromDashEnd = posInPattern - dashSize;
-    float distToNextDashStart = patternLength - posInPattern;
-    sdf = -min(distFromDashEnd, distToNextDashStart);
-  }
+${
+  cap === "round"
+    ? `  // Capsule SDF: round caps carved inside the dash length, so a dash never
+  // exceeds dashSize. Dashes shorter than the thickness degenerate to circles
+  // (dots) of diameter dashSize.
+  // ctx.sdf is 0 at the stroke boundary, so shift it back to centerline distance
+  float transverse = ctx.sdf + ctx.thickness * 0.5;
+  float capRadius = min(ctx.thickness, dashSize) * 0.5;
+  float halfLength = dashSize * 0.5 - capRadius;
+  vec2 q = vec2(max(abs(longFromCenter) - halfLength, 0.0), transverse);
+  float sdf = capRadius - length(q);`
+    : `  float sdf = dashSize * 0.5 - abs(longFromCenter);`
+}
 
   // Apply antialiasing using smoothstep
   // aaWidth is in world units, same as our distance

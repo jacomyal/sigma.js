@@ -68,6 +68,7 @@ export {
   layerGradient,
   layerPlain,
   resolveEdgeColorValue,
+  type DashCap,
   type DashSize,
   type DashSizeMode,
   type EdgeColorValue,

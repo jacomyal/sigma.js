@@ -135,4 +135,26 @@ describe("Composed edge program shader generation", () => {
 
     expectShadersToCompile(generated.vertexShader, generated.fragmentShader);
   });
+
+  test("generates compilable shaders with round-capped dashed layer", () => {
+    const generated = generateEdgeShaders({
+      paths: [pathLine()],
+      extremities: [extremityArrow()],
+      layers: [layerDashed({ cap: "round", dashSize: { value: 1, mode: "relative" } })],
+    });
+
+    expect(generated.fragmentShader).toContain("capRadius");
+    expectShadersToCompile(generated.vertexShader, generated.fragmentShader);
+  });
+
+  test("dashed layer defaults to butt caps", () => {
+    const generated = generateEdgeShaders({
+      paths: [pathLine()],
+      extremities: [extremityArrow()],
+      layers: [layerDashed()],
+    });
+
+    expect(generated.fragmentShader).not.toContain("capRadius");
+    expectShadersToCompile(generated.vertexShader, generated.fragmentShader);
+  });
 });

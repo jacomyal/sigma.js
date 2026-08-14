@@ -68,6 +68,13 @@ The `layerDashed()` function from `sigma/rendering` adds a dashed overlay on top
 and `gapSize` options accept either a fixed `{ value, mode }` object or an `{ attribute }` reference to read per-edge
 values from graph data. Set `mode: "pixels"` for screen-space sizing.
 
+The `cap` option controls the shape of dash ends: `"butt"` (the default) gives straight ends, while `"round"` gives
+round caps. Round-capped dashes shorter than the edge thickness degenerate to circles, so dotted edges are simply:
+
+```typescript
+layerDashed({ cap: "round", dashSize: { value: 1, mode: "relative" }, gapSize: { value: 2, mode: "relative" } });
+```
+
 ## Gradient edges
 
 The `layerGradient()` function from `sigma/rendering` fills the edge with a gradient along a list of color stops, from
