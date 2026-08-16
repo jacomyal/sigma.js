@@ -1,0 +1,44 @@
+---
+title: Browser bundle
+sidebar:
+  label: Browser bundle
+---
+
+import { Code } from "@astrojs/starlight/components";
+
+import { SIGMA_VERSION } from "../../../versions";
+
+Sigma ships a standalone UMD bundle (`sigma.min.js`) for usage without a package manager, typically through a CDN:
+
+<Code
+  lang="html"
+  code={`<script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/${SIGMA_VERSION}/sigma.min.js"></script>`}
+/>
+
+It exposes a single global: `Sigma`, the same class as the npm package's default export. That class also carries,
+as static properties, basically everything the npm package exports, each thing kind of at the right place:
+
+- The values exported by the main `sigma` entrypoint sit directly on the class: `Sigma.Camera`,
+  `Sigma.DEFAULT_STYLES`, `Sigma.DEFAULT_CAMERA_STATE`, etc.
+- The subpath entrypoints (`sigma/rendering`, `sigma/utils`, etc.) sit on namespaces of the same name:
+  `Sigma.rendering`, `Sigma.utils`, etc.
+
+For instance, drawing edges as curves uses `pathCurved` from `sigma/rendering`:
+
+```js
+// ESM
+import { pathCurved } from "sigma/rendering";
+
+// Browser bundle
+const { pathCurved } = Sigma.rendering;
+```
+
+The definitive list is the bundle's entrypoint itself, which is short and readable:
+[`packages/sigma/src/index-bundle.ts`](https://github.com/jacomyal/sigma.js/blob/main/packages/sigma/src/index-bundle.ts).
+The symbols themselves are documented in the [API reference](/api/sigma/).
+
+## Limitations
+
+- Type-only exports (interfaces, type aliases) do not exist at runtime, so they have no browser bundle counterpart.
+- The bundle includes the whole library. For production applications where size matters, prefer the npm package, so
+  your bundler can tree-shake unused code.

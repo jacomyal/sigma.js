@@ -115,8 +115,10 @@ export default defineConfig({
               starlightTypeDoc({
                 entryPoints: [
                   "../sigma/src/index.ts",
+                  "../sigma/src/types.ts",
                   "../sigma/src/settings.ts",
                   "../sigma/src/rendering/index.ts",
+                  "../sigma/src/primitives/index.ts",
                   "../sigma/src/utils/index.ts",
                   "../layer-leaflet/src/index.ts",
                   "../layer-maplibre/src/index.ts",
@@ -245,6 +247,7 @@ export default defineConfig({
             { slug: "reference/style-value-types" },
             { slug: "reference/primitives-schema" },
             { slug: "reference/state-flags" },
+            { slug: "reference/browser-bundle" },
           ],
         },
         {

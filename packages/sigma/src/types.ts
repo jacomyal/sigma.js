@@ -8,7 +8,19 @@
 import { EventEmitter } from "events";
 import Graph from "graphology-types";
 
-import { Attributes, FullEdgeState, FullGraphState, FullNodeState } from "./types/styles";
+import {
+  DEFAULT_EDGE_PRIMITIVES as PRIMITIVES_DEFAULT_EDGE_PRIMITIVES,
+  DEFAULT_NODE_PRIMITIVES as PRIMITIVES_DEFAULT_NODE_PRIMITIVES,
+  DEFAULT_PRIMITIVES as PRIMITIVES_DEFAULT_PRIMITIVES,
+} from "./primitives/types";
+import {
+  Attributes,
+  FullEdgeState,
+  FullGraphState,
+  FullNodeState,
+  DEFAULT_STYLES as STYLES_DEFAULT_STYLES,
+  DEPTHLESS_STYLES as STYLES_DEPTHLESS_STYLES,
+} from "./types/styles";
 
 /**
  * Util type to represent maps of typed elements, but implemented with
@@ -499,7 +511,10 @@ export type {
   StageStyleValue,
   StageStyles,
 } from "./types/styles";
-export { DEFAULT_STYLES, DEPTHLESS_STYLES } from "./types/styles";
+/** @deprecated Import `DEFAULT_STYLES` from `"sigma"` instead. */
+export const DEFAULT_STYLES = STYLES_DEFAULT_STYLES;
+/** @deprecated Import `DEPTHLESS_STYLES` from `"sigma"` instead. */
+export const DEPTHLESS_STYLES = STYLES_DEPTHLESS_STYLES;
 export {
   resolveGraphicValue,
   evaluateStatePredicate,
@@ -523,4 +538,9 @@ export type {
   LabelAttachmentRenderer,
   LabelAttachmentContext,
 } from "./primitives/types";
-export { DEFAULT_PRIMITIVES, DEFAULT_NODE_PRIMITIVES, DEFAULT_EDGE_PRIMITIVES } from "./primitives/types";
+/** @deprecated Import `DEFAULT_PRIMITIVES` from `"sigma/primitives"` instead. */
+export const DEFAULT_PRIMITIVES = PRIMITIVES_DEFAULT_PRIMITIVES;
+/** @deprecated Import `DEFAULT_NODE_PRIMITIVES` from `"sigma/primitives"` instead. */
+export const DEFAULT_NODE_PRIMITIVES = PRIMITIVES_DEFAULT_NODE_PRIMITIVES;
+/** @deprecated Import `DEFAULT_EDGE_PRIMITIVES` from `"sigma/primitives"` instead. */
+export const DEFAULT_EDGE_PRIMITIVES = PRIMITIVES_DEFAULT_EDGE_PRIMITIVES;

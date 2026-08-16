@@ -56,7 +56,7 @@ Then, you will need to pass a `styles` option when creating the sigma instance. 
 keep the built-in hover behaviors (label visibility, depth layers, backdrops), then override `color` and `size`.
 
 ```typescript
-import { DEFAULT_STYLES } from "sigma/types";
+import { DEFAULT_STYLES } from "sigma";
 
 const renderer = new Sigma(graph, document.getElementById("container")!, {
   styles: {
@@ -72,6 +72,9 @@ const renderer = new Sigma(graph, document.getElementById("container")!, {
   },
 });
 ```
+
+If you use sigma through the CDN bundle instead of the npm package, `DEFAULT_STYLES` is available as
+`Sigma.DEFAULT_STYLES`. See the [Browser bundle](/reference/browser-bundle/) reference.
 
 The result looks the same, but now the styling is declared in one place. The `size` binding maps the `score` attribute
 to a 10–50 range automatically.
