@@ -1,0 +1,279 @@
+<div id="sigma-container"></div>
+
+<style>
+  #sigma-container {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import { ForceAtlas2GPULayout } from "@sigma/layout-fa2-gpu";
+  import { layerBorder } from "@sigma/node-border";
+  import { layerImage } from "@sigma/node-image";
+  import Graph from "graphology";
+  import forceAtlas2 from "graphology-layout-forceatlas2";
+  import circular from "graphology-layout/circular";
+  import Papa from "papaparse";
+  import Sigma from "sigma";
+  import { extremityArrow, layerDashed, layerFill, layerPlain, pathCurved, pathLine } from "sigma/rendering";
+  import type { SDFShape } from "sigma/rendering";
+  import { DEPTHLESS_STYLES } from "sigma";
+
+  import { registerControls } from "../_controls";
+
+  /**
+   * This example shows edge labels on a graph with no node labels: countries
+   * are identified by their flag alone, and the points are only readable on
+   * the edges. This needs the `edgeLabelAnchors: "allNodes"` setting, since
+   * by default edge labels are derived from displayed node labels.
+   */
+
+  type NodeStatus = "normal" | "active";
+  type EdgeStatus = "normal" | "direct" | "indirect";
+
+  const TELEVOTES_COLOR = "#C7928F";
+  const JURY_COLOR = "#6F7A9E";
+
+  const container = document.getElementById("sigma-container") as HTMLElement;
+
+  function sdfFlag(): SDFShape {
+    // language=GLSL
+    const glsl = /*glsl*/ `
+float sdf_flag(vec2 uv, float size) {
+  vec2 d = abs(uv) - vec2(size, size * 0.6);
+  return length(max(d, 0.0)) + min(max(d.x, d.y), 0.0);
+}
+`;
+    return { name: "flag", glsl, uniforms: [], inradiusFactor: 0.6 };
+  }
+
+  let votes = "both";
+  let minPoints = 12;
+
+  function refresh() {
+    rebuildEdges();
+    layout.start(500);
+  }
+
+  registerControls({
+    votes: {
+      type: "action-select",
+      label: "Votes",
+      default: votes,
+      options: [
+        { label: "Televote + jury", value: "both" },
+        { label: "Televote", value: "tv" },
+        { label: "Jury", value: "jury" },
+      ],
+      action: (value) => {
+        votes = value;
+        refresh();
+      },
+    },
+    minPoints: {
+      type: "action-select",
+      label: "Min points",
+      default: minPoints + "",
+      options: [
+        { label: "All", value: "1" },
+        { label: "8+", value: "8" },
+        { label: "10+", value: "10" },
+        { label: "Twelve points", value: "12" },
+      ],
+      action: (value) => {
+        minPoints = +value;
+        refresh();
+      },
+    },
+  });
+
+  // The dataset is the Eurovision 2023 final: who gave how many points to
+  // whom, split between televote and jury votes.
+  // Source: https://github.com/Spijkervet/eurovision-dataset
+  const csv = await fetch("/data/eurovision-2023-votes.csv").then((res) => res.text());
+  const { data: rows } = Papa.parse<{ from: string; to: string; tele: string; jury: string }>(csv, {
+    header: true,
+    skipEmptyLines: true,
+  });
+
+  const received: Record<string, number> = {};
+  const countries = new Set<string>();
+  rows.forEach(({ from, to, tele, jury }) => {
+    countries.add(from);
+    countries.add(to);
+    received[to] = (received[to] ?? 0) + +tele + +jury;
+  });
+  const maxReceived = Math.max(...Object.values(received));
+
+  const graph = new Graph({ type: "directed" });
+  [...countries].sort().forEach((id) => {
+    graph.addNode(id, {
+      image: `https://flagcdn.com/w160/${id}.png`,
+      size: 5 + 5 * Math.sqrt((received[id] ?? 0) / maxReceived),
+    });
+  });
+
+  // One edge per (giver, receiver) pair; televote and jury awards merge into it.
+  function rebuildEdges() {
+    graph.clearEdges();
+    rows.forEach(({ from, to, tele, jury }) => {
+      const awards = (
+        [
+          ["tv", +tele],
+          ["jury", +jury],
+        ] as const
+      ).filter(([kind, points]) => points >= minPoints && (votes === "both" || votes === kind));
+      if (!awards.length) return;
+
+      graph.addEdge(from, to, {
+        kind: awards.length === 2 ? "both" : awards[0][0],
+        label: awards.map(([kind, points]) => `${kind} ${points}`).join(", "),
+        size: awards.reduce((total, [, points]) => total + points, 0) / 2,
+      });
+    });
+  }
+  rebuildEdges();
+
+  circular.assign(graph, { scale: 200 });
+
+  const renderer = new Sigma(graph, container, {
+    customNodeState: {
+      status: "normal" as NodeStatus,
+    },
+    customEdgeState: {
+      status: "normal" as EdgeStatus,
+    },
+    customGraphState: {
+      hasActiveSubgraph: false,
+    },
+    primitives: {
+      depthLayers: [
+        // normal items:
+        "edges",
+        "nodes",
+        // hovered node's neighborhood:
+        "activeEdges",
+        "activeNodes",
+        "focusedNodes",
+      ],
+      nodes: {
+        variables: { image: { type: "string", default: "" } },
+        shapes: [sdfFlag()],
+        layers: [
+          layerFill(),
+          // "contain" keeps the whole flag in its atlas cell instead of a square center crop.
+          layerImage({ textureManagerOptions: { objectFit: "contain" } }),
+          layerBorder({
+            borders: [
+              { size: 0.08, color: "#000000" },
+              { color: "transparent", fill: true },
+            ],
+          }),
+        ],
+      },
+      edges: {
+        paths: [pathLine(), pathCurved()],
+        extremities: [extremityArrow({ lengthRatio: 3, widthRatio: 2 })],
+        defaultHead: "arrow",
+        variables: {
+          dashColor: { type: "color", default: "transparent" },
+        },
+        layers: [
+          layerPlain(),
+          layerDashed({
+            dashColor: { attribute: "dashColor" },
+            dashSize: { value: 2, mode: "relative" },
+            gapSize: { value: 2, mode: "relative" },
+          }),
+        ],
+        label: { color: "#1c2833", textBorder: { width: 12, color: "#ffffff" } },
+      },
+    },
+    styles: {
+      nodes: [
+        DEPTHLESS_STYLES.nodes,
+        {
+          color: "#e5e7eb",
+          shape: "flag",
+          cursor: "grab",
+          // Country names only on hover: the flag is the label.
+          labelVisibility: { whenState: "isHovered", then: "visible", else: "hidden" },
+          labelBackgroundColor: "#ffffffcc",
+          labelBackgroundPadding: 3,
+        },
+        {
+          matchState: "status",
+          cases: {
+            normal: { depth: "nodes" },
+            active: { depth: "activeNodes" },
+          },
+        },
+        { whenState: "isHovered", then: { depth: "focusedNodes" } },
+        { whenState: "isDragged", then: { cursor: "grabbing" } },
+      ],
+      edges: [
+        DEPTHLESS_STYLES.edges,
+        { depth: "edges", parallelPath: "curved", parallelSpread: 0.5, opacity: 0.8 },
+        {
+          matchData: "kind",
+          cases: {
+            tv: { color: TELEVOTES_COLOR },
+            jury: { color: JURY_COLOR },
+            // "both": televote base with jury-colored dashes alternating.
+            both: { color: TELEVOTES_COLOR, dashColor: JURY_COLOR },
+          },
+        },
+        {
+          matchState: "status",
+          cases: {
+            direct: { depth: "activeEdges", opacity: 1, labelVisibility: "visible" },
+            indirect: { depth: "activeEdges", opacity: 0.5 },
+          },
+        },
+        // During a focus, only the hovered node's own edges keep their labels.
+        {
+          when: (_attributes, { status }, { hasActiveSubgraph }) => hasActiveSubgraph && status !== "direct",
+          then: { labelVisibility: "hidden", opacity: 0.1 },
+        },
+      ],
+      stage: [{ whenState: "isDragging", then: { cursor: "grabbing" } }],
+    },
+    settings: {
+      autoRescale: "once",
+      itemSizesReference: "positions",
+      enableNodeDrag: true,
+      renderEdgeLabels: true,
+      edgeLabelAnchors: "allNodes",
+    },
+  });
+
+  // Dim everything but the hovered country and its direct voting partners.
+  function focusNode(node: string | null) {
+    const neighbors = node ? new Set(graph.neighbors(node)) : new Set<string>();
+
+    graph.forEachNode((n) => {
+      renderer.setNodeState(n, { status: node && (n === node || neighbors.has(n)) ? "active" : "normal" });
+    });
+    graph.forEachEdge((edge, _attributes, source, target) => {
+      let status: EdgeStatus = "normal";
+      if (source === node || target === node) status = "direct";
+      else if (neighbors.has(source) && neighbors.has(target)) status = "indirect";
+      renderer.setEdgeState(edge, { status });
+    });
+
+    renderer.setGraphState({ hasActiveSubgraph: !!node });
+  }
+
+  renderer.on("enterNode", ({ node }) => focusNode(node));
+  renderer.on("leaveNode", () => focusNode(null));
+
+  const inferred = forceAtlas2.inferSettings(graph);
+  const layout = new ForceAtlas2GPULayout(renderer, {
+    gravity: inferred.gravity ?? 1,
+    slowDown: inferred.slowDown ?? 1,
+    strongGravityMode: inferred.strongGravityMode ?? false,
+    scalingRatio: 50,
+  });
+  layout.start(2000);
+</script>
