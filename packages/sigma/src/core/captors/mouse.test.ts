@@ -43,6 +43,7 @@ beforeEach<SigmaTestContext>(async (context) => {
       zoomDuration: 30,
       inertiaDuration: 30,
       doubleClickZoomingDuration: 30,
+      doubleClickTimeout: 2000,
     },
   });
   context.graph = graph;

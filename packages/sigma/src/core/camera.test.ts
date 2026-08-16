@@ -1,6 +1,6 @@
 import { Camera, DEFAULT_CAMERA_STATE } from "sigma";
 import { CameraState } from "sigma/types";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { wait } from "../_test-helpers";
 
@@ -279,8 +279,8 @@ describe("Camera", function () {
         ends.push(completed);
       });
 
-      const pending = camera.animate({ x: 10 }, { duration: 500 });
-      await wait(50);
+      const pending = camera.animate({ x: 10 }, { duration: 10000 });
+      await vi.waitFor(() => expect(camera.x).toBeGreaterThan(0.5), { timeout: 5000 });
       camera.cancelAnimation();
 
       await pending;
