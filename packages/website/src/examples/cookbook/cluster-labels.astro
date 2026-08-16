@@ -32,9 +32,9 @@
   import Graph from "graphology";
   import type { SerializedGraph } from "graphology-types";
   import iwanthue from "iwanthue";
-  import Sigma from "sigma";
+  import Sigma, { DEFAULT_STYLES } from "sigma";
   import { layerGradient, pathLine, pathLoop } from "sigma/rendering";
-  import { type Coordinates, DEFAULT_STYLES } from "sigma/types";
+  import type { Coordinates } from "sigma/types";
 
   const container = document.getElementById("sigma-container") as HTMLElement;
 

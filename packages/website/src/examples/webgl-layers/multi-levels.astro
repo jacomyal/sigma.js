@@ -10,10 +10,10 @@
 <script>
   import { bindWebGLLayer, createContoursProgram } from "@sigma/layer-webgl";
   import Graph from "graphology";
-  import Sigma, { DEFAULT_DEPTH_LAYERS } from "sigma";
+  import Sigma, { DEFAULT_STYLES } from "sigma";
+  import { DEFAULT_DEPTH_LAYERS } from "sigma/primitives";
 
   import data from "../_data/data.json";
-  import { DEFAULT_STYLES } from "sigma/types";
   import { layerBorder } from "@sigma/node-border";
 
   const graph = new Graph();

@@ -9,7 +9,7 @@
 
 <script>
   import Graph from "graphology";
-  import Sigma from "sigma";
+  import Sigma, { DEFAULT_STYLES } from "sigma";
   import {
     extremityArrow,
     extremityBar,
@@ -22,7 +22,6 @@
     pathLine,
     pathCurvedS,
   } from "sigma/rendering";
-  import { DEFAULT_STYLES } from "sigma/types";
 
   const container = document.getElementById("sigma-container") as HTMLElement;
 

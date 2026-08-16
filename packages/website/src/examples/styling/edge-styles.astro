@@ -9,7 +9,7 @@
 
 <script>
   import Graph from "graphology";
-  import Sigma from "sigma";
+  import Sigma, { DEFAULT_STYLES } from "sigma";
   import {
     extremityArrow,
     layerDashed,
@@ -23,7 +23,6 @@
     sdfCircle,
     sdfTriangle,
   } from "sigma/rendering";
-  import { DEFAULT_STYLES } from "sigma/types";
 
   const container = document.getElementById("sigma-container") as HTMLElement;
 

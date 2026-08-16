@@ -63,11 +63,10 @@
 </style>
 
 <script>
-  import Sigma from "sigma";
+  import Sigma, { DEPTHLESS_STYLES } from "sigma";
   import { extremityArrow, layerFill, layerPlain, pathCurved, pathLine, pathLoop, sdfDiamond } from "sigma/rendering";
   import { layerBorder } from "@sigma/node-border";
   import type { Coordinates, LabelAttachmentContent, LabelAttachmentContext } from "sigma/types";
-  import { DEPTHLESS_STYLES } from "sigma/types";
   import { nodeExtent } from "graphology-metrics/graph/extent";
   import { bindWebGLLayer, createColorLayerProgram } from "@sigma/layer-webgl";
   import { loadDataset } from "./load-dataset";
