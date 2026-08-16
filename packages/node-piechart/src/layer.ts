@@ -100,16 +100,20 @@ function generatePiechartGLSL(slices: NonNullable<LayerPiechartOptions["slices"]
   // Generate total calculation
   const totalCalc = slices.map((_, i) => `sliceValue_${i + 1}`).join(" + ");
 
-  // Generate angle calculations and color selection
+  // Generate boundary angle calculations and antialiased color blending
   const angleCalculations = slices
     .map(
       (_, i) => `    float angle_${i + 1} = angle_${i} + sliceValue_${i + 1} * ${numberToGLSLFloat(TWO_PI)} / total;`,
     )
     .join("\n");
 
-  const colorSelections = slices
-    .map((_, i) => `if (angle < angle_${i + 1}) color = sliceColor_${i + 1};`)
-    .join("\n    else ");
+  const colorBlends = slices
+    .slice(1)
+    .map(
+      (_, i) =>
+        `  color = mix(color, sliceColor_${i + 2}, smoothstep(angle_${i + 1} - aa, angle_${i + 1} + aa, angle));`,
+    )
+    .join("\n");
 
   // Build the complete GLSL function
   // language=GLSL
@@ -135,7 +139,7 @@ ${colorBiasAdjustments}
   // Set up values
 ${valueAssignments}
 
-  // Calculate angles and select color
+  // Normalize slice values into boundary angles
   float total = ${totalCalc};
 
   // Fall back to default color if all slices are zero
@@ -146,11 +150,18 @@ ${valueAssignments}
   }
 
   float angle_0 = 0.0;
-  vec4 color = u_defaultColor;
-  color.a *= bias;
-
 ${angleCalculations}
-  ${colorSelections}
+
+  // ~1px expressed in angle units at this radius (arc length = radius * angle)
+  float r = length(context.uv);
+  float aa = context.aaWidth / max(r, context.aaWidth);
+
+  vec4 color = sliceColor_1;
+${colorBlends}
+
+  // Blend the last/first boundary across the mod() seam at 0 / 2*PI
+  color = mix(sliceColor_${slices.length}, color, smoothstep(-aa, aa, angle));
+  color = mix(color, sliceColor_1, smoothstep(${numberToGLSLFloat(TWO_PI)} - aa, ${numberToGLSLFloat(TWO_PI)} + aa, angle));
 
   return color;
 }
