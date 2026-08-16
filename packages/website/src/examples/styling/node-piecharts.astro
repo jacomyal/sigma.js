@@ -9,42 +9,44 @@
 
 <script>
   import { layerPiechart } from "@sigma/node-piechart";
+  import iwanthue from "iwanthue";
+  import seedrandom from "seedrandom";
   import Sigma from "sigma";
 
+  import { registerControls } from "../_controls";
   import { getSmallGraph } from "../_data/small-graph";
 
   const container = document.getElementById("sigma-container") as HTMLElement;
 
+  const { slices } = registerControls({
+    slices: { type: "number", label: "Slices", default: 3, min: 1, max: 32, step: 1 },
+  });
+
   const graph = getSmallGraph();
 
-  const SLICES: Record<string, { positive: number; neutral: number; negative: number }> = {
-    a: { positive: 10, neutral: 17, negative: 14 },
-    b: { positive: 2, neutral: 4, negative: 1 },
-    c: { positive: 0, neutral: 8, negative: 3 },
-    d: { positive: 0, neutral: 0, negative: 0 },
-    e: { positive: 17, neutral: 1, negative: 3 },
-    f: { positive: 0, neutral: 8, negative: 4 },
-  };
+  const rng = seedrandom("sigma");
+  const palette = iwanthue(slices, { seed: "sigma", colorSpace: "green-mint" });
+
+  const sliceKeys = Array.from({ length: slices }, (_, i) => `slice${i}`);
+
   graph.forEachNode((node) => {
-    graph.mergeNodeAttributes(node, SLICES[node]);
+    sliceKeys.forEach((key) => {
+      // Node "d" stays empty to showcase defaultColor
+      graph.setNodeAttribute(node, key, node === "d" ? 0 : Math.max(rng() ** 2 - 0.01, 0));
+    });
   });
 
   new Sigma(graph, container, {
     primitives: {
       nodes: {
-        variables: {
-          negative: { type: "number", default: 0 },
-          neutral: { type: "number", default: 0 },
-          positive: { type: "number", default: 0 },
-        },
+        variables: Object.fromEntries(sliceKeys.map((key) => [key, { type: "number", default: 0 }])),
         layers: [
           layerPiechart({
             defaultColor: "#BCB7C4",
-            slices: [
-              { color: "#F05454", value: { attribute: "negative" } },
-              { color: "#7798FA", value: { attribute: "neutral" } },
-              { color: "#6DDB55", value: { attribute: "positive" } },
-            ],
+            slices: sliceKeys.map((key, i) => ({
+              color: palette[i],
+              value: { attribute: key },
+            })),
           }),
         ],
       },
