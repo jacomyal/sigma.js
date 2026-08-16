@@ -52,6 +52,7 @@ export class LabelRenderer<
   G extends Attributes = Attributes,
 > {
   labelGrid: LabelGrid = new LabelGrid();
+  edgeAnchorGrid: LabelGrid = new LabelGrid();
   displayedNodeLabels: Set<string> = new Set();
   displayedEdgeLabels: Set<string> = new Set();
   /** Per-frame edge-label candidate list, shared by background and label passes. */
@@ -75,9 +76,10 @@ export class LabelRenderer<
     this.displayedEdgeLabels = new Set();
   }
 
-  /** Reset the label grid (called from clearNodeIndices). */
+  /** Reset the label grids (called from clearNodeIndices). */
   resetLabelGrid(): void {
     this.labelGrid = new LabelGrid();
+    this.edgeAnchorGrid = new LabelGrid();
   }
 
   /**
@@ -613,16 +615,23 @@ export class LabelRenderer<
    * `renderEdgeLabelBackgrounds` consume it with their own depth filter.
    */
   computeDisplayedEdgeLabels(): void {
-    const { graph, stateManager, edgesWithForcedLabels } = this.internals;
+    const { graph, stateManager, settings, edgesWithForcedLabels } = this.internals;
     const highlightedNodes = new Set<string>(
       graph.filterNodes((node) => stateManager.getNodeState(node).isHighlighted),
     );
+
+    // Anchors are picked over the whole graph, not just the visible part (the
+    // GPU clips offscreen labels anyway)
+    const anchors =
+      settings.edgeLabelAnchors === "allNodes"
+        ? new Set(this.edgeAnchorGrid.getLabelsToDisplay(this.internals.getCameraState().ratio, settings.labelDensity))
+        : this.displayedNodeLabels;
 
     const hovered = stateManager.hovered;
     const list = edgeLabelsToDisplayFromNodes({
       graph,
       hoveredNode: hovered?.kind === "node" ? hovered.key : null,
-      displayedNodeLabels: this.displayedNodeLabels,
+      displayedNodeLabels: anchors,
       highlightedNodes,
     });
     extend(list, edgesWithForcedLabels);

@@ -784,6 +784,8 @@ export default class Sigma<
     // Resetting the label grid
     // TODO: it's probably better to do this explicitly or on resizes for layout and anims
     this.labelRenderer.labelGrid.resizeAndClear(dimensions, settings.labelGridCellSize);
+    this.labelRenderer.edgeAnchorGrid.resizeAndClear(dimensions, settings.labelGridCellSize);
+    const fillEdgeAnchorGrid = settings.renderEdgeLabels && settings.edgeLabelAnchors === "allNodes";
 
     let visibilityChanged = false;
     resetKind(this.pickingState, "node");
@@ -809,8 +811,16 @@ export default class Sigma<
           data.size,
           this.framedGraphToViewport(data, { matrix: nullCameraMatrix }),
         );
+
+      if (fillEdgeAnchorGrid && data.visibility !== "hidden")
+        this.labelRenderer.edgeAnchorGrid.add(
+          node,
+          data.size,
+          this.framedGraphToViewport(data, { matrix: nullCameraMatrix }),
+        );
     }
     this.labelRenderer.labelGrid.organize();
+    this.labelRenderer.edgeAnchorGrid.organize();
 
     this.nodeProgram.reallocate(nodes.length);
     let nodeProcessCount = 0;

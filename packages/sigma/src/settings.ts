@@ -22,6 +22,7 @@ export interface Settings {
   hideLabelsOnMove: boolean;
   renderLabels: boolean;
   renderEdgeLabels: boolean;
+  edgeLabelAnchors: "nodeLabels" | "allNodes";
   enableEdgeEvents: boolean;
   nodeLabelEvents: LabelEventsSetting;
   edgeLabelEvents: LabelEventsSetting;
@@ -91,6 +92,7 @@ export const DEFAULT_SETTINGS: Settings = {
   hideLabelsOnMove: false,
   renderLabels: true,
   renderEdgeLabels: false,
+  edgeLabelAnchors: "nodeLabels",
   enableEdgeEvents: false,
   nodeLabelEvents: false,
   edgeLabelEvents: false,
