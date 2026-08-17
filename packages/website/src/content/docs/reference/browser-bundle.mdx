@@ -6,7 +6,7 @@ sidebar:
 
 import { Code } from "@astrojs/starlight/components";
 
-import { SIGMA_VERSION } from "../../../versions";
+import { GRAPHOLOGY_VERSION, NODE_IMAGE_VERSION, SIGMA_VERSION } from "../../../versions";
 
 Sigma ships a standalone UMD bundle (`sigma.min.js`) for usage without a package manager, typically through a CDN:
 
@@ -37,8 +37,63 @@ The definitive list is the bundle's entrypoint itself, which is short and readab
 [`packages/sigma/src/index-bundle.ts`](https://github.com/jacomyal/sigma.js/blob/main/packages/sigma/src/index-bundle.ts).
 The symbols themselves are documented in the [API reference](/api/sigma/).
 
+## Satellite packages
+
+The `@sigma/*` packages (`@sigma/node-image`, `@sigma/layer-leaflet`, etc.) do not ship UMD bundles, and we don't want
+to keep them updated on cdn.js, as this is too demanding. They can still be used without a package manager, as ES
+modules, through [jsdelivr](https://www.jsdelivr.com/)'s `/+esm` endpoint, which rewrites their imports on the fly:
+
+<Code
+  lang="html"
+  code={`<!doctype html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sigma.js/${SIGMA_VERSION}/sigma.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/graphology/${GRAPHOLOGY_VERSION}/graphology.umd.min.js"></script>
+  </head>
+  <body>
+    <div id="container" style="width: 800px; height: 600px"></div>
+    <script type="module">
+      import { layerImage } from "https://cdn.jsdelivr.net/npm/@sigma/node-image@${NODE_IMAGE_VERSION}/+esm";
+
+      const graph = new graphology.Graph();
+      graph.addNode("1", {
+        x: 0,
+        y: 0,
+        size: 1,
+        image: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Jim_Morrison_1969.JPG",
+      });
+      graph.addNode("2", {
+        x: 10,
+        y: 10,
+        size: 2,
+        image: "https://upload.wikimedia.org/wikipedia/commons/b/b1/Eric_Clapton_1.jpg",
+      });
+      graph.addEdge("1", "2");
+
+      new Sigma(graph, document.getElementById("container"), {
+        settings: { autoRescaleContent: "nodes" },
+        primitives: {
+          nodes: {
+            variables: { image: { type: "string", default: "" } },
+            layers: [Sigma.rendering.layerFill(), layerImage()],
+          },
+        },
+      });
+    </script>
+
+  </body>
+</html>`}
+/>
+
+The `Sigma` and `graphology` globals are available in the module: browsers always run classic `<script>` tags before
+module scripts.
+
 ## Limitations
 
 - Type-only exports (interfaces, type aliases) do not exist at runtime, so they have no browser bundle counterpart.
 - The bundle includes the whole library. For production applications where size matters, prefer the npm package, so
   your bundler can tree-shake unused code.
+- The `/+esm` endpoint resolves a satellite package's `sigma` dependency to its own ES module copy, separate from the
+  `Sigma` global. The helpers satellite packages use work fine that way, but it means some sigma code is downloaded
+  twice.
