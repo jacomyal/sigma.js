@@ -53,7 +53,9 @@ function sameHit(a: Hit | null, b: Hit | null): boolean {
  */
 export function updateHover(i: AnyInternals, rawHit: Hit | null, event: MouseCoords): void {
   const baseEvent: SigmaEventPayload = { event, preventSigmaDefault: () => event.preventSigmaDefault() };
-  const hit = routeHit(i, rawHit, "enter");
+  // A dragged node stays hovered for the whole session, wherever the pixels land
+  const session = i.dragManager.session;
+  const hit: Hit | null = session ? { kind: "node", key: session.node } : routeHit(i, rawHit, "enter");
 
   const { stateManager } = i;
   const prev = stateManager.hovered;

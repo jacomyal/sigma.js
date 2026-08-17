@@ -6,7 +6,7 @@ import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
-import { add, hoverNode, simulateTouchEvent, wait } from "./_test-helpers";
+import { add, hoverNode, simulateMouseEvent, simulateTouchEvent, wait } from "./_test-helpers";
 
 interface SigmaTestContext {
   sigma: Sigma;
@@ -145,6 +145,31 @@ describe("Sigma interaction events", () => {
     graph.addNode("n3", { x: 100, y: 100, size: 10 });
     await new Promise<void>((resolve) => sigma.once("afterProcess", () => resolve()));
     expect(invalidate).toHaveBeenCalled();
+  });
+
+  test<SigmaTestContext>("a dragged node should stay hovered, even away from the cursor", async ({
+    sigma,
+    graph,
+    target,
+  }) => {
+    sigma.setSetting("enableNodeDrag", true);
+
+    // Freeze the node in place, so the cursor moves away from it while dragging
+    sigma.setSetting("dragPositionToAttributes", () => ({}));
+
+    await hoverNode(sigma, "n1");
+    const start = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
+    const away = add(start, { x: 100, y: 100 });
+
+    await simulateMouseEvent(target, "pointerdown", start);
+    await simulateMouseEvent(target, "pointermove", add(start, { x: 50, y: 50 }));
+    await simulateMouseEvent(target, "pointermove", away);
+    await wait(200);
+    expect(sigma.getNodeState("n1").isHovered).toBe(true);
+
+    // On release, hover falls back to what is really under the cursor
+    await simulateMouseEvent(target, "pointerup", away);
+    await vi.waitFor(() => expect(sigma.getNodeState("n1").isHovered).toBe(false), { timeout: 5000 });
   });
 
   test<SigmaTestContext>("touching a node should hover it and cancel other nodes hovering", async ({

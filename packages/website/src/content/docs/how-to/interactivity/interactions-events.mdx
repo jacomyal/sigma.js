@@ -78,6 +78,12 @@ Hover events (`enterNode`, `leaveNode` and their edge and label counterparts) ar
 rendered frame: they fire a frame after the pointer moves, and also when the _scene_ moves under a still pointer. A
 node drifting away from the cursor during a layout animation fires `leaveNode` without any mouse movement.
 
+While a node is being dragged (with `enableNodeDrag`), hover is pinned to it: the pointer has captured the node, so it
+stays hovered and no `enterNode` or `leaveNode` fires until the drag ends, even when the pointer visually leaves it,
+as with fast drags or positions constrained through `dragPositionToAttributes`. On release, hover falls back to
+whatever actually sits under the pointer. If you need live hover during a custom drag gesture (say, to pick a target
+node), cancel the built-in drag with `preventSigmaDefault()` on `nodeDragStart` and drive the gesture yourself.
+
 ## Enabling edge events
 
 Edge events are disabled by default for performance (edge hit detection requires extra GPU work). Enable them with:
