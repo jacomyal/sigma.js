@@ -132,6 +132,15 @@ export class HoverResolver {
     }
   }
 
+  /** Drops in-flight reads and dead GL objects after a context loss. */
+  reset(): void {
+    if (this.rafId !== null) cancelAnimationFrame(this.rafId);
+    this.rafId = null;
+    this.fence = null;
+    this.readBuffer = null;
+    this.dirty = false;
+  }
+
   kill(): void {
     this.killed = true;
     if (this.rafId !== null) cancelAnimationFrame(this.rafId);

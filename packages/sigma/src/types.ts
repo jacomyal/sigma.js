@@ -324,6 +324,8 @@ export type SigmaAdditionalEvents = {
   nodeDragEnd(payload: SigmaNodeDragEventPayload): void;
   // WebGL lifecycle events:
   afterTexturesUpload(): void;
+  webglContextLost(): void;
+  webglContextRestored(): void;
 };
 
 export type SigmaEvents = SigmaStageEvents &

@@ -137,6 +137,13 @@ export class FrameTexture {
     return this.textureHeight;
   }
 
+  /** Recreates texture and framebuffer after a context loss, for the next frame-pass to refill. */
+  restore(): void {
+    // Extensions reset with the context, so float rendering must be re-enabled
+    this.gl.getExtension("EXT_color_buffer_float");
+    this.create();
+  }
+
   kill(): void {
     const { gl } = this;
     if (this.texture) {

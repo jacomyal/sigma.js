@@ -175,6 +175,12 @@ export class AttachmentManager {
     }
   }
 
+  /** Drops the dead GL texture after a context loss, for the next atlas pass to repack. */
+  restore(): void {
+    this.glTexture = null;
+    this.dirty = true;
+  }
+
   /**
    * Clears all cached data and textures.
    */

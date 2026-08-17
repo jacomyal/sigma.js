@@ -132,6 +132,9 @@ type CustomLayerProgram = {
   cacheData?(): void;
 };
 
+/** Builds a custom layer program; re-invoked after a WebGL context restore. */
+type CustomLayerProgramFactory = (gl: WebGL2RenderingContext) => CustomLayerProgram;
+
 /**
  * Main class.
  *
@@ -212,6 +215,8 @@ export default class Sigma<
 
   // Internal states
   private renderFrame: number | null = null;
+  // True between "webglcontextlost" and the rebuild on "webglcontextrestored"
+  private contextLost = false;
   private pendingProcess: "none" | "nodes" | "full" = "full";
   private needToRefreshState = false;
   private checkEdgesEventsFrame: number | null = null;
@@ -220,16 +225,20 @@ export default class Sigma<
   private edgeStyleAnalysis: StyleAnalysis = { dependency: "static", xAttribute: null, yAttribute: null };
 
   // Programs (single program per item kind)
-  private nodeProgram: NodeProgram<N, E, G>;
-  private nodeFramePass: NodeLabelFramePass;
-  private edgeProgram: EdgeProgram<N, E, G>;
-  private edgeFramePass: EdgeFramePass;
+  private nodeProgram!: NodeProgram<N, E, G>;
+  private nodeFramePass!: NodeLabelFramePass;
+  private edgeProgram!: EdgeProgram<N, E, G>;
+  private edgeFramePass!: EdgeFramePass;
 
   // Resolved depth layers (fixed at construction, cached to avoid repeated spreading)
   private depthLayers: readonly string[] = [...DEFAULT_DEPTH_LAYERS];
 
-  // Custom layer programs (fullscreen quad effects), keyed by unique id
-  private customLayerPrograms = new Map<string, { depth: string; program: CustomLayerProgram }>();
+  // Custom layer programs (fullscreen quad effects), keyed by unique id.
+  // The factory rebuilds the program after a context restore.
+  private customLayerPrograms = new Map<
+    string,
+    { depth: string; factory: CustomLayerProgramFactory; program: CustomLayerProgram }
+  >();
 
   // Shape slug for edge clamping (encodes shape name and params)
   private nodeShapeSlug: string | null = null;
@@ -411,8 +420,6 @@ export default class Sigma<
     // edge-indexed in lockstep with edgeDataTexture
     const edgeFrameTexture = new FrameTexture(this.webGLContext!, { channels: 4 });
 
-    // Generate programs from primitives (uses defaults when not provided)
-    const sigma = this as unknown as Sigma<N, E, G>;
     const gl = this.webGLContext!;
 
     // Resolves hover from the picking framebuffer, asynchronously
@@ -424,22 +431,8 @@ export default class Sigma<
       onIndex: (index, event) => updateHover(this.internals, this.pickingState.lookup[index] ?? null, event),
     });
 
-    const {
-      nodeProgram,
-      labelProgram,
-      backdropProgram,
-      labelBackgroundProgram,
-      attachmentProgram,
-      framePass,
-      shapeSlug: nodeShapeSlug,
-      shapeNameToIndex: nodeShapeMap,
-      shapeGlobalIds: nodeGlobalShapeIds,
-      variables: nodeVariables,
-    } = generateNodeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, resolvedPrimitives?.nodes);
-    this.nodeProgram = nodeProgram;
-    this.nodeFramePass = framePass;
-    this.nodeVariableEntries = Object.entries(nodeVariables) as [string, { type: string; default: unknown }][];
-    if (nodeShapeSlug) this.nodeShapeSlug = nodeShapeSlug;
+    // Generate programs from primitives (uses defaults when not provided)
+    const programs = this.initPrograms(resolvedPrimitives);
 
     // Create the attachment atlas manager only when attachments are declared.
     // The shape-aware attachment program comes from the node bundle and renders
@@ -449,19 +442,6 @@ export default class Sigma<
     if (labelAttachments && Object.keys(labelAttachments).length > 0) {
       attachmentManager = new AttachmentManager(gl, labelAttachments, () => this.scheduleRender());
     }
-
-    const {
-      edgeProgram,
-      labelProgram: edgeLabelProgram,
-      labelBackgroundProgram: edgeLabelBackgroundProgram,
-      framePass: edgeFramePass,
-      variables: edgeVariables,
-      paths: edgePaths,
-    } = generateEdgeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, resolvedPrimitives?.edges);
-    this.edgeProgram = edgeProgram;
-    this.edgeFramePass = edgeFramePass;
-    this.edgeVariableEntries = Object.entries(edgeVariables) as [string, { type: string; default: unknown }][];
-    this.edgePathsByName = new Map(edgePaths.map((p) => [p.name, p]));
 
     // Create the shared internals object. All reassignable fields are plain properties;
     // satellites hold a reference to this object and see updates via direct assignment.
@@ -480,19 +460,12 @@ export default class Sigma<
       hoverResolver,
       nodeStyleAnalysis,
       pickingState: this.pickingState,
-      labelProgram,
-      edgeLabelProgram,
-      edgeLabelBackgroundProgram,
-      backdropProgram,
-      labelBackgroundProgram,
+      ...programs,
       attachmentManager,
-      attachmentProgram,
       nodeDataTexture,
       nodeFrameTexture,
       edgeDataTexture,
       edgeFrameTexture,
-      nodeShapeMap: nodeShapeMap ?? null,
-      nodeGlobalShapeIds: nodeGlobalShapeIds ?? null,
       getDimensions: () => this.getDimensions(),
       getGraphDimensions: () => this.getGraphDimensions(),
       getStagePadding: () => this.getStagePadding(),
@@ -653,6 +626,8 @@ export default class Sigma<
    * picking table. Returns null if the pixel is empty.
    */
   private getHitAtPosition(position: Coordinates): Hit | null {
+    if (this.contextLost) return null;
+
     const gl = this.webGLContext!;
 
     // Read from picking framebuffer (scaled by downSizingRatio)
@@ -1058,6 +1033,9 @@ export default class Sigma<
    * @return {Sigma}
    */
   private render(): this {
+    // No use rendering while the context is lost, the restore handler refreshes
+    if (this.contextLost) return this;
+
     this.emit("beforeRender");
 
     const exitRender = () => {
@@ -1735,7 +1713,34 @@ export default class Sigma<
     this.stageCanvas = this.extraElements.stage as HTMLCanvasElement;
     this.webGLContext = gl;
 
-    // Create picking framebuffer for two-pass rendering
+    // preventDefault asks the browser to restore the context later, unless sigma was killed
+    this.stageCanvas.addEventListener("webglcontextlost", (event) => {
+      if (!this.webGLContext) return;
+      event.preventDefault();
+      this.contextLost = true;
+      if (this.renderFrame) {
+        cancelAnimationFrame(this.renderFrame);
+        this.renderFrame = null;
+      }
+      this.emit("webglContextLost");
+    });
+    this.stageCanvas.addEventListener("webglcontextrestored", () => {
+      // rAF is paused in hidden tabs, so only visible tabs re-acquire contexts
+      requestAnimationFrame(() => {
+        if (this.webGLContext && !this.webGLContext.isContextLost()) this.restoreWebGLContext();
+      });
+    });
+
+    this.initPickingFramebuffer();
+  }
+
+  /**
+   * (Re)creates the picking framebuffer, at construction and after a context
+   * restore. It starts at 1x1, and resetWebGLTexture sizes it on each render.
+   */
+  private initPickingFramebuffer(): void {
+    const gl = this.webGLContext!;
+
     const frameBuffer = gl.createFramebuffer();
     if (!frameBuffer) throw new Error(`Sigma: cannot create picking frame buffer`);
 
@@ -1770,6 +1775,85 @@ export default class Sigma<
     this.pickingFrameBuffer = frameBuffer;
     this.pickingTexture = pickingTexture;
     this.pickingDepthBuffer = depthBuffer;
+  }
+
+  /**
+   * (Re)generates node and edge programs from primitives, at construction and
+   * after a context restore. Returns the internals-bound programs.
+   */
+  private initPrograms(primitives: PrimitivesDeclaration | null) {
+    const sigma = this as unknown as Sigma<N, E, G>;
+    const gl = this.webGLContext!;
+
+    const {
+      nodeProgram,
+      labelProgram,
+      backdropProgram,
+      labelBackgroundProgram,
+      attachmentProgram,
+      framePass,
+      shapeSlug: nodeShapeSlug,
+      shapeNameToIndex: nodeShapeMap,
+      shapeGlobalIds: nodeGlobalShapeIds,
+      variables: nodeVariables,
+    } = generateNodeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, primitives?.nodes);
+    this.nodeProgram = nodeProgram;
+    this.nodeFramePass = framePass;
+    this.nodeVariableEntries = Object.entries(nodeVariables) as [string, { type: string; default: unknown }][];
+    if (nodeShapeSlug) this.nodeShapeSlug = nodeShapeSlug;
+
+    const {
+      edgeProgram,
+      labelProgram: edgeLabelProgram,
+      labelBackgroundProgram: edgeLabelBackgroundProgram,
+      framePass: edgeFramePass,
+      variables: edgeVariables,
+      paths: edgePaths,
+    } = generateEdgeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, primitives?.edges);
+    this.edgeProgram = edgeProgram;
+    this.edgeFramePass = edgeFramePass;
+    this.edgeVariableEntries = Object.entries(edgeVariables) as [string, { type: string; default: unknown }][];
+    this.edgePathsByName = new Map(edgePaths.map((p) => [p.name, p]));
+
+    return {
+      labelProgram,
+      edgeLabelProgram,
+      edgeLabelBackgroundProgram,
+      backdropProgram,
+      labelBackgroundProgram,
+      attachmentProgram,
+      nodeShapeMap: nodeShapeMap ?? null,
+      nodeGlobalShapeIds: nodeGlobalShapeIds ?? null,
+    };
+  }
+
+  /**
+   * Rebuilds all GPU resources after a context restore: the context object is
+   * valid again, only its resources died.
+   */
+  private restoreWebGLContext(): void {
+    const internals = this.internals;
+
+    this.initPickingFramebuffer();
+
+    internals.nodeDataTexture?.restore();
+    internals.nodeFrameTexture?.restore();
+    internals.edgeDataTexture?.restore();
+    internals.edgeFrameTexture?.restore();
+    internals.attachmentManager?.restore();
+    internals.hoverResolver.reset();
+
+    Object.assign(internals, this.initPrograms(internals.primitives));
+
+    // Custom layer programs are user code: rebuild each from its factory
+    for (const entry of this.customLayerPrograms.values()) {
+      entry.program.kill();
+      entry.program = entry.factory(this.webGLContext!);
+    }
+
+    this.contextLost = false;
+    this.emit("webglContextRestored");
+    this.refresh();
   }
 
   /**
@@ -1914,16 +1998,21 @@ export default class Sigma<
    * removed with {@link Sigma#removeCustomLayerProgram}. It renders at the given
    * `depth`, which must be declared in the primitives depthLayers array; several
    * programs may share a depth and render in registration order. Reusing an `id`
-   * disposes the program previously registered under it.
+   * disposes the program previously registered under it. The `factory` is
+   * re-invoked when a lost WebGL context is restored.
    */
-  addCustomLayerProgram(id: string, depth: ExtractDepthLayersFromPrimitives<P>, program: CustomLayerProgram): this {
+  addCustomLayerProgram(
+    id: string,
+    depth: ExtractDepthLayersFromPrimitives<P>,
+    factory: CustomLayerProgramFactory,
+  ): this {
     if (!this.depthLayers.includes(depth))
       throw new Error(
         `Sigma: cannot add custom layer program at depth "${depth}", ` +
           `it must be declared in primitives.depthLayers. Current layers: ${this.depthLayers.join(", ")}`,
       );
     this.customLayerPrograms.get(id)?.program.kill();
-    this.customLayerPrograms.set(id, { depth, program });
+    this.customLayerPrograms.set(id, { depth, factory, program: factory(this.webGLContext!) });
     this.refresh();
     return this;
   }

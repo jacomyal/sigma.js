@@ -346,6 +346,14 @@ export class DataTexture {
     this.dirtyRangeEnd = this.capacity;
   }
 
+  /** Recreates the GPU texture after a context loss, re-uploading the CPU-side data. */
+  restore(): void {
+    this.createTexture();
+    this.dirty = false;
+    this.dirtyRangeStart = Infinity;
+    this.dirtyRangeEnd = -1;
+  }
+
   /**
    * Destroys the texture and clears all data.
    */
