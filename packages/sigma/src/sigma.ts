@@ -2976,6 +2976,22 @@ export default class Sigma<
   }
 
   /**
+   * Method used to translate a point's coordinates from the graph system to the framed graph system (the normalized
+   * ~[0, 1] space used by the camera state).
+   */
+  graphToFramedGraph(coordinates: Coordinates): Coordinates {
+    return this.normalizationFunction(coordinates);
+  }
+
+  /**
+   * Method used to translate a point's coordinates from the framed graph system (the normalized ~[0, 1] space used by
+   * the camera state) to the graph system.
+   */
+  framedGraphToGraph(coordinates: Coordinates): Coordinates {
+    return this.normalizationFunction.inverse(coordinates);
+  }
+
+  /**
    * Method returning the distance multiplier between the graph system and the
    * viewport system.
    */
