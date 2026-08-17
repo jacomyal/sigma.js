@@ -24,6 +24,7 @@ import {
   pickingIdOf,
   registerItem,
   resetKind,
+  samePickingAllocation,
 } from "./core/interactive-kinds";
 import { LabelRenderer } from "./core/label-renderer";
 import { SDFAtlasManager } from "./core/sdf-atlas";
@@ -1040,12 +1041,13 @@ export default class Sigma<
   private processData(): void {
     this.emit("beforeProcess");
     this.internals.attachmentManager?.clear();
+    const previousIds = { ...this.pickingState.idsByKind };
     const visibilityChanged = this.processNodes();
     if (this.pendingProcess === "full" || visibilityChanged) this.processEdges();
     // Allocate label IDs after node/edge IDs. On a nodes-only refresh the
     // cached edge IDs in the picking state are preserved.
     allocateLabelIds(this.pickingState, this.internals);
-    this.internals.hoverResolver.invalidate();
+    if (!samePickingAllocation(previousIds, this.pickingState.idsByKind)) this.internals.hoverResolver.invalidate();
     this.pendingProcess = "none";
     this.emit("afterProcess");
   }

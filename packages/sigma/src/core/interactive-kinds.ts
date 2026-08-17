@@ -185,6 +185,21 @@ export function allocateLabelIds(state: PickingState, i: AnyInternals): void {
   }
 }
 
+/** Do two allocations map every (kind, key) to the same picking ID? */
+export function samePickingAllocation(
+  a: Record<KindName, Map<string, number>>,
+  b: Record<KindName, Map<string, number>>,
+): boolean {
+  for (const kind of KIND_NAMES) {
+    const mapA = a[kind];
+    const mapB = b[kind];
+    if (mapA === mapB) continue;
+    if (mapA.size !== mapB.size) return false;
+    for (const [key, id] of mapA) if (mapB.get(key) !== id) return false;
+  }
+  return true;
+}
+
 // ============================================================================
 // Dispatch helpers - called by event-handlers and sigma
 // ============================================================================

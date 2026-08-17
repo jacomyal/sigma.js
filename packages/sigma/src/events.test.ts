@@ -128,6 +128,25 @@ describe("Sigma interaction events", () => {
     expect(left).toEqual(["n1"]);
   });
 
+  test<SigmaTestContext>("a layout tick should not invalidate picking", async ({ sigma, graph }) => {
+    // Wait for the initial full process before spying, because it legitimately invalidates
+    sigma.scheduleRender();
+    await new Promise<void>((resolve) => sigma.once("afterRender", () => resolve()));
+
+    const { hoverResolver } = sigma["internals"];
+    const invalidate = vi.spyOn(hoverResolver, "invalidate");
+
+    // Simulate a layout tick (it causes reindexation, but the rebuilt picking allocation is identical)
+    graph.updateEachNodeAttributes((_, attributes) => ({ ...attributes }));
+    await new Promise<void>((resolve) => sigma.once("afterProcess", () => resolve()));
+    expect(invalidate).not.toHaveBeenCalled();
+
+    // Simulate a structural change, that reallocates picking IDs and must invalidate
+    graph.addNode("n3", { x: 100, y: 100, size: 10 });
+    await new Promise<void>((resolve) => sigma.once("afterProcess", () => resolve()));
+    expect(invalidate).toHaveBeenCalled();
+  });
+
   test<SigmaTestContext>("touching a node should hover it and cancel other nodes hovering", async ({
     sigma,
     graph,
