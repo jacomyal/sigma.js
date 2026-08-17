@@ -25,9 +25,7 @@ export default function bindWebGLLayer<P extends PrimitivesDeclaration>(
   ProgramClass: WebGLLayerProgramType,
   id: string = `webgl-layer-${autoLayerId++}`,
 ): () => void {
-  const gl = renderer.getWebGLContext();
-  const program = new ProgramClass(gl, null, renderer);
-  renderer.addCustomLayerProgram(id, depth, program);
+  renderer.addCustomLayerProgram(id, depth, (gl) => new ProgramClass(gl, null, renderer));
 
   return () => renderer.removeCustomLayerProgram(id);
 }
