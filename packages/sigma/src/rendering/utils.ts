@@ -1,4 +1,13 @@
 function getAttributeItemsCount(attr: ProgramAttributeSpecification): number {
+  // The vertex buffer packs attributes as 32-bit float slots, so only these
+  // two shapes can work:
+  const isFloat = attr.type === WebGL2RenderingContext.FLOAT && !attr.normalized;
+  const isPackedBytes = attr.type === WebGL2RenderingContext.UNSIGNED_BYTE && attr.size === 4 && attr.normalized;
+  if (!isFloat && !isPackedBytes)
+    throw new Error(
+      `Attribute "${attr.name}" is invalid: only non-normalized FLOAT and normalized UNSIGNED_BYTE with size 4 are supported.`,
+    );
+
   return attr.normalized ? 1 : attr.size;
 }
 export function getAttributesItemsCount(attrs: ProgramAttributeSpecification[]): number {
