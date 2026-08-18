@@ -72,6 +72,11 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     this.flushGraphStateFlags();
     return this.graphState;
   }
+  getHighlightedNodes(): Set<string> {
+    const highlighted = new Set<string>();
+    for (const [key, state] of this.nodeStates) if (state.isHighlighted) highlighted.add(key);
+    return highlighted;
+  }
 
   // State mutations (public API, exposed on Sigma)
   setNodeState(key: string, state: Partial<BaseNodeState> | Partial<FullNodeState<NS>>): void {
@@ -279,3 +284,6 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     }
   }
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyStateManager = StateManager<any, any, any>;

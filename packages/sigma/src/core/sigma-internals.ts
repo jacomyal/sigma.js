@@ -30,6 +30,7 @@ import { BaseEdgeState, BaseNodeState } from "../types/styles";
 import { DragManager } from "./drag-manager";
 import { HoverResolver } from "./hover-resolver";
 import type { Hit, PickingState } from "./interactive-kinds";
+import { AnyStateManager } from "./state-manager";
 import { StyleAnalysis } from "./styles";
 
 /**
@@ -58,11 +59,7 @@ export type SigmaInternals<
   pixelRatio: number;
   // Graph and managers
   graph: Graph<N, E, G>;
-  stateManager: {
-    hovered: Hit | null;
-    setHovered(hit: Hit | null): void;
-    getNodeState(key: string): BaseNodeState;
-  };
+  stateManager: AnyStateManager;
   dragManager: DragManager;
   hoverResolver: HoverResolver;
   nodeStyleAnalysis: StyleAnalysis;

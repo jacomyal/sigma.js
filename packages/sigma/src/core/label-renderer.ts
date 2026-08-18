@@ -616,9 +616,7 @@ export class LabelRenderer<
    */
   computeDisplayedEdgeLabels(): void {
     const { graph, stateManager, settings, edgesWithForcedLabels } = this.internals;
-    const highlightedNodes = new Set<string>(
-      graph.filterNodes((node) => stateManager.getNodeState(node).isHighlighted),
-    );
+    const highlightedNodes = stateManager.getHighlightedNodes();
 
     // Anchors are picked over the whole graph, not just the visible part (the
     // GPU clips offscreen labels anyway)

@@ -163,24 +163,29 @@ export function edgeLabelsToDisplayFromNodes(params: {
 }): Array<string> {
   const { graph, hoveredNode, highlightedNodes, displayedNodeLabels } = params;
 
-  const worthyEdges: Array<string> = [];
+  // An edge label shows when an extremity is highlighted or hovered, or when
+  // both extremities show theirs. Scanning adjacencies instead of all edges
+  // keeps the cost tied to what is displayed, not to the graph size.
+  const relevantEdges = new Set<string>();
 
-  // TODO: the code below can be optimized using #.forEach and batching the code per adj
+  const fullyWorthyNodes = new Set(highlightedNodes);
+  if (hoveredNode) fullyWorthyNodes.add(hoveredNode);
 
-  // We should display an edge's label if:
-  //   - Any of its extremities is highlighted or hovered
-  //   - Both of its extremities has its label shown
-  graph.forEachEdge((edge, _, source, target) => {
-    if (
-      source === hoveredNode ||
-      target === hoveredNode ||
-      highlightedNodes.has(source) ||
-      highlightedNodes.has(target) ||
-      (displayedNodeLabels.has(source) && displayedNodeLabels.has(target))
-    ) {
-      worthyEdges.push(edge);
-    }
-  });
+  for (const node of fullyWorthyNodes) {
+    // States can outlive nodes (or target unknown keys), so check first
+    if (!graph.hasNode(node)) continue;
+    graph.forEachEdge(node, (edge) => {
+      relevantEdges.add(edge);
+    });
+  }
 
-  return worthyEdges;
+  for (const node of displayedNodeLabels) {
+    if (fullyWorthyNodes.has(node)) continue;
+    graph.forEachEdge(node, (edge, _, source, target) => {
+      const other = source === node ? target : source;
+      if (displayedNodeLabels.has(other)) relevantEdges.add(edge);
+    });
+  }
+
+  return Array.from(relevantEdges);
 }
