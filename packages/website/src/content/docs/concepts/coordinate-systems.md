@@ -49,4 +49,4 @@ The `autoRescale` setting controls whether sigma should rescale the node positio
 
 - `true `(default): the node extent is recomputed on each render, so the graph always fills the viewport.
 - `"once"`: the extent is captured on the first render and frozen, and subsequent additions won't change the framing.
-- `false`: no rescaling. Graph coordinates are treated as pixels, centered in the viewport. Useful when you already control positions in screen units (e.g. map overlays).
+- `false`: no rescaling. Graph coordinates are treated as pixels, with the origin `(0, 0)` at the viewport center. The mapping never depends on the graph's contents, so adding or moving nodes never shifts the view. Useful when you already control positions in screen units (e.g. map overlays).

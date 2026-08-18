@@ -65,8 +65,8 @@
     for (let col = 0; col < COLS; col++) {
       const id = `${row}-${col}`;
       graph.addNode(id, {
-        x: col * SPACING,
-        y: -row * SPACING,
+        x: (col - (COLS - 1) / 2) * SPACING,
+        y: ((ROWS - 1) / 2 - row) * SPACING,
         color: COLORS[(row + col) % COLORS.length],
       });
 

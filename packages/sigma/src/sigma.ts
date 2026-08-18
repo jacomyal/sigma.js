@@ -714,11 +714,19 @@ export default class Sigma<
 
     // Recompute the node extent, unless "once" has already frozen it:
     let nodeExtent = this.nodeExtent;
-    if (autoRescale !== "once" || !this.autoRescaleFrozen) {
+    if (autoRescale === false) {
+      // Without rescaling, 1 graph unit = 1 pixel and the origin sits at the
+      // viewport center: the mapping never depends on the graph's contents.
+      const { width, height } = dimensions;
+      nodeExtent = {
+        x: [-width / 2, width / 2],
+        y: [-height / 2, height / 2],
+      };
+    } else if (autoRescale !== "once" || !this.autoRescaleFrozen) {
       nodeExtent = this.computeNodeExtent();
       // A custom bounding box overrides the node extent, so fitting it is
       // useless:
-      if (autoRescale !== false && autoRescaleContent !== "positions" && !this.customBBox)
+      if (autoRescaleContent !== "positions" && !this.customBBox)
         nodeExtent = computeFittedExtent({
           extent: nodeExtent,
           coords: this.nodeGraphCoords,
@@ -731,18 +739,6 @@ export default class Sigma<
           nodeLabelBox: (data, radius) => this.labelRenderer.nodeLabelBox(data, radius),
         });
       if (autoRescale === "once") this.autoRescaleFrozen = true;
-    }
-
-    // Without rescaling, 1 graph unit = 1 pixel: keep the extent's center but
-    // resize it to span the viewport.
-    if (autoRescale === false) {
-      const { width, height } = dimensions;
-      const cx = (nodeExtent.x[0] + nodeExtent.x[1]) / 2;
-      const cy = (nodeExtent.y[0] + nodeExtent.y[1]) / 2;
-      nodeExtent = {
-        x: [cx - width / 2, cx + width / 2],
-        y: [cy - height / 2, cy + height / 2],
-      };
     }
 
     this.nodeExtent = nodeExtent;
