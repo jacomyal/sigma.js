@@ -170,13 +170,23 @@ export function registerItem(state: PickingState, kind: KindName, key: string): 
  * borrow their parent's keys in the parent's iteration order.
  */
 export function allocateLabelIds(state: PickingState, i: AnyInternals): void {
+  // Clear any prior label allocations.
   for (const name of KIND_NAMES) {
-    const entry = KIND_REGISTRY[name];
-    if (entry.parent === null) continue;
-    // Clear any prior allocation for this label kind.
+    if (KIND_REGISTRY[name].parent === null) continue;
     for (const id of state.idsByKind[name].values()) state.lookup[id] = null;
     state.idsByKind[name] = new Map();
-    if (!entry.isEnabled(i)) continue;
+  }
+
+  // `nextId` is stale after a partial process: restart after the highest parent ID
+  state.nextId = 1;
+  for (const name of KIND_NAMES) {
+    if (KIND_REGISTRY[name].parent !== null) continue;
+    for (const id of state.idsByKind[name].values()) if (id >= state.nextId) state.nextId = id + 1;
+  }
+
+  for (const name of KIND_NAMES) {
+    const entry = KIND_REGISTRY[name];
+    if (entry.parent === null || !entry.isEnabled(i)) continue;
     for (const parentKey of state.idsByKind[entry.parent].keys()) {
       state.idsByKind[name].set(parentKey, state.nextId);
       state.lookup[state.nextId] = { kind: name, key: parentKey };
