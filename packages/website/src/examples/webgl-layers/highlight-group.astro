@@ -50,7 +50,7 @@
   const renderer = new Sigma(graph, container, {
     primitives: {
       // Insert the metaballs depth layers between the edges and the nodes:
-      depthLayers: ["edges", ...communityDepths, "nodes", "topNodes"],
+      depthLayers: ["edges", ...communityDepths, "topEdges", "nodes", "topNodes"],
     },
   });
 
