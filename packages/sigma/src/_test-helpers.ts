@@ -1,6 +1,9 @@
 import Sigma from "sigma";
 import { Coordinates } from "sigma/types";
+import { indexToColor } from "sigma/utils";
 import { expect, vi } from "vitest";
+
+import { KindName } from "./core/interactive-kinds";
 
 /**
  * Moves the pointer over `node` and waits for its async hover resolution.
@@ -9,6 +12,49 @@ export async function hoverNode(sigma: Sigma, node: string): Promise<void> {
   const position = sigma.graphToViewport(sigma.getGraph().getNodeAttributes(node) as Coordinates);
   await simulateMouseEvent(sigma.getMouseLayer(), "pointermove", position);
   await vi.waitFor(() => expect(sigma.getNodeState(node).isHovered).toBe(true), { timeout: 5000 });
+}
+
+/**
+ * Returns the viewport position where an item can be picked, or null when it
+ * has no pixel in the picking framebuffer. The item is a graph node or edge
+ * (`key`), seen as one of the pickable kinds ("node", "nodeLabel", etc.): for
+ * instance `("nodeLabel", "n1")` targets the label rect of node "n1".
+ */
+export function findPickingPosition(sigma: Sigma, kind: KindName, key: string): Coordinates | null {
+  const internals = sigma["internals"];
+  const id = internals.pickingState.idsByKind[kind].get(key);
+  if (!id) return null;
+
+  const gl = sigma["webGLContext"]!;
+  const downSizingRatio = internals.settings.pickingDownSizingRatio;
+  const width = Math.ceil(gl.drawingBufferWidth / downSizingRatio);
+  const height = Math.ceil(gl.drawingBufferHeight / downSizingRatio);
+
+  const pixels = new Uint8Array(width * height * 4);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, sigma["pickingFrameBuffer"]);
+  gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+  // Barycenter of the pixels holding the item's picking ID
+  const target = indexToColor(id);
+  const words = new Uint32Array(pixels.buffer);
+  let sumX = 0;
+  let sumY = 0;
+  let count = 0;
+  for (let i = 0; i < words.length; i++) {
+    if (words[i] !== target) continue;
+    sumX += i % width;
+    sumY += Math.floor(i / width);
+    count++;
+  }
+  if (!count) return null;
+
+  // Inverse of pickingPixelCoords, aimed at the matched pixels' barycenter
+  const { pixelRatio } = internals;
+  return {
+    x: ((sumX / count + 0.5) * downSizingRatio) / pixelRatio,
+    y: ((gl.drawingBufferHeight / downSizingRatio - (sumY / count + 0.5)) * downSizingRatio) / pixelRatio,
+  };
 }
 
 /**

@@ -6,7 +6,7 @@ import { createElement } from "sigma/utils";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
-import { add, hoverNode, simulateMouseEvent, simulateTouchEvent, wait } from "./_test-helpers";
+import { add, findPickingPosition, hoverNode, simulateMouseEvent, simulateTouchEvent, wait } from "./_test-helpers";
 
 interface SigmaTestContext {
   sigma: Sigma;
@@ -444,7 +444,7 @@ describe("Sigma per-interaction label events: mixed click=extend + enter=separat
     sigma.getContainer().remove();
   });
 
-  test<MixedContext>("hover fires enterNodeLabel, click fires clickNode", async ({ sigma, graph, container }) => {
+  test<MixedContext>("hover fires enterNodeLabel, click fires clickNode", async ({ sigma, container }) => {
     const nodeClicks: string[] = [];
     const labelClicks: string[] = [];
     const labelEnters: string[] = [];
@@ -452,20 +452,27 @@ describe("Sigma per-interaction label events: mixed click=extend + enter=separat
     sigma.on("clickNodeLabel", ({ node }) => labelClicks.push(node));
     sigma.on("enterNodeLabel", ({ node }) => labelEnters.push(node));
 
-    const nodePos = sigma.graphToViewport(graph.getNodeAttributes("n1") as Coordinates);
-    for (const dx of [30, 40, 50, 60]) {
-      await userEvent.hover(container, { position: { x: nodePos.x + dx, y: nodePos.y } });
-      await wait(50);
-      if (labelEnters.length) break;
-    }
-    for (const dx of [30, 40, 50, 60]) {
-      await userEvent.click(container, { position: { x: nodePos.x + dx, y: nodePos.y } });
-      await wait(10);
-      if (nodeClicks.length) break;
-    }
+    // The label rect can move between frames: re-probe it before each attempt
+    await vi.waitFor(
+      async () => {
+        const position = findPickingPosition(sigma, "nodeLabel", "n1");
+        expect(position).not.toBeNull();
+        await userEvent.hover(container, { position: position! });
+        expect(labelEnters).toContain("n1");
+      },
+      { timeout: 5000, interval: 200 },
+    );
 
-    expect(labelEnters).toContain("n1");
-    expect(nodeClicks).toContain("n1");
+    await vi.waitFor(
+      async () => {
+        const position = findPickingPosition(sigma, "nodeLabel", "n1");
+        expect(position).not.toBeNull();
+        await userEvent.click(container, { position: position! });
+        expect(nodeClicks).toContain("n1");
+      },
+      { timeout: 5000, interval: 200 },
+    );
+
     expect(labelClicks).toEqual([]);
   });
 });
