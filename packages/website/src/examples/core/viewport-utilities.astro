@@ -21,6 +21,7 @@
   import { fitViewportToNodes, getNodesInViewport } from "@sigma/utils";
   import Graph from "graphology";
   import louvain from "graphology-communities-louvain";
+  import seedrandom from "seedrandom";
   import Sigma from "sigma";
 
   import { registerControls } from "../_controls";
@@ -43,8 +44,8 @@
   const graph = new Graph();
   graph.import(data);
 
-  // Detect communities
-  louvain.assign(graph, { nodeCommunityAttribute: "community" });
+  // Detect communities (seeded, so results are stable across runs)
+  louvain.assign(graph, { nodeCommunityAttribute: "community", rng: seedrandom("sigma") });
   const communities = new Set<string>();
   graph.forEachNode((_, attrs) => communities.add(attrs.community));
   const communitiesArray = Array.from(communities);
