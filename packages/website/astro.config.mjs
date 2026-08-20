@@ -107,7 +107,7 @@ export default defineConfig({
     starlight({
       plugins: [
         starlightLinksValidator({
-          exclude: ({ link }) => link.includes("/api/"),
+          exclude: ({ link }) => link.includes("/api/") || link.startsWith("/embed/"),
         }),
         ...(isDev
           ? []
@@ -220,6 +220,7 @@ export default defineConfig({
                 { slug: "how-to/technical/loading-data" },
                 { slug: "how-to/technical/custom-sizes" },
                 { slug: "how-to/technical/export-image" },
+                { slug: "how-to/technical/performance" },
                 { slug: "how-to/technical/migration-v3-v4" },
               ],
             },
