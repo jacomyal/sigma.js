@@ -84,6 +84,9 @@ export interface Settings {
 
   // Debug
   DEBUG_displayPickingLayer: boolean;
+  DEBUG_logShaders: boolean;
+  DEBUG_logRenderStats: boolean;
+  DEBUG_gpuTimerQueries: boolean;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -151,6 +154,9 @@ export const DEFAULT_SETTINGS: Settings = {
 
   // Debug
   DEBUG_displayPickingLayer: false,
+  DEBUG_logShaders: false,
+  DEBUG_logRenderStats: false,
+  DEBUG_gpuTimerQueries: false,
 };
 
 export function validateSettings(settings: Settings): void {

@@ -60,6 +60,7 @@ import {
   NodeDataTexture,
   NodeLabelFramePass,
   NodeProgram,
+  Program,
   getShapeId,
 } from "./rendering";
 import { Settings, resolveSettings, validateSettings } from "./settings";
@@ -135,6 +136,12 @@ type CustomLayerProgram = {
 /** Builds a custom layer program; re-invoked after a WebGL context restore. */
 type CustomLayerProgramFactory = (gl: WebGL2RenderingContext) => CustomLayerProgram;
 
+/** Minimal typing for the EXT_disjoint_timer_query_webgl2 extension, used by DEBUG_gpuTimerQueries. */
+interface EXTDisjointTimerQueryWebGL2 {
+  TIME_ELAPSED_EXT: number;
+  GPU_DISJOINT_EXT: number;
+}
+
 /**
  * Main class.
  *
@@ -189,6 +196,12 @@ export default class Sigma<
   private correctionRatio = 1;
   private frameId = 0;
   private customBBox: { x: Extent; y: Extent } | null = null;
+
+  // DEBUG_gpuTimerQueries: EXT_disjoint_timer_query_webgl2 handle (undefined = not
+  // yet resolved, null = unsupported) and the queries currently in flight.
+  private gpuTimerExt: EXTDisjointTimerQueryWebGL2 | null | undefined = undefined;
+  private activeGpuTimerQuery: WebGLQuery | null = null;
+  private pendingGpuTimerQueries: Array<{ query: WebGLQuery; frameId: number }> = [];
   private normalizationFunction: NormalizationFunction = createNormalizationFunction({
     x: [0, 1],
     y: [0, 1],
@@ -1095,6 +1108,12 @@ export default class Sigma<
     // console.log(this.graphToViewportRatio * this.correctionRatio * this.normalizationFunction.ratio * 2);
 
     this.frameId++;
+
+    const debugPrograms = this.internals.settings.DEBUG_logRenderStats ? this.getDebugPrograms() : null;
+    if (debugPrograms) debugPrograms.forEach((program) => program.resetDebugStats());
+
+    if (this.internals.settings.DEBUG_gpuTimerQueries) this.beginGpuTimerQuery();
+
     // Keep the node-frame texture sized to the node-data texture before capturing
     // render params, so the texture width baked into params (and read by consumers
     // as texel coordinates) reflects any resize this frame.
@@ -1261,10 +1280,117 @@ export default class Sigma<
       );
     }
 
+    if (this.internals.settings.DEBUG_gpuTimerQueries) this.endGpuTimerQuery();
+    this.pollGpuTimerQueries();
+
+    if (debugPrograms) this.logRenderStats(debugPrograms);
+
     // Do not display labels on move per setting
     if (this.internals.settings.hideLabelsOnMove && moving) return exitRender();
 
     return exitRender();
+  }
+
+  /** DEBUG_logShaders / DEBUG_logRenderStats: every built-in Program instance sigma owns this frame. */
+  private getDebugPrograms(): Program<string, N, E, G>[] {
+    return [
+      this.nodeProgram,
+      this.edgeProgram,
+      this.internals.labelProgram,
+      this.internals.edgeLabelProgram,
+      this.internals.edgeLabelBackgroundProgram,
+      this.internals.backdropProgram,
+      this.internals.labelBackgroundProgram,
+      this.internals.attachmentProgram,
+    ].filter((program): program is NonNullable<typeof program> => program !== null);
+  }
+
+  /** DEBUG_logRenderStats: logs this frame's counters as a table, keyed by program class name. */
+  private logRenderStats(programs: Program<string, N, E, G>[]): void {
+    const rows: Record<string, { drawCalls: number; verticesDrawn: number; bufferUploadBytes: number }> = {};
+    for (const program of programs) rows[program.constructor.name] = { ...program.debugStats };
+    // eslint-disable-next-line no-console
+    console.log(`[sigma] DEBUG_logRenderStats: frame #${this.frameId}`);
+    // eslint-disable-next-line no-console
+    console.table(rows);
+  }
+
+  /**
+   * DEBUG_gpuTimerQueries: lazily resolves EXT_disjoint_timer_query_webgl2. Returns
+   * null (and warns once) if the browser/driver doesn't support it.
+   */
+  private getGpuTimerExtension(): EXTDisjointTimerQueryWebGL2 | null {
+    if (this.gpuTimerExt === undefined) {
+      this.gpuTimerExt = this.webGLContext!.getExtension(
+        "EXT_disjoint_timer_query_webgl2",
+      ) as EXTDisjointTimerQueryWebGL2 | null;
+      if (!this.gpuTimerExt) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          "Sigma: DEBUG_gpuTimerQueries is enabled, but this browser/driver doesn't support EXT_disjoint_timer_query_webgl2.",
+        );
+      }
+    }
+    return this.gpuTimerExt;
+  }
+
+  /** DEBUG_gpuTimerQueries: starts a query wrapping every GL call until `endGpuTimerQuery`. */
+  private beginGpuTimerQuery(): void {
+    const ext = this.getGpuTimerExtension();
+    if (!ext) return;
+
+    const gl = this.webGLContext!;
+    const query = gl.createQuery();
+    if (!query) return;
+
+    gl.beginQuery(ext.TIME_ELAPSED_EXT, query);
+    this.activeGpuTimerQuery = query;
+  }
+
+  /** DEBUG_gpuTimerQueries: closes the query started by `beginGpuTimerQuery` and queues it for polling. */
+  private endGpuTimerQuery(): void {
+    if (!this.gpuTimerExt || !this.activeGpuTimerQuery) return;
+
+    this.webGLContext!.endQuery(this.gpuTimerExt.TIME_ELAPSED_EXT);
+    this.pendingGpuTimerQueries.push({ query: this.activeGpuTimerQuery, frameId: this.frameId });
+    this.activeGpuTimerQuery = null;
+  }
+
+  /**
+   * DEBUG_gpuTimerQueries: results typically aren't ready the same frame they're
+   * queried, so this drains whichever queued queries have resolved by now.
+   */
+  private pollGpuTimerQueries(): void {
+    if (this.pendingGpuTimerQueries.length === 0) return;
+
+    const gl = this.webGLContext!;
+    const ext = this.gpuTimerExt;
+
+    // Extension/context is gone (e.g. context loss): the queued queries are dead, drop them.
+    if (!ext) {
+      this.pendingGpuTimerQueries.forEach(({ query }) => gl.deleteQuery(query));
+      this.pendingGpuTimerQueries = [];
+      return;
+    }
+
+    // A disjoint event invalidates every outstanding query's timing, not just the current one.
+    const disjoint = gl.getParameter(ext.GPU_DISJOINT_EXT);
+    const stillPending: Array<{ query: WebGLQuery; frameId: number }> = [];
+    for (const pending of this.pendingGpuTimerQueries) {
+      if (!gl.getQueryParameter(pending.query, gl.QUERY_RESULT_AVAILABLE)) {
+        stillPending.push(pending);
+        continue;
+      }
+      if (!disjoint) {
+        const elapsedNs = gl.getQueryParameter(pending.query, gl.QUERY_RESULT) as number;
+        // eslint-disable-next-line no-console
+        console.log(
+          `[sigma] DEBUG_gpuTimerQueries: frame #${pending.frameId} GPU time = ${(elapsedNs / 1e6).toFixed(2)}ms`,
+        );
+      }
+      gl.deleteQuery(pending.query);
+    }
+    this.pendingGpuTimerQueries = stillPending;
   }
 
   /**
@@ -1718,6 +1844,10 @@ export default class Sigma<
         cancelAnimationFrame(this.renderFrame);
         this.renderFrame = null;
       }
+      // DEBUG_gpuTimerQueries: the extension handle and any in-flight queries die with the context.
+      this.gpuTimerExt = undefined;
+      this.activeGpuTimerQuery = null;
+      this.pendingGpuTimerQueries = [];
       this.emit("webglContextLost");
     });
     this.stageCanvas.addEventListener("webglcontextrestored", () => {

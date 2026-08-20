@@ -126,6 +126,14 @@ export abstract class Program<
   protected renderOffset = 0;
   protected renderCount = -1;
 
+  // DEBUG_logRenderStats:
+  // counters accumulated across a frame's render() calls, read and reset by
+  // Sigma once per frame
+  debugStats = { drawCalls: 0, verticesDrawn: 0, bufferUploadBytes: 0 };
+  // DEBUG_logShaders:
+  // logged lazily from render(), not from the constructor
+  private shadersLogged = false;
+
   normalProgram: ProgramInfo;
   pickProgram: ProgramInfo | null = null;
 
@@ -195,6 +203,12 @@ export abstract class Program<
     if (this.pickProgram) killProgram(this.pickProgram);
   }
 
+  resetDebugStats(): void {
+    this.debugStats.drawCalls = 0;
+    this.debugStats.verticesDrawn = 0;
+    this.debugStats.bufferUploadBytes = 0;
+  }
+
   protected getProgramInfo(
     name: "normal" | "pick",
     gl: WebGL2RenderingContext,
@@ -261,6 +275,8 @@ export abstract class Program<
       if (this.uploadedGeneration.get(buffer) !== this.bufferGeneration) {
         gl.bufferData(gl.ARRAY_BUFFER, this.floats, gl.DYNAMIC_DRAW);
         this.uploadedGeneration.set(buffer, this.bufferGeneration);
+        if (this.renderer?.getSetting("DEBUG_logRenderStats"))
+          this.debugStats.bufferUploadBytes += this.floats.byteLength;
       }
     } else {
       // Handle constant data (things that remain unchanged for all items):
@@ -271,6 +287,8 @@ export abstract class Program<
       if (this.uploadedConstantGeneration.get(program.constantBuffer) !== this.constantBufferGeneration) {
         gl.bufferData(gl.ARRAY_BUFFER, this.constantArray, gl.STATIC_DRAW);
         this.uploadedConstantGeneration.set(program.constantBuffer, this.constantBufferGeneration);
+        if (this.renderer?.getSetting("DEBUG_logRenderStats"))
+          this.debugStats.bufferUploadBytes += this.constantArray.byteLength;
       }
 
       // Handle "instance specific" data (things that vary for each item):
@@ -281,6 +299,8 @@ export abstract class Program<
       if (this.uploadedGeneration.get(buffer) !== this.bufferGeneration) {
         gl.bufferData(gl.ARRAY_BUFFER, this.floats, gl.DYNAMIC_DRAW);
         this.uploadedGeneration.set(buffer, this.bufferGeneration);
+        if (this.renderer?.getSetting("DEBUG_logRenderStats"))
+          this.debugStats.bufferUploadBytes += this.floats.byteLength;
       }
     }
 
@@ -393,6 +413,18 @@ export abstract class Program<
   }
 
   render(params: RenderParams, offset?: number, count?: number): void {
+    if (!this.shadersLogged && this.renderer?.getSetting("DEBUG_logShaders")) {
+      this.shadersLogged = true;
+      // eslint-disable-next-line no-console
+      console.log(`[sigma] DEBUG_logShaders: ${this.constructor.name}`, {
+        normal: { vertexShaderSource: this.VERTEX_SHADER_SOURCE, fragmentShaderSource: this.FRAGMENT_SHADER_SOURCE },
+        pick: {
+          vertexShaderSource: insertPickingModeDefine(this.VERTEX_SHADER_SOURCE),
+          fragmentShaderSource: insertPickingModeDefine(this.FRAGMENT_SHADER_SOURCE),
+        },
+      });
+    }
+
     if (this.hasNothingToRender()) return;
 
     this.renderOffset = offset ?? 0;
@@ -427,6 +459,12 @@ export abstract class Program<
   drawWebGL(method: number /* GLenum */, { gl }: ProgramInfo): void {
     // Framebuffer is already bound by render() for either picking or visual pass
     const count = this.renderCount >= 0 ? this.renderCount : this.capacity;
+
+    if (this.renderer?.getSetting("DEBUG_logRenderStats")) {
+      this.debugStats.drawCalls++;
+      this.debugStats.verticesDrawn += count * this.VERTICES;
+    }
+
     if (!this.isInstanced) {
       gl.drawArrays(method, this.renderOffset * this.VERTICES, count * this.VERTICES);
     } else {
