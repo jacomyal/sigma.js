@@ -37,9 +37,13 @@ function routeHit(i: AnyInternals, hit: Hit | null, verb: MouseInteraction): Hit
   return hit;
 }
 
-/** Resolves the picking pixel at `event` to a routed hit. */
+/**
+ * Resolves the hit for `verb` at `event`. Wheel reuses the last hover hit,
+ * since a fresh read would block on the GPU every tick.
+ */
 function resolveEventHit(i: AnyInternals, event: { x: number; y: number }, verb: MouseInteraction): Hit | null {
-  return routeHit(i, i.getHitAtPosition(event), verb);
+  const hit = verb === "wheel" ? i.stateManager.hovered : i.getHitAtPosition(event);
+  return routeHit(i, hit, verb);
 }
 
 function sameHit(a: Hit | null, b: Hit | null): boolean {
