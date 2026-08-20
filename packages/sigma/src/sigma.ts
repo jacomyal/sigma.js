@@ -445,7 +445,7 @@ export default class Sigma<
     });
 
     // Generate programs from primitives (uses defaults when not provided)
-    const programs = this.initPrograms(resolvedPrimitives);
+    const programs = this.initPrograms(resolvedPrimitives, resolvedSettings);
 
     // Create the attachment atlas manager only when attachments are declared.
     // The shape-aware attachment program comes from the node bundle and renders
@@ -1907,7 +1907,7 @@ export default class Sigma<
    * (Re)generates node and edge programs from primitives, at construction and
    * after a context restore. Returns the internals-bound programs.
    */
-  private initPrograms(primitives: PrimitivesDeclaration | null) {
+  private initPrograms(primitives: PrimitivesDeclaration | null, settings: Settings) {
     const sigma = this as unknown as Sigma<N, E, G>;
     const gl = this.webGLContext!;
 
@@ -1922,7 +1922,7 @@ export default class Sigma<
       shapeNameToIndex: nodeShapeMap,
       shapeGlobalIds: nodeGlobalShapeIds,
       variables: nodeVariables,
-    } = generateNodeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, primitives?.nodes);
+    } = generateNodeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, primitives?.nodes, settings.antialiasNodes);
     this.nodeProgram = nodeProgram;
     this.nodeFramePass = framePass;
     this.nodeVariableEntries = Object.entries(nodeVariables) as [string, { type: string; default: unknown }][];
@@ -1935,7 +1935,7 @@ export default class Sigma<
       framePass: edgeFramePass,
       variables: edgeVariables,
       paths: edgePaths,
-    } = generateEdgeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, primitives?.edges);
+    } = generateEdgeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, primitives?.edges, settings.antialiasEdges);
     this.edgeProgram = edgeProgram;
     this.edgeFramePass = edgeFramePass;
     this.edgeVariableEntries = Object.entries(edgeVariables) as [string, { type: string; default: unknown }][];
@@ -1969,7 +1969,7 @@ export default class Sigma<
     internals.attachmentManager?.restore();
     internals.hoverResolver.reset();
 
-    Object.assign(internals, this.initPrograms(internals.primitives));
+    Object.assign(internals, this.initPrograms(internals.primitives, internals.settings));
 
     // Custom layer programs are user code: rebuild each from its factory
     for (const entry of this.customLayerPrograms.values()) {

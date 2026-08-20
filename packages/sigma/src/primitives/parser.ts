@@ -307,18 +307,25 @@ export function generateNodeProgram<
   gl: WebGL2RenderingContext,
   pickingBuffer: WebGLFramebuffer | null,
   renderer: Sigma<N, E, G>,
-  nodePrimitives?: NodePrimitives,
+  nodePrimitives: NodePrimitives | undefined,
+  antialias: boolean,
 ): GeneratedNodeProgram<N, E, G> {
   const { shapes, layers } = parseNodePrimitives(nodePrimitives);
   const variables = nodePrimitives?.variables || {};
 
-  const bundle = createNodeProgram<N, E, G>(gl, pickingBuffer, renderer, {
-    shapes,
-    layers,
-    label: nodePrimitives?.label,
-    backdrop: nodePrimitives?.backdrop,
-    labelAttachments: nodePrimitives?.labelAttachments,
-  });
+  const bundle = createNodeProgram<N, E, G>(
+    gl,
+    pickingBuffer,
+    renderer,
+    {
+      shapes,
+      layers,
+      label: nodePrimitives?.label,
+      backdrop: nodePrimitives?.backdrop,
+      labelAttachments: nodePrimitives?.labelAttachments,
+    },
+    antialias,
+  );
 
   return { ...bundle, variables };
 }
@@ -336,7 +343,8 @@ export function generateEdgeProgram<
   gl: WebGL2RenderingContext,
   pickingBuffer: WebGLFramebuffer | null,
   renderer: Sigma<N, E, G>,
-  edgePrimitives?: EdgePrimitives,
+  edgePrimitives: EdgePrimitives | undefined,
+  antialias: boolean,
 ): GeneratedEdgeProgram<N, E, G> {
   const { paths, extremities, layers } = parseEdgePrimitives(edgePrimitives);
 
@@ -347,14 +355,20 @@ export function generateEdgeProgram<
   }
   Object.assign(variables, edgePrimitives?.variables || {});
 
-  const bundle = createEdgeProgram<N, E, G>(gl, pickingBuffer, renderer, {
-    paths,
-    extremities,
-    layers,
-    defaultHead: edgePrimitives?.defaultHead,
-    defaultTail: edgePrimitives?.defaultTail,
-    label: edgePrimitives?.label,
-  });
+  const bundle = createEdgeProgram<N, E, G>(
+    gl,
+    pickingBuffer,
+    renderer,
+    {
+      paths,
+      extremities,
+      layers,
+      defaultHead: edgePrimitives?.defaultHead,
+      defaultTail: edgePrimitives?.defaultTail,
+      label: edgePrimitives?.label,
+    },
+    antialias,
+  );
 
   return { ...bundle, variables, paths };
 }

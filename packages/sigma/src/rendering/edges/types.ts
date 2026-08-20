@@ -164,6 +164,14 @@ export interface EdgePath {
   linearParameterization?: boolean;
 
   /**
+   * When true, the shaders expose `v_sourceNodeSize` and `v_targetNodeSize`
+   * varyings carrying the source and target node visual sizes, read from the
+   * node data texture. Set this when the path's GLSL reads them (e.g. pathLoop
+   * clamping the loop radius to the node's size).
+   */
+  needsNodeSize?: boolean;
+
+  /**
    * Whether this path has sharp corners that need special handling for
    * above/below label positioning.
    *

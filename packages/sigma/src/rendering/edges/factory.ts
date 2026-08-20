@@ -91,6 +91,7 @@ export function createEdgeProgram<
   pickingBuffer: WebGLFramebuffer | null,
   renderer: Sigma<N, E, G>,
   options: EdgeProgramOptions,
+  antialias: boolean,
 ): EdgeProgramBundle<N, E, G> {
   const normalized = normalizeEdgeProgramOptions(options);
   const { paths, layers, defaultHead, defaultTail } = normalized;
@@ -137,7 +138,7 @@ export function createEdgeProgram<
     constructor(gl: WebGL2RenderingContext, pickingBuffer: WebGLFramebuffer | null, renderer: Sigma<N, E, G>) {
       // Generate shaders on first instantiation (after node shapes are registered)
       if (!generated) {
-        generated = generateEdgeShaders({ paths, extremities, layers });
+        generated = generateEdgeShaders({ paths, extremities, layers, antialias });
       }
 
       super(gl, pickingBuffer, renderer);
@@ -272,7 +273,12 @@ export function createEdgeProgram<
       });
 
       // Regenerate shaders with potentially updated layers
-      generated = generateEdgeShaders({ paths, extremities, layers: newLayers });
+      generated = generateEdgeShaders({
+        paths,
+        extremities,
+        layers: newLayers,
+        antialias: this.renderer.getSetting("antialiasEdges"),
+      });
 
       // Rebuild WebGL program
       const gl = this.normalProgram.gl;

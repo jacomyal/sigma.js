@@ -33,6 +33,8 @@ export interface Settings {
   stagePadding: number;
   minEdgeThickness: number;
   antiAliasingFeather: number;
+  antialiasEdges: boolean;
+  antialiasNodes: boolean;
 
   // Mouse and touch settings
   dragTimeout: number;
@@ -106,6 +108,8 @@ export const DEFAULT_SETTINGS: Settings = {
   stagePadding: 30,
   minEdgeThickness: 1.7,
   antiAliasingFeather: 1,
+  antialiasEdges: true,
+  antialiasNodes: true,
 
   // Mouse and touch settings
   dragTimeout: 100,

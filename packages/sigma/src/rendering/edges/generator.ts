@@ -31,11 +31,10 @@ import {
 
 const { FLOAT, UNSIGNED_BYTE } = WebGL2RenderingContext;
 
-/**
- * Options for generating edge shaders.
- * Alias for EdgeProgramOptions for backward compatibility.
- */
-export type EdgeShaderGenerationOptions = EdgeProgramOptions;
+/** Options for generating edge shaders, plus knobs not exposed on the public primitives API. */
+export type EdgeShaderGenerationOptions = EdgeProgramOptions & {
+  antialias?: boolean;
+};
 
 // ============================================================================
 // Multi-Path GLSL Generation Helpers
@@ -633,6 +632,10 @@ function generateVertexShaderMulti(
   // Node-color varyings are only emitted when a layer reads them
   const needsNodeColors = layers.some((layer) => layer.needsNodeColors);
 
+  // Node-size varyings are only emitted when a path reads them (e.g. pathLoop
+  // clamping the loop radius to the node's visual size)
+  const needsNodeSize = paths.some((p) => p.needsNodeSize);
+
   // language=GLSL
   const glsl = /*glsl*/ `#version 300 es
 
@@ -676,7 +679,6 @@ out vec4 v_color;
 out float v_opacity;
 out vec4 v_id;
 out float v_thickness;       // Edge body thickness (in consistent units)
-out float v_maxWidthFactor;  // Max width factor for geometry expansion
 out float v_t;
 out float v_tStart;
 out float v_tEnd;
@@ -685,9 +687,13 @@ out float v_antialiasingWidth;  // Anti-aliasing width (normalized: u_correction
 out vec2 v_source;
 out vec2 v_target;
 out float v_edgeLength;
-out vec2 v_position;         // World position of the vertex (for position-based distance)
+${
+  needsNodeSize
+    ? `
 out float v_sourceNodeSize;  // Source node size (mirrored in labels/generator.ts as plain float)
-out float v_targetNodeSize;  // Target node size (mirrored in labels/generator.ts as plain float)
+out float v_targetNodeSize;  // Target node size (mirrored in labels/generator.ts as plain float)`
+    : ""
+}
 ${
   needsNodeColors
     ? `
@@ -776,12 +782,14 @@ ${textureFetch.varyingAssignments}
 
   vec2 a_source = srcNodeData.xy;
   vec2 a_target = tgtNodeData.xy;
-  float a_sourceSize = srcNodeData.z;
-  float a_targetSize = tgtNodeData.z;
-
+${
+  needsNodeSize
+    ? `
   // Assign node size varyings early (path functions like loops need them during clamping)
-  v_sourceNodeSize = a_sourceSize;
-  v_targetNodeSize = a_targetSize;
+  v_sourceNodeSize = srcNodeData.z;
+  v_targetNodeSize = tgtNodeData.z;`
+    : ""
+}
 ${
   needsNodeColors
     ? `
@@ -810,9 +818,6 @@ ${
   float tEnd             = a_headLengthRatio > 0.0 ? frameClamp.y : 1.0;
   float straightenFactor = frameClamp.z;
   float pathLength       = frameClamp.w;
-
-  // Width factor for geometry expansion (use max of both extremities)
-  float widthFactor = max(max(headWidthFactor, tailWidthFactor), 1.0);
 
   // Anti-aliasing width (~1 pixel, normalized by thickness)
   float antialiasingWidth = u_correctionRatio / webGLThickness;
@@ -920,7 +925,6 @@ ${
   v_opacity = a_opacity;
   v_id = a_id;
   v_thickness = webGLThickness;
-  v_maxWidthFactor = widthFactor;
   v_t = t;
   v_tStart = tStart;
   v_tEnd = tEnd;
@@ -929,7 +933,6 @@ ${
   v_source = a_source;
   v_target = a_target;
   v_edgeLength = pathLength;
-  v_position = position;
 
   // Zone varyings
   v_zone = zone;
@@ -955,7 +958,12 @@ ${
  * Uses query functions (selectors) for path and extremity operations.
  * Supports multiple layers with "over" alpha compositing.
  */
-function generateFragmentShaderMulti(paths: EdgePath[], extremities: EdgeExtremity[], layers: EdgeLayer[]): string {
+function generateFragmentShaderMulti(
+  paths: EdgePath[],
+  extremities: EdgeExtremity[],
+  layers: EdgeLayer[],
+  antialias: boolean,
+): string {
   // Compute attribute layout for path/layer attributes from texture
   const attributeLayout = computeAttributeLayout([...paths, ...layers]);
   const textureFetch = generateEdgeAttributeTextureFetch(attributeLayout);
@@ -987,8 +995,20 @@ function generateFragmentShaderMulti(paths: EdgePath[], extremities: EdgeExtremi
   // Generate base ratio array for extremities (shared pool for head/tail)
   const extremityBaseRatios = extremities.map((e) => numberToGLSLFloat(e.baseRatio ?? 0.5)).join(", ");
 
+  // With 0 or 1 extremities the ratio is always the same constant, so skip the array lookup.
+  const baseRatioLookup = (idVar: string): string =>
+    extremities.length > 1 ? `EXTREMITY_BASE_RATIOS[${idVar}]` : numberToGLSLFloat(extremities[0]?.baseRatio ?? 0.5);
+
+  // True if some extremity draws tail/head geometry; if not, every fragment is
+  // body zone, so the tail/head branches below are dead code.
+  const hasAnyExtremityGeometry = extremities.some((e) => (!isAttributeSource(e.length) ? e.length > 0 : true));
+
   // Node-color varyings are only emitted when a layer reads them
   const needsNodeColors = layers.some((layer) => layer.needsNodeColors);
+
+  // Node-size varyings are only emitted when a path reads them (e.g. pathLoop
+  // clamping the loop radius to the node's visual size)
+  const needsNodeSize = paths.some((p) => p.needsNodeSize);
 
   // Generate layer function calls with "over" compositing (like node layers)
   const layerCalls = layers
@@ -1007,7 +1027,6 @@ in vec4 v_color;
 in float v_opacity;
 in vec4 v_id;
 in float v_thickness;       // Edge body thickness
-in float v_maxWidthFactor;  // Max width factor for geometry expansion
 in float v_t;
 in float v_tStart;
 in float v_tEnd;
@@ -1016,9 +1035,13 @@ in float v_antialiasingWidth;  // Anti-aliasing width (normalized: u_correctionR
 in vec2 v_source;
 in vec2 v_target;
 in float v_edgeLength;
-in vec2 v_position;          // World position of the fragment
+${
+  needsNodeSize
+    ? `
 in float v_sourceNodeSize;   // Source node size (mirrored in labels/generator.ts as plain float)
-in float v_targetNodeSize;   // Target node size (mirrored in labels/generator.ts as plain float)
+in float v_targetNodeSize;   // Target node size (mirrored in labels/generator.ts as plain float)`
+    : ""
+}
 ${
   needsNodeColors
     ? `
@@ -1056,8 +1079,12 @@ ${customUniforms.join("\n")}
 // Fragment output (single target - picking handled via separate pass)
 out vec4 fragColor;
 
-// Base ratio array for extremities (shared pool for head/tail)
-const float EXTREMITY_BASE_RATIOS[${extremities.length}] = float[](${extremityBaseRatios});
+${
+  extremities.length > 1
+    ? `// Base ratio array for extremities (shared pool for head/tail)
+const float EXTREMITY_BASE_RATIOS[${extremities.length}] = float[](${extremityBaseRatios});`
+    : ""
+}
 
 // EdgeContext struct
 struct EdgeContext {
@@ -1138,7 +1165,7 @@ void main() {
   context.sdf = distFromCenter - halfThickness;
   context.position = queryPathPosition(v_pathId, v_t, v_source, v_target);
   context.tangent = queryPathTangent(v_pathId, v_t, v_source, v_target);
-  context.normal = queryPathNormal(v_pathId, v_t, v_source, v_target);
+  context.normal = vec2(-context.tangent.y, context.tangent.x);
   context.thickness = v_thickness;
   context.aaWidth = aaWidthWebGL;
   context.edgeLength = v_edgeLength;
@@ -1175,9 +1202,11 @@ ${
   float bodySDF = distFromCenter - halfThickness;
   float finalSDF;
 
-  // Get base ratios from shared array
-  float headBaseRatio = EXTREMITY_BASE_RATIOS[v_headId];
-  float tailBaseRatio = EXTREMITY_BASE_RATIOS[v_tailId];
+${
+  hasAnyExtremityGeometry
+    ? `  // Base ratios, from baseRatioLookup
+  float headBaseRatio = ${baseRatioLookup("v_headId")};
+  float tailBaseRatio = ${baseRatioLookup("v_tailId")};
 
   if (v_zone < 0.5) {
     // TAIL ZONE: v_zoneT goes 0 (tip) to 1 (base)
@@ -1204,15 +1233,23 @@ ${
     } else {
       finalSDF = headSDF;
     }
-  }
+  }`
+    : `  // No extremity draws tail/head geometry, so every vertex is body zone.
+  finalSDF = bodySDF;`
+}
 
   #ifdef PICKING_MODE
     // Picking pass: output edge ID for pixels within the picking area
     if (finalSDF > u_pickingPadding * aaWidthWebGL) discard;
     fragColor = v_id;
   #else
-    // Visual pass: anti-aliased edge with layers, edge opacity applied once
-    float alpha = smoothstep(aaWidthWebGL, -aaWidthWebGL, finalSDF) * v_opacity;
+${
+  antialias
+    ? `    // Visual pass: anti-aliased edge with layers, edge opacity applied once
+    float alpha = smoothstep(aaWidthWebGL, -aaWidthWebGL, finalSDF) * v_opacity;`
+    : `    // Visual pass: hard-edged (no anti-aliasing gradient) edge with layers, edge opacity applied once
+    float alpha = (finalSDF < 0.0 ? 1.0 : 0.0) * v_opacity;`
+}
     if (alpha < 0.01) discard;
 
     // Apply layers sequentially with "over" compositing
@@ -1262,6 +1299,7 @@ function getConstantDataForCombination(
  */
 export function generateEdgeShaders(options: EdgeShaderGenerationOptions): GeneratedEdgeShaders {
   const { paths, extremities, layers } = normalizeEdgeProgramOptions(options);
+  const antialias = options.antialias ?? true;
 
   // Generate constant data for all combinations (any extremity can be head or tail)
   const vertexCountsPerCombination = new Map<string, number>();
@@ -1335,7 +1373,7 @@ export function generateEdgeShaders(options: EdgeShaderGenerationOptions): Gener
 
   return {
     vertexShader: generateVertexShaderMulti(paths, extremities, layers, constantAttributes),
-    fragmentShader: generateFragmentShaderMulti(paths, extremities, layers),
+    fragmentShader: generateFragmentShaderMulti(paths, extremities, layers, antialias),
     uniforms: collectUniformsMulti(paths, extremities, layers),
     attributes: collectAttributesMulti(paths, extremities, layers),
     verticesPerEdge: maxVerticesPerEdge,

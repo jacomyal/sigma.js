@@ -60,6 +60,7 @@ export function createNodeProgram<
   pickingBuffer: WebGLFramebuffer | null,
   renderer: Sigma<N, E, G>,
   options: NodeProgramOptions,
+  antialias: boolean,
 ): NodeProgramBundle<N, E, G> {
   const { label: labelOptions = {}, shapes } = options;
 
@@ -91,6 +92,7 @@ export function createNodeProgram<
     shapes,
     layers,
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
+    antialias,
   });
 
   // Companion programs (instances). LabelBackgroundProgram gets the
@@ -254,6 +256,7 @@ export function createNodeProgram<
         shapes,
         layers,
         shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
+        antialias: this.renderer.getSetting("antialiasNodes"),
       });
 
       // Rebuild WebGL program

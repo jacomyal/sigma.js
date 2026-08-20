@@ -92,6 +92,7 @@ float path_loop_length(vec2 source, vec2 target) {
     name: "loop",
     segments,
     glsl,
+    needsNodeSize: true,
     uniforms: [],
     attributes: [
       { name: "loopRadius", size: 1, type: WebGL2RenderingContext.FLOAT },

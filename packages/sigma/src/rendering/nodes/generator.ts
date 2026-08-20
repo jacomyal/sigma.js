@@ -31,6 +31,7 @@ export interface ShaderGenerationOptions {
    * to local indices for the queryNodeSDF switch statement.
    */
   shapeGlobalIds?: number[];
+  antialias?: boolean;
 }
 
 /**
@@ -239,7 +240,12 @@ ${varyingAssignments}
  * The node's shape rotation is applied by the vertex shader (quad geometry), so
  * the fragment SDF query (`queryNodeSDF`) is rotation-agnostic.
  */
-export function generateFragmentShader(shapes: SDFShape[], layers: FragmentLayer[], shapeGlobalIds?: number[]): string {
+export function generateFragmentShader(
+  shapes: SDFShape[],
+  layers: FragmentLayer[],
+  shapeGlobalIds?: number[],
+  antialias = true,
+): string {
   // Generate layer function calls with "over" compositing
   const layerCalls = layers
     .map((layer, index) => {
@@ -396,9 +402,14 @@ ${layerCalls}
     if (context.sdf > u_pickingPadding * v_pixelToUV) discard;
     fragColor = v_id;
   #else
-    // Visual pass: apply antialiasing at shape boundary, node opacity once
+${
+  antialias
+    ? `    // Visual pass: apply antialiasing at shape boundary, node opacity once
     // smoothstep provides smooth transition from opaque to transparent
-    float alpha = smoothstep(context.aaWidth, -context.aaWidth, context.sdf) * v_opacity;
+    float alpha = smoothstep(context.aaWidth, -context.aaWidth, context.sdf) * v_opacity;`
+    : `    // Visual pass: hard-edged (no anti-aliasing gradient) shape boundary, node opacity applied once
+    float alpha = (context.sdf < 0.0 ? 1.0 : 0.0) * v_opacity;`
+}
     // Mix with transparent to fade both color AND alpha together (avoids bright halo)
     fragColor = mix(vec4(0.0), color, alpha);
   #endif
@@ -463,11 +474,11 @@ export function collectAttributes(_layers: FragmentLayer[]): AttributeSpecificat
  * Main generator function that produces complete shader code and metadata.
  */
 export function generateShaders(options: ShaderGenerationOptions): GeneratedShaders {
-  const { shapes, layers, shapeGlobalIds } = options;
+  const { shapes, layers, shapeGlobalIds, antialias = true } = options;
 
   return {
     vertexShader: generateVertexShader(shapes, layers),
-    fragmentShader: generateFragmentShader(shapes, layers, shapeGlobalIds),
+    fragmentShader: generateFragmentShader(shapes, layers, shapeGlobalIds, antialias),
     uniforms: collectUniforms(shapes, layers),
     attributes: collectAttributes(layers),
   };
