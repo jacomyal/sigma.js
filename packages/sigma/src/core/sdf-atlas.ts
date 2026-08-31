@@ -583,10 +583,11 @@ export class SDFAtlasManager extends EventEmitter {
   private finalizeCurrentTexture(): void {
     const { maxTextureSize } = this.options;
 
-    const effectiveWidth = Math.min(
-      maxTextureSize,
-      Math.max(this.cursor.x, this.cursor.rowHeight > 0 ? maxTextureSize : 1),
-    );
+    // A page that already holds a completed row spans the full width, even when the
+    // cursor sits at x = 0: overflow finalizes right after the row wrap reset x and
+    // rowHeight, and reading cursor.x alone would then crop the page down to 1px.
+    const hasCompletedRow = this.cursor.y > 0 || this.cursor.rowHeight > 0;
+    const effectiveWidth = Math.min(maxTextureSize, Math.max(this.cursor.x, hasCompletedRow ? maxTextureSize : 1));
     const effectiveHeight = Math.min(maxTextureSize, this.cursor.y + this.cursor.rowHeight + GLYPH_MARGIN);
 
     const textureData = this.ctx.getImageData(0, 0, effectiveWidth, effectiveHeight);
