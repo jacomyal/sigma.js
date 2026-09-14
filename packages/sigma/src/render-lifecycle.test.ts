@@ -1,12 +1,16 @@
 /**
- * Regression test for the render lifecycle when process() and refreshState()
- * both fire in the same frame.
+ * Regression tests for the render() lifecycle.
  *
- * This happens when graph mutations (e.g. moving a node during drag) trigger
+ * "coincide": process() and refreshState() both fire in the same frame. This
+ * happens when graph mutations (e.g. moving a node during drag) trigger
  * needToProcess while state changes (e.g. clearing selection on drag start)
  * trigger needToRefreshState. Both run inside the same render() call:
  * process() first, then refreshState(). The final display data must reflect
  * the state changes — not silently discard them.
+ *
+ * "unchanged frame": render() is called again with nothing changed (e.g. an
+ * animation loop driving a shader uniform). It must not redo work whose
+ * inputs (label text, positions, camera) haven't changed.
  */
 import Graph from "graphology";
 import Sigma from "sigma";
@@ -60,6 +64,27 @@ describe("Render lifecycle", () => {
     // Both nodes should be back to default color
     expect(sigma.getNodeDisplayData("n1")?.color).toBe("#666");
     expect(sigma.getNodeDisplayData("n2")?.color).toBe("#666");
+
+    sigma.kill();
+    container.remove();
+  });
+
+  test("does not re-upload the label buffer on an unchanged frame", async () => {
+    const graph = new Graph();
+    graph.addNode("n1", { x: 0, y: 0, size: 10, label: "Hello" });
+
+    const container = createElement("div", { width: "100px", height: "100px" });
+    document.body.append(container);
+
+    const sigma = new Sigma(graph, container, { settings: { DEBUG_logRenderStats: true } });
+
+    // Simulate an animation loop calling render() again with nothing changed
+    // (e.g. only a shader uniform driving an animated edge).
+    sigma.scheduleRender();
+    await new Promise((r) => requestAnimationFrame(r));
+
+    const { labelProgram } = sigma["internals"];
+    expect(labelProgram.debugStats.bufferUploadBytes).toBe(0);
 
     sigma.kill();
     container.remove();
