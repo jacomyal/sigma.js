@@ -61,6 +61,13 @@ export class LabelRenderer<
   private labelSizeCache = new Map<string, { width: number; height: number; textHeight: number }>();
   /** Reusable interleaved [nodeIndex, positionMode, labelAngle] buffer for the frame-pass. */
   private framePassPoints: Float32Array = new Float32Array(0);
+  /**
+   * Set by sigma when data, state, or the camera changed since the last
+   * frame. When false, renderWebGLLabels/renderEdgeLabels skip rebuilding
+   * their GPU buffer and just redraw the one already on the GPU, since the
+   * label buffers only depend on world-space data, not the view matrix.
+   */
+  labelsDirty = true;
 
   constructor(private internals: SigmaInternals<N, E, G>) {}
 
@@ -319,60 +326,67 @@ export class LabelRenderer<
       visibleNodes.push(node);
     }
 
-    let totalCharacters = 0;
-    for (let i = 0, l = visibleNodes.length; i < l; i++) {
-      const data = nodeDataCache[visibleNodes[i]];
-      totalCharacters += data.label!.length;
-    }
+    // Nothing to show at this depth: skip touching the shared buffer so we
+    // don't clobber another depth's content already built this frame.
+    if (visibleNodes.length === 0) return;
 
-    labelProgram.reallocate(totalCharacters);
-
-    // TODO: These defaults should come from the styles system
-    const defaultLabelSize = 14;
-    const defaultLabelMargin = primitives?.nodes?.label?.margin ?? DEFAULT_LABEL_MARGIN;
-    const defaultLabelPosition = DEFAULT_NODE_DISPLAY_DATA.labelPosition;
-    const defaultLabelFont = primitives?.nodes?.label?.font?.family || "sans-serif";
-
-    const fontKeyMap = new Map<string, string>();
-
-    let characterOffset = 0;
-    for (let i = 0, l = visibleNodes.length; i < l; i++) {
-      const node = visibleNodes[i];
-      const data = nodeDataCache[node];
-
-      const fontString = data.labelFont || defaultLabelFont;
-      let fontKey = fontKeyMap.get(fontString);
-      if (fontKey === undefined) {
-        const { family, weight, style } = parseFontString(fontString);
-        fontKey = labelProgram.registerFont(family, weight, style);
-        fontKeyMap.set(fontString, fontKey);
+    if (this.labelsDirty) {
+      let totalCharacters = 0;
+      for (let i = 0, l = visibleNodes.length; i < l; i++) {
+        const data = nodeDataCache[visibleNodes[i]];
+        totalCharacters += data.label!.length;
       }
 
-      const labelData: LabelDisplayData = {
-        text: data.label!,
-        x: data.x,
-        y: data.y,
-        size: data.labelSize ?? defaultLabelSize,
-        color: data.labelColor,
-        nodeSize: data.size,
-        margin: defaultLabelMargin,
-        position: data.labelPosition ?? defaultLabelPosition,
-        hidden: false,
-        forceLabel: hasForcedLabel(data),
-        type: "default",
-        zIndex: data.zIndex ?? 0,
-        parentType: "node",
-        parentKey: node,
-        fontKey,
-        labelAngle: data.labelAngle ?? 0,
-        nodeIndex: nodeDataTexture!.getIndex(node),
-      };
+      labelProgram.reallocate(totalCharacters);
 
-      const charsProcessed = labelProgram.processLabel(node, characterOffset, labelData);
-      characterOffset += charsProcessed;
+      // TODO: These defaults should come from the styles system
+      const defaultLabelSize = 14;
+      const defaultLabelMargin = primitives?.nodes?.label?.margin ?? DEFAULT_LABEL_MARGIN;
+      const defaultLabelPosition = DEFAULT_NODE_DISPLAY_DATA.labelPosition;
+      const defaultLabelFont = primitives?.nodes?.label?.font?.family || "sans-serif";
+
+      const fontKeyMap = new Map<string, string>();
+
+      let characterOffset = 0;
+      for (let i = 0, l = visibleNodes.length; i < l; i++) {
+        const node = visibleNodes[i];
+        const data = nodeDataCache[node];
+
+        const fontString = data.labelFont || defaultLabelFont;
+        let fontKey = fontKeyMap.get(fontString);
+        if (fontKey === undefined) {
+          const { family, weight, style } = parseFontString(fontString);
+          fontKey = labelProgram.registerFont(family, weight, style);
+          fontKeyMap.set(fontString, fontKey);
+        }
+
+        const labelData: LabelDisplayData = {
+          text: data.label!,
+          x: data.x,
+          y: data.y,
+          size: data.labelSize ?? defaultLabelSize,
+          color: data.labelColor,
+          nodeSize: data.size,
+          margin: defaultLabelMargin,
+          position: data.labelPosition ?? defaultLabelPosition,
+          hidden: false,
+          forceLabel: hasForcedLabel(data),
+          type: "default",
+          zIndex: data.zIndex ?? 0,
+          parentType: "node",
+          parentKey: node,
+          fontKey,
+          labelAngle: data.labelAngle ?? 0,
+          nodeIndex: nodeDataTexture!.getIndex(node),
+        };
+
+        const charsProcessed = labelProgram.processLabel(node, characterOffset, labelData);
+        characterOffset += charsProcessed;
+      }
+
+      labelProgram.invalidateBuffers();
     }
 
-    labelProgram.invalidateBuffers();
     labelProgram.render(params);
   }
 
@@ -679,68 +693,75 @@ export class LabelRenderer<
       this.internals;
 
     const edgesToRender = this.filterEdgeLabelsForDepth(depth);
+    for (const edge of edgesToRender) this.displayedEdgeLabels.add(edge);
 
-    let totalCharacters = 0;
-    for (const edge of edgesToRender) totalCharacters += edgeDataCache[edge].label!.length;
+    // Nothing to show at this depth: skip touching the shared buffer so we
+    // don't clobber another depth's content already built this frame.
+    if (edgesToRender.length === 0) return;
 
-    edgeLabelProgram.reallocate(totalCharacters);
+    if (this.labelsDirty) {
+      let totalCharacters = 0;
+      for (const edge of edgesToRender) totalCharacters += edgeDataCache[edge].label!.length;
 
-    const defaultEdgeLabelMargin = primitives?.edges?.label?.margin ?? 5;
-    const defaultEdgeLabelPosition = "over" as const;
+      edgeLabelProgram.reallocate(totalCharacters);
 
-    let characterOffset = 0;
-    for (const edge of edgesToRender) {
-      const extremities = graph.extremities(edge);
-      const sourceKey = extremities[0];
-      const targetKey = extremities[1];
-      const sourceData = nodeDataCache[sourceKey];
-      const targetData = nodeDataCache[targetKey];
-      const edgeData = edgeDataCache[edge];
+      const defaultEdgeLabelMargin = primitives?.edges?.label?.margin ?? 5;
+      const defaultEdgeLabelPosition = "over" as const;
 
-      const sourceNodeIndex = nodeDataTexture!.getIndex(sourceKey);
-      const targetNodeIndex = nodeDataTexture!.getIndex(targetKey);
-      const edgeIndex = edgeDataTexture!.getIndex(edge);
+      let characterOffset = 0;
+      for (const edge of edgesToRender) {
+        const extremities = graph.extremities(edge);
+        const sourceKey = extremities[0];
+        const targetKey = extremities[1];
+        const sourceData = nodeDataCache[sourceKey];
+        const targetData = nodeDataCache[targetKey];
+        const edgeData = edgeDataCache[edge];
 
-      const labelData: EdgeLabelDisplayData = {
-        text: edgeData.label!,
-        x: (sourceData.x + targetData.x) / 2,
-        y: (sourceData.y + targetData.y) / 2,
-        size: DEFAULT_EDGE_LABEL_SIZE,
-        color: edgeData.labelColor,
-        nodeSize: 0,
-        nodeIndex: -1,
-        margin: defaultEdgeLabelMargin,
-        position: edgeData.labelPosition ?? defaultEdgeLabelPosition,
-        hidden: false,
-        forceLabel: hasForcedLabel(edgeData),
-        type: "default",
-        zIndex: edgeData.zIndex ?? 0,
-        parentType: "edge",
-        parentKey: edge,
-        fontKey: "",
-        labelAngle: 0,
-        sourceX: sourceData.x,
-        sourceY: sourceData.y,
-        targetX: targetData.x,
-        targetY: targetData.y,
-        sourceSize: sourceData.size,
-        targetSize: targetData.size,
-        sourceShape: sourceData.shape || "circle",
-        targetShape: targetData.shape || "circle",
-        edgeSize: edgeData.size,
-        offset: 0,
-        edgeAttributes: edgeData as unknown as Record<string, unknown>,
-        sourceNodeIndex,
-        targetNodeIndex,
-        edgeIndex,
-      };
+        const sourceNodeIndex = nodeDataTexture!.getIndex(sourceKey);
+        const targetNodeIndex = nodeDataTexture!.getIndex(targetKey);
+        const edgeIndex = edgeDataTexture!.getIndex(edge);
 
-      const charsProcessed = edgeLabelProgram.processEdgeLabel(edge, characterOffset, labelData);
-      characterOffset += charsProcessed;
-      this.displayedEdgeLabels.add(edge);
+        const labelData: EdgeLabelDisplayData = {
+          text: edgeData.label!,
+          x: (sourceData.x + targetData.x) / 2,
+          y: (sourceData.y + targetData.y) / 2,
+          size: DEFAULT_EDGE_LABEL_SIZE,
+          color: edgeData.labelColor,
+          nodeSize: 0,
+          nodeIndex: -1,
+          margin: defaultEdgeLabelMargin,
+          position: edgeData.labelPosition ?? defaultEdgeLabelPosition,
+          hidden: false,
+          forceLabel: hasForcedLabel(edgeData),
+          type: "default",
+          zIndex: edgeData.zIndex ?? 0,
+          parentType: "edge",
+          parentKey: edge,
+          fontKey: "",
+          labelAngle: 0,
+          sourceX: sourceData.x,
+          sourceY: sourceData.y,
+          targetX: targetData.x,
+          targetY: targetData.y,
+          sourceSize: sourceData.size,
+          targetSize: targetData.size,
+          sourceShape: sourceData.shape || "circle",
+          targetShape: targetData.shape || "circle",
+          edgeSize: edgeData.size,
+          offset: 0,
+          edgeAttributes: edgeData as unknown as Record<string, unknown>,
+          sourceNodeIndex,
+          targetNodeIndex,
+          edgeIndex,
+        };
+
+        const charsProcessed = edgeLabelProgram.processEdgeLabel(edge, characterOffset, labelData);
+        characterOffset += charsProcessed;
+      }
+
+      edgeLabelProgram.invalidateBuffers();
     }
 
-    edgeLabelProgram.invalidateBuffers();
     edgeLabelProgram.render(params);
   }
 

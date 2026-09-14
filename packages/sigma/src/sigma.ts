@@ -605,6 +605,9 @@ export default class Sigma<
   private bindCameraHandlers(): this {
     this.activeListeners.camera = () => {
       this.refreshMatrices();
+      // The camera ratio/viewport determines which labels get culled in, so
+      // a camera move can change the label buffer even with static data.
+      this.labelRenderer.labelsDirty = true;
       this.scheduleRender();
     };
     this.activeListeners.cameraAnimationStart = ({ from, to }: CameraAnimationPayload) => {
@@ -1063,6 +1066,10 @@ export default class Sigma<
     // First we need to resize
     this.resize();
 
+    // Reprocessing data or refreshing state can change label text, position,
+    // or styling, so the label buffers must be rebuilt this frame.
+    if (this.pendingProcess !== "none" || this.needToRefreshState) this.labelRenderer.labelsDirty = true;
+
     // Do we need to reprocess data?
     if (this.pendingProcess !== "none") this.processData();
 
@@ -1261,6 +1268,9 @@ export default class Sigma<
         this.labelRenderer.renderWebGLLabels(params, depth);
       }
     }
+
+    // Label buffers are now up to date with this frame's data/state/camera.
+    this.labelRenderer.labelsDirty = false;
 
     // If DEBUG_displayPickingLayer is enabled, blit picking framebuffer to screen
     if (this.internals.settings.DEBUG_displayPickingLayer) {
@@ -2601,6 +2611,10 @@ export default class Sigma<
     // If nothing has changed, we can stop right here
     if (!force && previousWidth === this.width && previousHeight === this.height) return this;
 
+    // The viewport size affects the label culling grid, so it can change
+    // which labels get displayed even with static data and camera.
+    this.labelRenderer.labelsDirty = true;
+
     // Sizing dom elements (stage is in extraElements)
     for (const element of [this.mouseLayer, ...Object.values(this.extraElements)]) {
       element.style.width = this.width + "px";
@@ -2984,7 +2998,11 @@ export default class Sigma<
           this.addNodeToProgram(node, programIndex);
         }
       }
-      if (skipIndexation && nodes.length > 0) this.nodeProgram.invalidateBuffers();
+      if (skipIndexation && nodes.length > 0) {
+        this.nodeProgram.invalidateBuffers();
+        // Reducers may have changed label text/position on these nodes.
+        this.labelRenderer.labelsDirty = true;
+      }
 
       const edges = opts?.partialGraph?.edges || [];
       for (let i = 0, l = edges.length; i < l; i++) {
@@ -2999,7 +3017,11 @@ export default class Sigma<
           this.addEdgeToProgram(edge, programIndex);
         }
       }
-      if (skipIndexation && edges.length > 0) this.edgeProgram.invalidateBuffers();
+      if (skipIndexation && edges.length > 0) {
+        this.edgeProgram.invalidateBuffers();
+        // Reducers may have changed label text/position on these edges.
+        this.labelRenderer.labelsDirty = true;
+      }
 
       // Determine how much reprocessing is needed on the next render
       if (!skipIndexation && this.pendingProcess !== "full") {
