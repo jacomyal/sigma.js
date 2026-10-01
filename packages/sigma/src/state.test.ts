@@ -65,6 +65,17 @@ describe("Sigma state management", () => {
       expect(sigma.getNodeState("n1").isHighlighted).toBe(true);
       expect(sigma.getNodeState("n2").isHighlighted).toBe(true);
     });
+
+    test<SigmaTestContext>("setNodeState normalizes non-string keys (regression #1454)", ({ sigma, graph }) => {
+      graph.addNode(3, { x: 2, y: 2, size: 10 });
+
+      // @ts-expect-error passing a number where a string is expected, on purpose
+      sigma.setNodeState(3, { isHighlighted: true });
+      expect(sigma.getNodeState("3").isHighlighted).toBe(true);
+
+      // @ts-expect-error same as above
+      expect(sigma.getNodeState(3).isHighlighted).toBe(true);
+    });
   });
 
   describe("Edge state", () => {
@@ -87,6 +98,18 @@ describe("Sigma state management", () => {
       const edgeKey = graph.edges()[0];
       sigma.setEdgeState(edgeKey, { isHovered: true });
       expect(sigma.getEdgeState(edgeKey).isHovered).toBe(true);
+    });
+
+    test<SigmaTestContext>("setEdgeState normalizes non-string keys (regression #1454)", ({ sigma, graph }) => {
+      graph.addNode("n3", { x: 2, y: 2, size: 10 });
+      graph.addEdgeWithKey(7, "n1", "n3", { size: 1 });
+
+      // @ts-expect-error passing a number where a string is expected, on purpose
+      sigma.setEdgeState(7, { isHighlighted: true });
+      expect(sigma.getEdgeState("7").isHighlighted).toBe(true);
+
+      // @ts-expect-error same as above
+      expect(sigma.getEdgeState(7).isHighlighted).toBe(true);
     });
   });
 
