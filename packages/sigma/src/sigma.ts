@@ -2979,7 +2979,7 @@ export default class Sigma<
     } else {
       const nodes = opts.partialGraph?.nodes || [];
       for (let i = 0, l = nodes?.length || 0; i < l; i++) {
-        const node = nodes[i];
+        const node = "" + nodes[i];
         const oldAttachment = this.internals.nodeDataCache[node]?.labelAttachment;
         // Recompute node's data (ie. apply reducer)
         this.updateNode(node);
@@ -3006,7 +3006,7 @@ export default class Sigma<
 
       const edges = opts?.partialGraph?.edges || [];
       for (let i = 0, l = edges.length; i < l; i++) {
-        const edge = edges[i];
+        const edge = "" + edges[i];
         // Recompute edge's data (ie. apply reducer)
         this.updateEdge(edge);
         // Add edge to the program

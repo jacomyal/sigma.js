@@ -53,6 +53,7 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
 
   // State accessors
   getNodeState(key: string): FullNodeState<NS> {
+    key = "" + key;
     let state = this.nodeStates.get(key);
     if (!state) {
       state = createNodeState<NS>(this.customNodeStateDefaults);
@@ -61,6 +62,7 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     return state;
   }
   getEdgeState(key: string): FullEdgeState<ES> {
+    key = "" + key;
     let state = this.edgeStates.get(key);
     if (!state) {
       state = createEdgeState<ES>(this.customEdgeStateDefaults);
@@ -80,6 +82,7 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
 
   // State mutations (public API, exposed on Sigma)
   setNodeState(key: string, state: Partial<BaseNodeState> | Partial<FullNodeState<NS>>): void {
+    key = "" + key;
     const currentState = this.getNodeState(key);
     if (!hasNewPartialProps(currentState as Record<string, unknown>, state as Record<string, unknown>)) return;
 
@@ -91,6 +94,7 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     this.scheduleRefresh();
   }
   setEdgeState(key: string, state: Partial<BaseEdgeState> | Partial<FullEdgeState<ES>>): void {
+    key = "" + key;
     const currentState = this.getEdgeState(key);
     if (!hasNewPartialProps(currentState as Record<string, unknown>, state as Record<string, unknown>)) return;
 
@@ -112,7 +116,8 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
   }
   setNodesState(keys: string[], state: Partial<BaseNodeState> | Partial<FullNodeState<NS>>): void {
     let changed = false;
-    for (const key of keys) {
+    for (let key of keys) {
+      key = "" + key;
       const currentState = this.getNodeState(key);
       if (!hasNewPartialProps(currentState as Record<string, unknown>, state as Record<string, unknown>)) continue;
       const newState = { ...currentState, ...state };
@@ -128,7 +133,8 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
   }
   setEdgesState(keys: string[], state: Partial<BaseEdgeState> | Partial<FullEdgeState<ES>>): void {
     let changed = false;
-    for (const key of keys) {
+    for (let key of keys) {
+      key = "" + key;
       const currentState = this.getEdgeState(key);
       if (!hasNewPartialProps(currentState as Record<string, unknown>, state as Record<string, unknown>)) continue;
       const newState = { ...currentState, ...state };
