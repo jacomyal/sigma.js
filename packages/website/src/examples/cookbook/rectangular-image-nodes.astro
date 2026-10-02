@@ -1,0 +1,75 @@
+<div id="sigma-container"></div>
+
+<style>
+  #sigma-container {
+    width: 100%;
+    height: 100%;
+  }
+</style>
+
+<script>
+  import { layerImage } from "@sigma/node-image";
+  import Sigma, { DEFAULT_STYLES } from "sigma";
+  import { extremityArrow, layerFill, pathCurved, sdfRectangle } from "sigma/rendering";
+
+  import { getSmallGraph } from "../_data/small-graph";
+
+  const container = document.getElementById("sigma-container") as HTMLElement;
+
+  const IMAGE_SIZES: Record<string, { width: number; height: number }> = {
+    a: { width: 600, height: 400 },
+    b: { width: 400, height: 600 },
+    c: { width: 600, height: 600 },
+    d: { width: 800, height: 300 },
+    e: { width: 300, height: 800 },
+    f: { width: 500, height: 350 },
+  };
+
+  const graph = getSmallGraph();
+
+  graph.forEachNode((node) => {
+    const { width, height } = IMAGE_SIZES[node];
+    graph.mergeNodeAttributes(node, {
+      image: `https://picsum.photos/${width}/${height}`,
+      aspectRatio: width / height,
+      label: `${width} x ${height}`,
+    });
+  });
+
+  new Sigma(graph, container, {
+    primitives: {
+      nodes: {
+        shapes: [sdfRectangle({ cornerRadius: 0.2 })],
+        variables: {
+          image: { type: "string", default: "" },
+        },
+        layers: [layerFill({ color: "#eee" }), layerImage({ textureManagerOptions: { objectFit: "contain" } })],
+      },
+      edges: {
+        paths: [pathCurved({ curvature: 0.5 })],
+        extremities: [extremityArrow({ lengthRatio: 4, widthRatio: 4 })],
+      },
+    },
+    styles: {
+      nodes: [
+        DEFAULT_STYLES.nodes,
+        {
+          backdropArea: "label",
+          labelPosition: "below",
+          size: 40,
+        },
+      ],
+      edges: [
+        DEFAULT_STYLES.edges,
+        {
+          path: "curved",
+          head: "arrow",
+          size: 8,
+        },
+      ],
+    },
+    settings: {
+      autoRescaleContent: "nodes",
+    },
+  });
+</script>
