@@ -1,6 +1,8 @@
 /**
  * Unit tests for the primitives parser module.
  */
+import Graph from "graphology";
+import Sigma, { DEFAULT_STYLES } from "sigma";
 import {
   parseEdgeExtremity,
   parseEdgeLayer,
@@ -11,7 +13,9 @@ import {
   parseNodeShape,
 } from "sigma/primitives";
 import { extremityArrow, layerFill, layerPlain, pathCurved, pathLine, sdfCircle, sdfSquare } from "sigma/rendering";
-import { describe, expect, it } from "vitest";
+import type { SDFShape } from "sigma/rendering";
+import { createElement } from "sigma/utils";
+import { afterEach, beforeEach, describe, expect, it, test } from "vitest";
 
 // =============================================================================
 // NODE SHAPE PARSING
@@ -199,5 +203,135 @@ describe("Primitives Parser", () => {
       expect(result.layers).toHaveLength(1);
       expect(result.layers[0].name).toBe("plain");
     });
+  });
+});
+
+// =============================================================================
+// VARIABLE MERGING (generateNodeProgram / generateEdgeProgram)
+// =============================================================================
+
+interface SigmaTestContext {
+  container: HTMLElement;
+}
+
+/** A minimal SDF shape declaring one attribute and its variable. */
+function createTestShapeWithVariable(): SDFShape {
+  return {
+    name: "parserTestShape",
+    glsl: "float sdf_parserTestShape(vec2 uv, float size, float aspectRatio) { return length(uv) - size; }",
+    uniforms: [],
+    attributes: [{ name: "aspectRatio", size: 1, type: WebGL2RenderingContext.FLOAT }],
+    variables: { aspectRatio: { type: "number", default: 1 } },
+  };
+}
+
+describe("generateNodeProgram variable merging", () => {
+  beforeEach<SigmaTestContext>(async (context) => {
+    const container = createElement("div", { width: "100px", height: "100px" });
+    document.body.append(container);
+    context.container = container;
+  });
+
+  afterEach<SigmaTestContext>(async ({ container }) => {
+    container.remove();
+  });
+
+  test<SigmaTestContext>("a shape's declared variable is usable without declaring it in primitives.nodes.variables", ({
+    container,
+  }) => {
+    const graph = new Graph();
+    graph.addNode("withAttribute", { x: 0, y: 0, aspectRatio: 2 });
+    graph.addNode("withoutAttribute", { x: 10, y: 10 });
+
+    const sigma = new Sigma(graph, container, {
+      primitives: { nodes: { shapes: [createTestShapeWithVariable()], layers: [layerFill()] } },
+    });
+    sigma.refresh();
+
+    expect(sigma.getNodeDisplayData("withAttribute")).toMatchObject({ aspectRatio: 2 });
+    expect(sigma.getNodeDisplayData("withoutAttribute")).toMatchObject({ aspectRatio: 1 });
+
+    sigma.kill();
+  });
+
+  test<SigmaTestContext>("primitives.nodes.variables takes precedence over a shape's declared variable on a name clash", ({
+    container,
+  }) => {
+    const graph = new Graph();
+    graph.addNode("n1", { x: 0, y: 0 });
+
+    const sigma = new Sigma(graph, container, {
+      primitives: {
+        nodes: {
+          shapes: [createTestShapeWithVariable()],
+          layers: [layerFill()],
+          variables: { aspectRatio: { type: "number", default: 99 } },
+        },
+      },
+    });
+    sigma.refresh();
+
+    expect(sigma.getNodeDisplayData("n1")).toMatchObject({ aspectRatio: 99 });
+
+    sigma.kill();
+  });
+});
+
+describe("generateEdgeProgram variable merging", () => {
+  beforeEach<SigmaTestContext>(async (context) => {
+    const container = createElement("div", { width: "100px", height: "100px" });
+    document.body.append(container);
+    context.container = container;
+  });
+
+  afterEach<SigmaTestContext>(async ({ container }) => {
+    container.remove();
+  });
+
+  test<SigmaTestContext>("pathCurved's declared curvature variable is usable without declaring it in primitives.edges.variables", ({
+    container,
+  }) => {
+    const graph = new Graph();
+    graph.addNode("n1", { x: 0, y: 0 });
+    graph.addNode("n2", { x: 10, y: 10 });
+    const edgeWithCurvature = graph.addEdge("n1", "n2", { curvature: 0.5 });
+    graph.addNode("n3", { x: 20, y: 20 });
+    const edgeWithoutCurvature = graph.addEdge("n2", "n3");
+
+    const sigma = new Sigma(graph, container, {
+      primitives: { edges: { paths: [pathCurved()], layers: [layerPlain()] } },
+      styles: { nodes: DEFAULT_STYLES.nodes, edges: DEFAULT_STYLES.edges },
+    });
+    sigma.refresh();
+
+    expect(sigma.getEdgeDisplayData(edgeWithCurvature)).toMatchObject({ curvature: 0.5 });
+    expect(sigma.getEdgeDisplayData(edgeWithoutCurvature)).toMatchObject({ curvature: 0 });
+
+    sigma.kill();
+  });
+
+  test<SigmaTestContext>("primitives.edges.variables takes precedence over a path's declared variable on a name clash", ({
+    container,
+  }) => {
+    const graph = new Graph();
+    graph.addNode("n1", { x: 0, y: 0 });
+    graph.addNode("n2", { x: 10, y: 10 });
+    const edge = graph.addEdge("n1", "n2");
+
+    const sigma = new Sigma(graph, container, {
+      primitives: {
+        edges: {
+          paths: [pathCurved()],
+          layers: [layerPlain()],
+          variables: { curvature: { type: "number", default: 0.3 } },
+        },
+      },
+      styles: { nodes: DEFAULT_STYLES.nodes, edges: DEFAULT_STYLES.edges },
+    });
+    sigma.refresh();
+
+    expect(sigma.getEdgeDisplayData(edge)).toMatchObject({ curvature: 0.3 });
+
+    sigma.kill();
   });
 });

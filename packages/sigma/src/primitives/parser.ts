@@ -294,6 +294,16 @@ export type GeneratedEdgeProgram<
   G extends Attributes = Attributes,
 > = EdgeProgramBundle<N, E, G> & { variables: VariablesDefinition; paths: EdgePath[] };
 
+/** Merges the items' `variables` with the primitives-level ones, which win on a clash. */
+function mergeDeclaredVariables(items: Array<{ variables?: VariablesDefinition }>, extra?: VariablesDefinition) {
+  const variables: VariablesDefinition = {};
+  for (const item of items) {
+    if (item.variables) Object.assign(variables, item.variables);
+  }
+  Object.assign(variables, extra || {});
+  return variables;
+}
+
 /**
  * Generates the full node program suite from a primitives declaration.
  * Wraps `createNodeProgram` with primitive parsing and tacks on the
@@ -311,7 +321,7 @@ export function generateNodeProgram<
   antialias: boolean,
 ): GeneratedNodeProgram<N, E, G> {
   const { shapes, layers } = parseNodePrimitives(nodePrimitives);
-  const variables = nodePrimitives?.variables || {};
+  const variables = mergeDeclaredVariables(shapes, nodePrimitives?.variables);
 
   const bundle = createNodeProgram<N, E, G>(
     gl,
@@ -345,15 +355,13 @@ export function generateEdgeProgram<
   renderer: Sigma<N, E, G>,
   edgePrimitives: EdgePrimitives | undefined,
   antialias: boolean,
+  // Node primitives, so edge clamping can read node shape attributes
+  nodePrimitives: NodePrimitives | undefined,
 ): GeneratedEdgeProgram<N, E, G> {
   const { paths, extremities, layers } = parseEdgePrimitives(edgePrimitives);
+  const { shapes: nodeShapes, layers: nodeLayers } = parseNodePrimitives(nodePrimitives);
 
-  // Collect variables declared by all paths
-  const variables: VariablesDefinition = {};
-  for (const path of paths) {
-    if (path.variables) Object.assign(variables, path.variables);
-  }
-  Object.assign(variables, edgePrimitives?.variables || {});
+  const variables = mergeDeclaredVariables(paths, edgePrimitives?.variables);
 
   const bundle = createEdgeProgram<N, E, G>(
     gl,
@@ -368,6 +376,8 @@ export function generateEdgeProgram<
       label: edgePrimitives?.label,
     },
     antialias,
+    nodeShapes,
+    nodeLayers,
   );
 
   return { ...bundle, variables, paths };

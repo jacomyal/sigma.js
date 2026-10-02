@@ -20,6 +20,7 @@
  * @module
  */
 import type { RenderParams } from "../../../types";
+import { ItemAttributeTexture, generateAttributeTextureFetch } from "../../data-texture";
 import type { FrameTexture } from "../../frame-texture";
 import {
   GLSL_GET_LABEL_DIRECTION,
@@ -30,10 +31,12 @@ import {
 import { setGLSLUniform } from "../../program";
 import { dedupeShapeUniforms, getShapeGLSLForShapes } from "../../shapes";
 import { loadFragmentShader, loadProgram, loadVertexShader } from "../../utils";
-import { SDFShape, UniformSpecification } from "../types";
+import { LAYER_ATTRIBUTE_TEXTURE_UNIT, getShapeAttributeLayout } from "../generator";
+import { FragmentLayer, SDFShape, UniformSpecification } from "../types";
 
 export interface NodeLabelFramePassOptions {
   shapes: SDFShape[];
+  layers: FragmentLayer[];
   shapeGlobalIds?: number[];
 }
 
@@ -51,7 +54,7 @@ void main() {
 }
 `;
 
-function generateVertexShader(shapes: SDFShape[], shapeGlobalIds?: number[]): string {
+function generateVertexShader(shapes: SDFShape[], layers: FragmentLayer[], shapeGlobalIds?: number[]): string {
   const shapeGLSL = getShapeGLSLForShapes(shapes);
 
   const shapeUniformDeclarations = dedupeShapeUniforms(shapes)
@@ -63,6 +66,18 @@ function generateVertexShader(shapes: SDFShape[], shapeGlobalIds?: number[]): st
   // to compute in-shader. Rotation is applied per node below, not baked in.
   const { code: findEdgeDistanceCode, multiShape } = generateFindEdgeDistanceForShapes(shapes, shapeGlobalIds);
 
+  // Shape attributes, fetched per node so the searched boundary matches the drawn one
+  const attributeLayout = getShapeAttributeLayout(shapes, layers);
+  const attributeDeclarations = Object.keys(attributeLayout.specs)
+    .map((name) => `float v_${name};`)
+    .join("\n");
+  const { fetchCode, varyingAssignments } = generateAttributeTextureFetch(attributeLayout, {
+    varPrefix: "nodeAttr",
+    baseTexelExpr: "nodeIdx * u_layerAttributeTexelsPerNode",
+    textureWidthUniform: "u_layerAttributeTextureWidth",
+    textureSamplerUniform: "u_layerAttributeTexture",
+  });
+
   // language=GLSL
   const shader = /*glsl*/ `#version 300 es
 precision highp float;
@@ -72,6 +87,9 @@ uniform sampler2D u_nodeDataTexture;
 uniform int u_nodeDataTextureWidth;
 uniform float u_frameTextureWidth;
 uniform float u_frameTextureHeight;
+uniform sampler2D u_layerAttributeTexture;
+uniform int u_layerAttributeTextureWidth;
+uniform int u_layerAttributeTexelsPerNode;
 ${shapeUniformDeclarations}
 
 in float a_nodeIndex;     // node-data texture index (also the target frame texel)
@@ -79,6 +97,9 @@ in float a_positionMode;  // 0=right 1=left 2=above 3=below 4=over
 in float a_labelAngle;    // intrinsic label angle (radians)
 
 out float v_edgeDist;
+
+// Shape attributes (plain globals: this pass is vertex-only)
+${attributeDeclarations}
 
 ${GLSL_READ_NODE_DATA}
 ${GLSL_READ_NODE_FLAGS}
@@ -88,6 +109,8 @@ ${GLSL_GET_LABEL_DIRECTION}
 
 void main() {
   int nodeIdx = int(a_nodeIndex);
+${fetchCode}
+${varyingAssignments}
   ${
     multiShape
       ? /*glsl*/ `// Multi-shape: the shape id lives in the node-data texture's .w channel:
@@ -146,18 +169,20 @@ export class NodeLabelFramePass {
   private buffer: WebGLBuffer;
   private uniformLocations: Record<string, WebGLUniformLocation | null> = {};
   private shapeUniforms: UniformSpecification[];
+  private hasAttributeData: boolean;
 
   /** Floats per point in the input buffer: nodeIndex, positionMode, labelAngle. */
   static readonly FLOATS_PER_POINT = 3;
 
   constructor(gl: WebGL2RenderingContext, options: NodeLabelFramePassOptions) {
-    const { shapes, shapeGlobalIds } = options;
+    const { shapes, layers, shapeGlobalIds } = options;
     if (shapes.length === 0) throw new Error("NodeLabelFramePass: at least one shape must be provided");
 
     this.gl = gl;
     this.shapeUniforms = dedupeShapeUniforms(shapes);
+    this.hasAttributeData = Object.keys(getShapeAttributeLayout(shapes, layers).offsets).length > 0;
 
-    this.vertexShader = loadVertexShader(gl, generateVertexShader(shapes, shapeGlobalIds));
+    this.vertexShader = loadVertexShader(gl, generateVertexShader(shapes, layers, shapeGlobalIds));
     this.fragmentShader = loadFragmentShader(gl, FRAGMENT_SHADER);
     this.program = loadProgram(gl, [this.vertexShader, this.fragmentShader]);
 
@@ -167,6 +192,9 @@ export class NodeLabelFramePass {
       "u_nodeDataTextureWidth",
       "u_frameTextureWidth",
       "u_frameTextureHeight",
+      "u_layerAttributeTexture",
+      "u_layerAttributeTextureWidth",
+      "u_layerAttributeTexelsPerNode",
       ...this.shapeUniforms.map((u) => u.name),
     ];
     for (const name of uniformNames) this.uniformLocations[name] = gl.getUniformLocation(this.program, name);
@@ -198,7 +226,13 @@ export class NodeLabelFramePass {
    * node-data texture (already bound). Leaves the framebuffer/viewport for the
    * caller to restore (the post-offscreen reset).
    */
-  run(pointData: Float32Array, count: number, frameTexture: FrameTexture, params: RenderParams): void {
+  run(
+    pointData: Float32Array,
+    count: number,
+    frameTexture: FrameTexture,
+    params: RenderParams,
+    attributeTexture: ItemAttributeTexture | null,
+  ): void {
     if (count === 0) return;
 
     const { gl } = this;
@@ -214,6 +248,15 @@ export class NodeLabelFramePass {
     gl.uniform1i(u.u_nodeDataTextureWidth, params.nodeDataTextureWidth);
     gl.uniform1f(u.u_frameTextureWidth, frameTexture.getTextureWidth());
     gl.uniform1f(u.u_frameTextureHeight, frameTexture.getTextureHeight());
+
+    if (this.hasAttributeData && attributeTexture) {
+      attributeTexture.bind(LAYER_ATTRIBUTE_TEXTURE_UNIT);
+      if (u.u_layerAttributeTexture) gl.uniform1i(u.u_layerAttributeTexture, LAYER_ATTRIBUTE_TEXTURE_UNIT);
+      if (u.u_layerAttributeTextureWidth)
+        gl.uniform1i(u.u_layerAttributeTextureWidth, attributeTexture.getTextureWidth());
+      if (u.u_layerAttributeTexelsPerNode)
+        gl.uniform1i(u.u_layerAttributeTexelsPerNode, attributeTexture.getTexelsPerItem());
+    }
 
     for (const uniform of this.shapeUniforms) setGLSLUniform(gl, this.uniformLocations[uniform.name], uniform);
 

@@ -120,9 +120,20 @@ export interface SDFShape {
 
   /**
    * Additional uniforms required by this shape (e.g., u_cornerRadius, u_rotation).
-   * Each uniform's value is already set when the shape is created.
+   * Values are baked into the GLSL, so each set of values is its own shape instance.
    */
   uniforms: UniformSpecification[];
+
+  /**
+   * Per-node float attributes (e.g. a rectangle's aspectRatio), read from the
+   * node attribute texture and passed to sdf_{name}() after the uniforms.
+   */
+  attributes?: AttributeSpecification[];
+
+  /**
+   * Variables backing the attributes above, like EdgePath's `variables`.
+   */
+  variables?: Record<string, { type: "number" | "color"; default: number | string }>;
 
   /**
    * Ratio of inradius to circumradius for this shape.
@@ -136,6 +147,12 @@ export interface SDFShape {
    * Defaults to 1.0 if not specified.
    */
   inradiusFactor?: number;
+
+  /**
+   * GLSL expression replacing `inradiusFactor` in the node fragment shader, for
+   * shapes whose depth varies per node. Reads attributes as `v_<name>`.
+   */
+  inradiusFactorGLSL?: string;
 }
 
 /**

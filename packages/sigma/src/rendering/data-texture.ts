@@ -615,6 +615,8 @@ export interface TextureFetchNaming {
   textureWidthUniform: string;
   /** Uniform name for the texture sampler, e.g. "u_layerAttributeTexture" */
   textureSamplerUniform: string;
+  /** Prefix of the assigned variables (default "v_"), to fetch one layout twice in a shader. */
+  outputPrefix?: string;
 }
 
 const COMPONENTS = ["r", "g", "b", "a"];
@@ -634,7 +636,7 @@ export function generateAttributeTextureFetch(
     return { fetchCode: "", varyingAssignments: "" };
   }
 
-  const { varPrefix, baseTexelExpr, textureWidthUniform, textureSamplerUniform } = naming;
+  const { varPrefix, baseTexelExpr, textureWidthUniform, textureSamplerUniform, outputPrefix = "v_" } = naming;
   const lines: string[] = [];
 
   // Base texel computation
@@ -661,28 +663,29 @@ export function generateAttributeTextureFetch(
     const texel = `${varPrefix}Texel${texelIndex}`;
     const nextTexel = `${varPrefix}Texel${texelIndex + 1}`;
 
+    const fetchedVar = `${varPrefix}Fetched_${name}`;
     if (spec.size === 1) {
-      lines.push(`  float fetched_${name} = ${texel}.${COMPONENTS[component]};`);
+      lines.push(`  float ${fetchedVar} = ${texel}.${COMPONENTS[component]};`);
     } else if (spec.size === 4 && component === 0) {
-      lines.push(`  vec4 fetched_${name} = ${texel};`);
+      lines.push(`  vec4 ${fetchedVar} = ${texel};`);
     } else {
       const endComponent = component + spec.size;
       if (endComponent <= 4) {
         // Fits within one texel
         const glslType = `vec${spec.size}`;
         const swizzle = COMPONENTS.slice(component, endComponent).join("");
-        lines.push(`  ${glslType} fetched_${name} = ${texel}.${swizzle};`);
+        lines.push(`  ${glslType} ${fetchedVar} = ${texel}.${swizzle};`);
       } else {
         // Spans two texels
         const glslType = spec.size === 4 ? "vec4" : `vec${spec.size}`;
         const firstParts = COMPONENTS.slice(component).map((c) => `${texel}.${c}`);
         const secondParts = COMPONENTS.slice(0, endComponent - 4).map((c) => `${nextTexel}.${c}`);
         const allParts = [...firstParts, ...secondParts].join(", ");
-        lines.push(`  ${glslType} fetched_${name} = ${glslType}(${allParts});`);
+        lines.push(`  ${glslType} ${fetchedVar} = ${glslType}(${allParts});`);
       }
     }
 
-    varyingLines.push(`  v_${name} = fetched_${name};`);
+    varyingLines.push(`  ${outputPrefix}${name} = ${fetchedVar};`);
   }
 
   return {

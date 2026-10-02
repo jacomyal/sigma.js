@@ -7,6 +7,7 @@
  *
  * @module
  */
+import { generateAttributeTextureFetch } from "../../data-texture";
 import {
   GLSL_NODE_SIZE_TO_PIXELS,
   GLSL_READ_FRAME_TEXEL,
@@ -17,9 +18,10 @@ import {
   GLSL_SDF_ROUNDED_BOX,
   GLSL_SDF_ROUNDED_ROTATED_BOX,
 } from "../../glsl";
-import { dedupeShapeUniforms, getShapeGLSLForShapes } from "../../shapes";
+import { dedupeShapeUniforms, generateSDFCall, getShapeGLSLForShapes } from "../../shapes";
 import { numberToGLSLFloat } from "../../utils";
-import { SDFShape } from "../types";
+import { getShapeAttributeLayout } from "../generator";
+import { FragmentLayer, SDFShape } from "../types";
 
 export interface GeneratedBackdropShaders {
   vertexShader: string;
@@ -29,12 +31,29 @@ export interface GeneratedBackdropShaders {
 
 export interface BackdropShaderOptions {
   shapes: SDFShape[];
+  /** The node program's layers, to locate shape attributes in the node attribute texture. */
+  layers: FragmentLayer[];
   /** Maps local shape index to global shape ID (for multi-shape programs). */
   shapeGlobalIds?: number[];
 }
 
+/** Shape attributes, as `flat` varyings. */
+function shapeAttributeVaryings(shapes: SDFShape[], layers: FragmentLayer[], qualifier: "out" | "in"): string {
+  const { specs } = getShapeAttributeLayout(shapes, layers);
+  return Object.keys(specs)
+    .map((name) => `flat ${qualifier} ${specs[name].size === 1 ? "float" : `vec${specs[name].size}`} v_${name};`)
+    .join("\n");
+}
+
 export function generateBackdropVertexShader(options: BackdropShaderOptions): string {
-  const { shapes, shapeGlobalIds } = options;
+  const { shapes, layers, shapeGlobalIds } = options;
+
+  const attributeFetch = generateAttributeTextureFetch(getShapeAttributeLayout(shapes, layers), {
+    varPrefix: "nodeAttr",
+    baseTexelExpr: "nodeIdx * u_layerAttributeTexelsPerNode",
+    textureWidthUniform: "u_layerAttributeTextureWidth",
+    textureSamplerUniform: "u_layerAttributeTexture",
+  });
 
   // Per-shape inradius/circumradius ratio, selected by shape id. Used to grow
   // the quad bounds to the shape's circumradius so corners/tips (and their
@@ -89,6 +108,9 @@ uniform sampler2D u_nodeDataTexture;
 uniform int u_nodeDataTextureWidth;
 uniform sampler2D u_nodeFrameTexture;
 uniform int u_nodeFrameTextureWidth;
+uniform sampler2D u_layerAttributeTexture;
+uniform int u_layerAttributeTextureWidth;
+uniform int u_layerAttributeTexelsPerNode;
 
 out vec2 v_uv;
 out vec2 v_nodeCenter;
@@ -107,6 +129,7 @@ out vec4 v_backdropBorderColor;
 out float v_backdropBorderWidth;
 out float v_backdropCornerRadius;
 out float v_backdropArea;
+${shapeAttributeVaryings(shapes, layers, "out")}
 
 ${GLSL_READ_NODE_DATA}
 ${GLSL_READ_NODE_FLAGS}
@@ -114,6 +137,8 @@ ${GLSL_READ_FRAME_TEXEL}
 
 void main() {
   int nodeIdx = int(a_nodeIndex);
+${attributeFetch.fetchCode}
+${attributeFetch.varyingAssignments}
 
   // Node data: (x, y, size, shapeId). shapeId (global) is forwarded to the
   // fragment shader, which keeps the shape SDF for the outline.
@@ -287,7 +312,7 @@ void main() {
 }
 
 export function generateBackdropFragmentShader(options: BackdropShaderOptions): string {
-  const { shapes, shapeGlobalIds } = options;
+  const { shapes, layers, shapeGlobalIds } = options;
 
   // Get all shape SDF functions (deduplicated)
   const shapeGLSL = getShapeGLSLForShapes(shapes);
@@ -297,53 +322,24 @@ export function generateBackdropFragmentShader(options: BackdropShaderOptions): 
     .join("\n");
 
   // Generate shape selector for fragment shader
+  const sdfCallGLSL = (shape: SDFShape) => generateSDFCall(shape, "nodeUV", "1.0");
+
   let shapeCallCode: string;
 
   if (shapes.length === 1) {
-    const shape = shapes[0];
-    const floatUniforms = shape.uniforms.filter((u) => u.type === "float") as Array<{
-      name: string;
-      type: "float";
-      value: number;
-    }>;
-    const paramValues = floatUniforms.map((u) => numberToGLSLFloat(u.value ?? 0));
-    const shapeCall =
-      paramValues.length > 0
-        ? `sdf_${shape.name}(nodeUV, 1.0, ${paramValues.join(", ")})`
-        : `sdf_${shape.name}(nodeUV, 1.0)`;
-    shapeCallCode = `float nodeSdfNormalized = ${shapeCall};`;
+    shapeCallCode = `float nodeSdfNormalized = ${sdfCallGLSL(shapes[0])};`;
   } else {
     // Multi-shape: generate switch-based SDF query
     // Use global shape IDs as case values when available (v_shapeId contains global IDs)
     const cases = shapes
       .map((shape, index) => {
-        const floatUniforms = shape.uniforms.filter((u) => u.type === "float") as Array<{
-          name: string;
-          type: "float";
-          value: number;
-        }>;
-        const paramValues = floatUniforms.map((u) => numberToGLSLFloat(u.value ?? 0));
-        const sdfCall =
-          paramValues.length > 0
-            ? `sdf_${shape.name}(nodeUV, 1.0, ${paramValues.join(", ")})`
-            : `sdf_${shape.name}(nodeUV, 1.0)`;
         const caseId = shapeGlobalIds ? shapeGlobalIds[index] : index;
-        return `    case ${caseId}: nodeSdfNormalized = ${sdfCall}; break;`;
+        return `    case ${caseId}: nodeSdfNormalized = ${sdfCallGLSL(shape)}; break;`;
       })
       .join("\n");
 
     // Default to first shape
-    const defaultShape = shapes[0];
-    const defaultFloatUniforms = defaultShape.uniforms.filter((u) => u.type === "float") as Array<{
-      name: string;
-      type: "float";
-      value: number;
-    }>;
-    const defaultParams = defaultFloatUniforms.map((u) => numberToGLSLFloat(u.value ?? 0));
-    const defaultCall =
-      defaultParams.length > 0
-        ? `sdf_${defaultShape.name}(nodeUV, 1.0, ${defaultParams.join(", ")})`
-        : `sdf_${defaultShape.name}(nodeUV, 1.0)`;
+    const defaultCall = sdfCallGLSL(shapes[0]);
 
     shapeCallCode = `float nodeSdfNormalized;
   int shapeId = int(v_shapeId);
@@ -387,6 +383,7 @@ in vec4 v_backdropBorderColor;
 in float v_backdropBorderWidth;
 in float v_backdropCornerRadius;
 in float v_backdropArea;
+${shapeAttributeVaryings(shapes, layers, "in")}
 
 uniform float u_cameraAngle;
 ${shapeUniformDeclarations}
@@ -483,6 +480,9 @@ export function collectBackdropUniforms(shapes: SDFShape[]): string[] {
     "u_nodeDataTextureWidth",
     "u_nodeFrameTexture",
     "u_nodeFrameTextureWidth",
+    "u_layerAttributeTexture",
+    "u_layerAttributeTextureWidth",
+    "u_layerAttributeTexelsPerNode",
   ];
 
   for (const uniform of dedupeShapeUniforms(shapes)) {

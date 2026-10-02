@@ -26,7 +26,7 @@ import { getShapeId, registerShapeInstance } from "../shapes";
 import { ProgramInfo } from "../utils";
 import { type AttachmentProgram, createAttachmentProgram } from "./attachments";
 import { type BackdropProgram, createBackdropProgram } from "./backdrops";
-import { generateShaders } from "./generator";
+import { LAYER_ATTRIBUTE_TEXTURE_UNIT, generateShaders, getNodeAttributeSources } from "./generator";
 import {
   type LabelBackgroundProgram,
   type LabelProgram,
@@ -35,9 +35,6 @@ import {
   createLabelProgram,
 } from "./labels";
 import { FragmentLayer, LayerLifecycleContext, LayerLifecycleHooks, NodeProgramOptions } from "./types";
-
-// Texture unit for layer attribute texture (units 0-4 used by sigma, unit 5 for layer attributes)
-const LAYER_ATTRIBUTE_TEXTURE_UNIT = 5;
 
 /**
  * Builds a node program suite from SDF shape(s) and fragment layers. The
@@ -103,6 +100,8 @@ export function createNodeProgram<
   });
   const backdropProgram = createBackdropProgram(gl, null, renderer, {
     shapes,
+    layers,
+    getAttributeTexture: () => nodeProgram.getAttributeTexture(),
     label: labelOptions,
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
   });
@@ -122,11 +121,13 @@ export function createNodeProgram<
   // texture, which the companions above read instead of searching themselves.
   const framePass = new NodeLabelFramePass(gl, {
     shapes,
+    layers,
     shapeGlobalIds: shapes.length > 1 ? shapeGlobalIds : undefined,
   });
 
-  // Compute layout once for all instances
-  const layerAttributeLayout = computeAttributeLayout(layers);
+  // Compute layout once for all instances (layer and shape attributes)
+  const nodeAttributeSources = getNodeAttributeSources(shapes, layers);
+  const layerAttributeLayout = computeAttributeLayout(nodeAttributeSources);
 
   // Build the node program class (instantiated at the bottom)
   const NodeProgramClass = class extends Program<string, N, E, G> {
@@ -204,7 +205,11 @@ export function createNodeProgram<
           );
         }
       });
-      this.attrDescriptors = buildAttrDescriptors(layers, layerAttributeLayout, lifecycleMapForDescriptors);
+      this.attrDescriptors = buildAttrDescriptors(
+        nodeAttributeSources,
+        layerAttributeLayout,
+        lifecycleMapForDescriptors,
+      );
     }
 
     getDefinition() {
@@ -290,6 +295,10 @@ export function createNodeProgram<
      */
     freeNode(nodeKey: string): void {
       this.layerAttributeTexture.free(nodeKey);
+    }
+
+    getAttributeTexture(): ItemAttributeTexture | null {
+      return this.layerAttributeTexture;
     }
 
     /**
@@ -444,8 +453,10 @@ export function createNodeProgram<
     }
   };
 
+  const nodeProgram = new NodeProgramClass(gl, null, renderer);
+
   return {
-    nodeProgram: new NodeProgramClass(gl, null, renderer),
+    nodeProgram,
     labelProgram,
     backdropProgram,
     labelBackgroundProgram,
@@ -467,6 +478,8 @@ export interface NodeProgram<
   allocateNode(nodeKey: string): void;
   freeNode(nodeKey: string): void;
   uploadLayerTexture(): void;
+  /** The node attribute texture, read by the frame-passes and backdrops. */
+  getAttributeTexture(): ItemAttributeTexture | null;
 }
 
 export interface NodeProgramBundle<

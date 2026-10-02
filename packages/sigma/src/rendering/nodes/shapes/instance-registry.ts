@@ -9,7 +9,7 @@
  * @module
  */
 import { numberToGLSLFloat } from "../../utils";
-import { SDFShape, UniformSpecification } from "../types";
+import { AttributeSpecification, SDFShape, UniformSpecification } from "../types";
 
 interface RegisteredShapeInstance {
   shape: SDFShape;
@@ -21,13 +21,52 @@ const shapeInstanceRegistry = new Map<string, RegisteredShapeInstance>();
 const shapeIdMap = new Map<string, number>();
 let nextShapeId = 0;
 
+/**
+ * Static fallback for a shape attribute, for edge clamping on shapes the edge
+ * program's node primitives don't declare.
+ */
+export function getStaticAttributeDefault(shape: SDFShape, attr: AttributeSpecification): string {
+  const declaredDefault = shape.variables?.[attr.source || attr.name.replace(/^a_/, "")]?.default;
+  const value =
+    typeof declaredDefault === "number"
+      ? declaredDefault
+      : typeof attr.defaultValue === "number"
+        ? attr.defaultValue
+        : 0;
+  return numberToGLSLFloat(value);
+}
+
+/**
+ * Builds a `sdf_{name}(...)` call: float uniforms baked as literals, then each
+ * attribute as `attributeExpr(attr)` (the `v_<name>` varying by default).
+ */
+export function generateSDFCall(
+  shape: SDFShape,
+  uv: string,
+  size: string,
+  attributeExpr: (attr: AttributeSpecification) => string = (attr) => `v_${attr.name.replace(/^a_/, "")}`,
+): string {
+  const params = [
+    uv,
+    size,
+    ...shape.uniforms.filter((u) => u.type === "float").map((u) => numberToGLSLFloat((u.value as number) ?? 0)),
+    ...(shape.attributes ?? []).map(attributeExpr),
+  ];
+  return `sdf_${shape.name}(${params.join(", ")})`;
+}
+
 function generateShapeSlug(shape: SDFShape): string {
   let slug = shape.name;
   const nonZeroParams = shape.uniforms
     .filter((u) => u.type === "float" && u.value !== undefined && u.value !== 0)
     .map((u) => `${u.name.replace("u_", "")}=${u.value}`)
     .sort();
-  if (nonZeroParams.length > 0) slug += "#" + nonZeroParams.join("#");
+  // Attribute sources and defaults change the static fallback in querySDF.
+  const attributeParams = (shape.attributes ?? []).map(
+    (a) => `${a.name}@${a.source ?? ""}=${getStaticAttributeDefault(shape, a)}`,
+  );
+  const params = [...nonZeroParams, ...attributeParams];
+  if (params.length > 0) slug += "#" + params.join("#");
   return slug;
 }
 
@@ -89,7 +128,14 @@ export function getAllShapeGLSL(): string {
   return deduplicateShapeGLSL(Array.from(shapeInstanceRegistry.values()).map((r) => r.shape));
 }
 
-export function generateShapeSelectorGLSL(): string {
+/**
+ * Generates the global `querySDF(shapeId, uv, size)` selector, used by edge
+ * clamping. Attributes listed in `dynamicAttributeNames` are read from `g_<name>`
+ * globals the caller sets; others use their static default.
+ *
+ * querySDF is rotation-agnostic: callers pre-rotate `uv` per node.
+ */
+export function generateShapeSelectorGLSL(dynamicAttributeNames?: ReadonlySet<string>): string {
   const shapes = Array.from(shapeInstanceRegistry.entries());
   if (shapes.length === 0) {
     return /*glsl*/ `
@@ -99,17 +145,12 @@ float querySDF(int shapeId, vec2 uv, float size) {
 `;
   }
 
-  // querySDF is rotation-agnostic: callers pre-rotate `uv` per node (the camera
-  // counter-rotation depends on the node's rotation-alignment flag).
   const cases = shapes
-    .map(([slug, registered], index) => {
-      const { shape, uniformValues } = registered;
-      const floatUniforms = shape.uniforms.filter((u) => u.type === "float");
-      const paramValues = floatUniforms.map((u) => numberToGLSLFloat(uniformValues[u.name] ?? 0));
-      const sdfCall =
-        paramValues.length === 0
-          ? `sdf_${shape.name}(uv, size)`
-          : `sdf_${shape.name}(uv, size, ${paramValues.join(", ")})`;
+    .map(([slug, { shape }], index) => {
+      const sdfCall = generateSDFCall(shape, "uv", "size", (a) => {
+        const name = a.name.replace(/^a_/, "");
+        return dynamicAttributeNames?.has(name) ? `g_${name}` : getStaticAttributeDefault(shape, a);
+      });
       return `    case ${index}: return ${sdfCall}; // ${slug}`;
     })
     .join("\n");
@@ -143,24 +184,16 @@ void queryNodeSDF(int shapeId, vec2 uv, float size) {
 `;
   }
 
-  const getSdfCall = (shape: SDFShape) => {
-    const floatUniforms = shape.uniforms.filter((u) => u.type === "float") as Array<{
-      name: string;
-      type: "float";
-      value: number;
-    }>;
-    const paramValues = floatUniforms.map((u) => numberToGLSLFloat(u.value ?? 0));
-    return paramValues.length === 0
-      ? `sdf_${shape.name}(uv, size)`
-      : `sdf_${shape.name}(uv, size, ${paramValues.join(", ")})`;
-  };
+  const getSdfCall = (shape: SDFShape) => generateSDFCall(shape, "uv", "size");
+  const getInradiusFactor = (shape: SDFShape) =>
+    shape.inradiusFactorGLSL ?? numberToGLSLFloat(shape.inradiusFactor ?? 1.0);
 
   if (shapes.length === 1) {
     const shape = shapes[0];
     return /*glsl*/ `
 void queryNodeSDF(int shapeId, vec2 uv, float size) {
   context.sdf = ${getSdfCall(shape)};
-  context.inradiusFactor = ${numberToGLSLFloat(shape.inradiusFactor ?? 1.0)};
+  context.inradiusFactor = ${getInradiusFactor(shape)};
 }
 `;
   }
@@ -169,7 +202,7 @@ void queryNodeSDF(int shapeId, vec2 uv, float size) {
     .map(
       (shape, index) => `    case ${index}: // ${shape.name}
       context.sdf = ${getSdfCall(shape)};
-      context.inradiusFactor = ${numberToGLSLFloat(shape.inradiusFactor ?? 1.0)};
+      context.inradiusFactor = ${getInradiusFactor(shape)};
       break;`,
     )
     .join("\n");
@@ -199,7 +232,7 @@ void queryNodeSDF(int shapeId, vec2 uv, float size) {
 ${cases}
     default:
       context.sdf = ${getSdfCall(defaultShape)};
-      context.inradiusFactor = ${numberToGLSLFloat(defaultShape.inradiusFactor ?? 1.0)};
+      context.inradiusFactor = ${getInradiusFactor(defaultShape)};
   }
 }
 `;

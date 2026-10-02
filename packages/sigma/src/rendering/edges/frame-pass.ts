@@ -22,6 +22,8 @@
 import type { RenderParams } from "../../types";
 import { ItemAttributeTexture, computeAttributeLayout } from "../data-texture";
 import type { FrameTexture } from "../frame-texture";
+import { FragmentLayer, SDFShape } from "../nodes";
+import { LAYER_ATTRIBUTE_TEXTURE_UNIT, getShapeAttributeLayout } from "../nodes/generator";
 import { setGLSLUniform } from "../program";
 import { loadFragmentShader, loadProgram, loadVertexShader } from "../utils";
 import { generateEdgeFramePassVertexShader } from "./generator";
@@ -32,6 +34,9 @@ export interface EdgeFramePassOptions {
   paths: EdgePath[];
   extremities: EdgeExtremity[];
   layers: EdgeLayer[];
+  /** Node primitives, to read node shape attributes for clamping. */
+  nodeShapes: SDFShape[];
+  nodeLayers: FragmentLayer[];
 }
 
 // language=GLSL
@@ -58,13 +63,18 @@ export class EdgeFramePass {
   // Path/extremity custom uniforms set per run (sampler2D ones are skipped).
   private customUniforms: UniformSpecification[];
   private hasAttributeData: boolean;
+  private hasNodeAttributeData: boolean;
 
   constructor(gl: WebGL2RenderingContext, options: EdgeFramePassOptions) {
-    const { paths, extremities, layers } = options;
+    const { paths, extremities, layers, nodeShapes, nodeLayers } = options;
     this.gl = gl;
     this.hasAttributeData = computeAttributeLayout([...paths, ...layers]).floatsPerItem > 0;
+    this.hasNodeAttributeData = Object.keys(getShapeAttributeLayout(nodeShapes, nodeLayers).offsets).length > 0;
 
-    this.vertexShader = loadVertexShader(gl, generateEdgeFramePassVertexShader(paths, extremities, layers));
+    this.vertexShader = loadVertexShader(
+      gl,
+      generateEdgeFramePassVertexShader(paths, extremities, layers, nodeShapes, nodeLayers),
+    );
     this.fragmentShader = loadFragmentShader(gl, FRAGMENT_SHADER);
     this.program = loadProgram(gl, [this.vertexShader, this.fragmentShader]);
 
@@ -91,6 +101,9 @@ export class EdgeFramePass {
       "u_edgeAttributeTexture",
       "u_edgeAttributeTextureWidth",
       "u_edgeAttributeTexelsPerEdge",
+      "u_layerAttributeTexture",
+      "u_layerAttributeTextureWidth",
+      "u_layerAttributeTexelsPerNode",
       "u_frameTextureWidth",
       "u_frameTextureHeight",
       ...this.customUniforms.map((u) => u.name),
@@ -114,6 +127,7 @@ export class EdgeFramePass {
     frameTexture: FrameTexture,
     edgeCount: number,
     edgeAttributeTexture: ItemAttributeTexture | null,
+    nodeAttributeTexture: ItemAttributeTexture | null,
   ): void {
     if (edgeCount === 0) return;
 
@@ -141,6 +155,15 @@ export class EdgeFramePass {
         gl.uniform1i(u.u_edgeAttributeTextureWidth, edgeAttributeTexture.getTextureWidth());
       if (u.u_edgeAttributeTexelsPerEdge)
         gl.uniform1i(u.u_edgeAttributeTexelsPerEdge, edgeAttributeTexture.getTexelsPerItem());
+    }
+
+    if (this.hasNodeAttributeData && nodeAttributeTexture) {
+      nodeAttributeTexture.bind(LAYER_ATTRIBUTE_TEXTURE_UNIT);
+      if (u.u_layerAttributeTexture) gl.uniform1i(u.u_layerAttributeTexture, LAYER_ATTRIBUTE_TEXTURE_UNIT);
+      if (u.u_layerAttributeTextureWidth)
+        gl.uniform1i(u.u_layerAttributeTextureWidth, nodeAttributeTexture.getTextureWidth());
+      if (u.u_layerAttributeTexelsPerNode)
+        gl.uniform1i(u.u_layerAttributeTexelsPerNode, nodeAttributeTexture.getTexelsPerItem());
     }
 
     for (const uniform of this.customUniforms) setGLSLUniform(gl, this.uniformLocations[uniform.name], uniform);

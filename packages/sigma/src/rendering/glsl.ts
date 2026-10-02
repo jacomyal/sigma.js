@@ -7,7 +7,7 @@
  */
 import { LabelPosition } from "../types";
 import type { SDFShape } from "./nodes";
-import { numberToGLSLFloat } from "./utils";
+import { generateSDFCall } from "./shapes";
 
 /**
  * Maps label position names to numeric values for shaders.
@@ -221,15 +221,8 @@ export function generateFindEdgeDistanceForShapes(
   shapes: SDFShape[],
   shapeGlobalIds?: number[],
 ): { code: string; multiShape: boolean } {
-  const floatParams = (shape: SDFShape): string[] =>
-    shape.uniforms
-      .filter((u): u is { name: string; type: "float"; value: number } => u.type === "float")
-      .map((u) => numberToGLSLFloat(u.value ?? 0));
-
-  const sdfCall = (shape: SDFShape): string => {
-    const params = floatParams(shape);
-    return params.length > 0 ? `sdf_${shape.name}(uv, size, ${params.join(", ")})` : `sdf_${shape.name}(uv, size)`;
-  };
+  // Shape attributes are read from v_<name> globals the caller fetches.
+  const sdfCall = (shape: SDFShape): string => generateSDFCall(shape, "uv", "size");
 
   if (shapes.length === 1) {
     return { code: findEdgeDistanceLoop(sdfCall(shapes[0])), multiShape: false };

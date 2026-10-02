@@ -21,7 +21,7 @@ import {
   computeAttributeLayout,
   packAttributes,
 } from "../data-texture";
-import { isAttributeSource } from "../nodes";
+import { FragmentLayer, SDFShape, isAttributeSource } from "../nodes";
 import { Program } from "../program";
 import { ProgramInfo } from "../utils";
 import { EdgeFramePass } from "./frame-pass";
@@ -92,6 +92,9 @@ export function createEdgeProgram<
   renderer: Sigma<N, E, G>,
   options: EdgeProgramOptions,
   antialias: boolean,
+  // Node primitives, so the frame-pass can read node shape attributes
+  nodeShapes: SDFShape[],
+  nodeLayers: FragmentLayer[],
 ): EdgeProgramBundle<N, E, G> {
   const normalized = normalizeEdgeProgramOptions(options);
   const { paths, layers, defaultHead, defaultTail } = normalized;
@@ -508,7 +511,7 @@ export function createEdgeProgram<
   // per frame into the edge-frame texture, which the body, label and background
   // all read by edge index. Built from the same paths/extremities/layers, so
   // its clamp matches what the body draws.
-  const framePass = new EdgeFramePass(gl, { paths, extremities, layers });
+  const framePass = new EdgeFramePass(gl, { paths, extremities, layers, nodeShapes, nodeLayers });
 
   return {
     edgeProgram: new EdgeProgramClass(gl, null, renderer),

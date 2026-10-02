@@ -12,11 +12,13 @@ import { Attributes } from "graphology-types";
 
 import type Sigma from "../../../sigma";
 import type { LabelPosition, RenderParams } from "../../../types";
+import { ItemAttributeTexture } from "../../data-texture";
 import { POSITION_MODE_MAP } from "../../glsl";
 import { Program } from "../../program";
 import { dedupeShapeUniforms } from "../../shapes";
 import { InstancedProgramDefinition, ProgramInfo } from "../../utils";
-import { LabelOptions, SDFShape } from "../types";
+import { LAYER_ATTRIBUTE_TEXTURE_UNIT } from "../generator";
+import { FragmentLayer, LabelOptions, SDFShape } from "../types";
 import { BackdropShaderOptions, generateBackdropShaders } from "./generator";
 
 export interface BackdropDisplayData {
@@ -44,6 +46,9 @@ export interface BackdropDisplayData {
 
 export interface CreateBackdropProgramOptions {
   shapes: SDFShape[];
+  layers: FragmentLayer[];
+  /** The node attribute texture, holding shape attributes. */
+  getAttributeTexture: () => ItemAttributeTexture | null;
   label?: LabelOptions;
   /** Maps local shape index to global shape ID (for multi-shape programs). */
   shapeGlobalIds?: number[];
@@ -59,7 +64,7 @@ export function createBackdropProgram<
   renderer: Sigma<N, E, G>,
   options: CreateBackdropProgramOptions,
 ): BackdropProgram<N, E, G> {
-  const { label: labelOptions = {}, shapes, shapeGlobalIds } = options;
+  const { label: labelOptions = {}, shapes, layers, getAttributeTexture, shapeGlobalIds } = options;
 
   if (shapes.length === 0) {
     throw new Error("createBackdropProgram: at least one shape must be provided in 'shapes'");
@@ -68,7 +73,7 @@ export function createBackdropProgram<
   const labelMargin = labelOptions.margin ?? 5;
   const zoomToLabelSizeRatioFunction = labelOptions.zoomToLabelSizeRatioFunction ?? (() => 1);
 
-  const shaderOptions: BackdropShaderOptions = { shapes, shapeGlobalIds };
+  const shaderOptions: BackdropShaderOptions = { shapes, layers, shapeGlobalIds };
   const generatedShaders = generateBackdropShaders(shaderOptions);
 
   type BackdropUniform = string;
@@ -167,6 +172,15 @@ export function createBackdropProgram<
       gl.uniform1i(uniformLocations.u_nodeDataTextureWidth, params.nodeDataTextureWidth);
       gl.uniform1i(uniformLocations.u_nodeFrameTexture, params.nodeFrameTextureUnit);
       gl.uniform1i(uniformLocations.u_nodeFrameTextureWidth, params.nodeFrameTextureWidth);
+
+      // Node attribute texture (shape attributes)
+      const attributeTexture = getAttributeTexture();
+      if (uniformLocations.u_layerAttributeTexture && attributeTexture) {
+        attributeTexture.bind(LAYER_ATTRIBUTE_TEXTURE_UNIT);
+        gl.uniform1i(uniformLocations.u_layerAttributeTexture, LAYER_ATTRIBUTE_TEXTURE_UNIT);
+        gl.uniform1i(uniformLocations.u_layerAttributeTextureWidth, attributeTexture.getTextureWidth());
+        gl.uniform1i(uniformLocations.u_layerAttributeTexelsPerNode, attributeTexture.getTexelsPerItem());
+      }
 
       // Shape-specific uniforms (fragment shader keeps the node SDF for the outline)
       for (const uniform of dedupeShapeUniforms(shapes)) {

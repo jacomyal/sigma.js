@@ -1175,6 +1175,7 @@ export default class Sigma<
       this.internals.edgeFrameTexture!,
       this.internals.edgeDataTexture!.getHighWaterMark(),
       this.edgeProgram.getAttributeTexture(),
+      this.nodeProgram.getAttributeTexture(),
     );
     this.internals.edgeFrameTexture!.bind(EDGE_FRAME_TEXTURE_UNIT);
 
@@ -1184,7 +1185,13 @@ export default class Sigma<
       // Run the frame-pass over the displayed labels to write each one's normalized
       // edge distance into the node-frame texture (unit 2); consumers read it there.
       const { data, count } = this.labelRenderer.buildFramePassPoints();
-      this.nodeFramePass.run(data, count, this.internals.nodeFrameTexture!, params);
+      this.nodeFramePass.run(
+        data,
+        count,
+        this.internals.nodeFrameTexture!,
+        params,
+        this.nodeProgram.getAttributeTexture(),
+      );
       this.internals.nodeFrameTexture!.bind(NODE_FRAME_TEXTURE_UNIT);
     }
 
@@ -1945,7 +1952,14 @@ export default class Sigma<
       framePass: edgeFramePass,
       variables: edgeVariables,
       paths: edgePaths,
-    } = generateEdgeProgram<N, E, G>(gl, this.pickingFrameBuffer, sigma, primitives?.edges, settings.antialiasEdges);
+    } = generateEdgeProgram<N, E, G>(
+      gl,
+      this.pickingFrameBuffer,
+      sigma,
+      primitives?.edges,
+      settings.antialiasEdges,
+      primitives?.nodes,
+    );
     this.edgeProgram = edgeProgram;
     this.edgeFramePass = edgeFramePass;
     this.edgeVariableEntries = Object.entries(edgeVariables) as [string, { type: string; default: unknown }][];

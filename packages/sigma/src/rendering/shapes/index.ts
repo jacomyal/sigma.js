@@ -18,5 +18,7 @@ export {
   dedupeShapeUniforms,
   generateShapeSelectorGLSL,
   generateNodeShapeSelectorGLSL,
+  getStaticAttributeDefault,
+  generateSDFCall,
   clearShapeInstanceRegistry,
 } from "../nodes/shapes/instance-registry";

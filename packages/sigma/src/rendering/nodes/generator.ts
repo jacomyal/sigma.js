@@ -6,7 +6,7 @@
  *
  * @module
  */
-import { computeAttributeLayout, generateAttributeTextureFetch } from "../data-texture";
+import { AttributeLayout, computeAttributeLayout, generateAttributeTextureFetch } from "../data-texture";
 import { GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../glsl";
 import { generateNodeShapeSelectorGLSL, getShapeGLSLForShapes } from "../shapes";
 import { AttributeSpecification, FragmentLayer, SDFShape } from "./types";
@@ -16,6 +16,33 @@ export interface GeneratedShaders {
   fragmentShader: string;
   uniforms: string[];
   attributes: AttributeSpecification[];
+}
+
+/** Node attribute texture unit, shared by all node passes (0-4 are sigma's). */
+export const LAYER_ATTRIBUTE_TEXTURE_UNIT = 5;
+
+/**
+ * Layer and shape attribute sources of the node attribute texture. Layers come
+ * first, so lifecycle hooks keep their layer index.
+ */
+export function getNodeAttributeSources(
+  shapes: SDFShape[],
+  layers: FragmentLayer[],
+): Array<{ attributes: AttributeSpecification[] }> {
+  return [...layers, ...shapes.map((shape) => ({ attributes: shape.attributes ?? [] }))];
+}
+
+/** The node attribute layout, restricted to shape attributes. */
+export function getShapeAttributeLayout(shapes: SDFShape[], layers: FragmentLayer[]): AttributeLayout {
+  const layout = computeAttributeLayout(getNodeAttributeSources(shapes, layers));
+  const names = new Set(shapes.flatMap((shape) => shape.attributes ?? []).map((a) => a.name.replace(/^a_/, "")));
+  const offsets: AttributeLayout["offsets"] = {};
+  const specs: AttributeLayout["specs"] = {};
+  for (const name of names) {
+    offsets[name] = layout.offsets[name];
+    specs[name] = layout.specs[name];
+  }
+  return { ...layout, offsets, specs };
 }
 
 export interface ShaderGenerationOptions {
@@ -77,10 +104,11 @@ export function generateVertexShader(shapes: SDFShape[], layers: FragmentLayer[]
     .map((u) => `uniform ${u.type} ${u.name};`)
     .join("\n");
 
-  // Collect all layer varyings as outputs (with deduplication)
+  // Collect all layer and shape varyings as outputs (with deduplication)
+  const attributeSources = getNodeAttributeSources(shapes, layers);
   const seenVaryings = new Set<string>();
-  const layerVaryings = layers
-    .flatMap((layer) => layer.attributes)
+  const layerVaryings = attributeSources
+    .flatMap((source) => source.attributes)
     .filter((a) => {
       const name = a.name.replace(/^a_/, "");
       if (seenVaryings.has(name)) return false;
@@ -94,8 +122,8 @@ export function generateVertexShader(shapes: SDFShape[], layers: FragmentLayer[]
     })
     .join("\n");
 
-  // Generate texture fetch code for layer attributes
-  const { fetchCode, varyingAssignments } = generateAttributeTextureFetch(computeAttributeLayout(layers), {
+  // Generate texture fetch code for layer and shape attributes
+  const { fetchCode, varyingAssignments } = generateAttributeTextureFetch(computeAttributeLayout(attributeSources), {
     varPrefix: "layer",
     baseTexelExpr: "nodeIdx * u_layerAttributeTexelsPerNode",
     textureWidthUniform: "u_layerAttributeTextureWidth",
@@ -286,10 +314,10 @@ export function generateFragmentShader(
     .map((u) => `uniform ${u.type} ${u.name};`)
     .join("\n");
 
-  // Collect all varyings from layers (with deduplication)
+  // Collect all varyings from layers and shapes (with deduplication)
   const seenVaryings = new Set<string>();
-  const layerVaryings = layers
-    .flatMap((layer) => layer.attributes)
+  const layerVaryings = getNodeAttributeSources(shapes, layers)
+    .flatMap((source) => source.attributes)
     .filter((a) => {
       const name = a.name.replace(/^a_/, "");
       if (seenVaryings.has(name)) return false;

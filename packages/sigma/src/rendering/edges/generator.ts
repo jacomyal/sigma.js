@@ -8,9 +8,10 @@
  *
  * @module
  */
-import { computeAttributeLayout } from "../data-texture";
+import { computeAttributeLayout, generateAttributeTextureFetch } from "../data-texture";
 import { GLSL_READ_FRAME_TEXEL, GLSL_READ_NODE_COLOR, GLSL_READ_NODE_DATA, GLSL_READ_NODE_FLAGS } from "../glsl";
-import { isAttributeSource } from "../nodes";
+import { FragmentLayer, SDFShape, isAttributeSource } from "../nodes";
+import { getShapeAttributeLayout } from "../nodes/generator";
 import { generateShapeSelectorGLSL, getAllShapeGLSL } from "../shapes";
 import { numberToGLSLFloat } from "../utils";
 import { generateEdgeAttributeTextureFetch } from "./path-attribute-texture";
@@ -287,14 +288,50 @@ ${targetCases}
  *
  * `tStart`/`tEnd` are the *ungated* boundary clamps (always searched); the body
  * re-applies its extremity gating in-shader, labels use them directly.
+ *
+ * `nodeShapes`/`nodeLayers` give the node attribute layout, to read each
+ * endpoint's shape attributes.
  */
 export function generateEdgeFramePassVertexShader(
   paths: EdgePath[],
   extremities: EdgeExtremity[],
   layers: EdgeLayer[],
+  nodeShapes: SDFShape[],
+  nodeLayers: FragmentLayer[],
 ): string {
   const attributeLayout = computeAttributeLayout([...paths, ...layers]);
   const textureFetch = generateEdgeAttributeTextureFetch(attributeLayout);
+
+  // Node shape attributes, fetched per endpoint and copied into g_<name> before each querySDF call
+  const nodeAttributeLayout = getShapeAttributeLayout(nodeShapes, nodeLayers);
+  const nodeAttributeNames = Object.keys(nodeAttributeLayout.offsets);
+  const glslTypeOf = (name: string) => {
+    const { size } = nodeAttributeLayout.specs[name];
+    return size === 1 ? "float" : `vec${size}`;
+  };
+
+  const nodeAttributeDeclarations = nodeAttributeNames
+    .map((name) => `${glslTypeOf(name)} v_source_${name};\n${glslTypeOf(name)} v_target_${name};`)
+    .join("\n");
+
+  const sourceAttributeFetch = generateAttributeTextureFetch(nodeAttributeLayout, {
+    varPrefix: "srcNodeAttr",
+    baseTexelExpr: "srcIdx * u_layerAttributeTexelsPerNode",
+    textureWidthUniform: "u_layerAttributeTextureWidth",
+    textureSamplerUniform: "u_layerAttributeTexture",
+    outputPrefix: "v_source_",
+  });
+  const targetAttributeFetch = generateAttributeTextureFetch(nodeAttributeLayout, {
+    varPrefix: "tgtNodeAttr",
+    baseTexelExpr: "tgtIdx * u_layerAttributeTexelsPerNode",
+    textureWidthUniform: "u_layerAttributeTextureWidth",
+    textureSamplerUniform: "u_layerAttributeTexture",
+    outputPrefix: "v_target_",
+  });
+
+  const dynamicAttributeGlobals = nodeAttributeNames.map((name) => `${glslTypeOf(name)} g_${name};`).join("\n");
+  const setGlobalsFromSource = nodeAttributeNames.map((name) => `  g_${name} = v_source_${name};`).join("\n");
+  const setGlobalsFromTarget = nodeAttributeNames.map((name) => `  g_${name} = v_target_${name};`).join("\n");
 
   const seenUniforms = new Set<string>();
   const customUniforms: string[] = [];
@@ -322,6 +359,11 @@ uniform int u_edgeDataTextureWidth;
 // Edge attribute texture (for path-specific attributes like curvature)
 ${textureFetch.uniformDeclarations}
 
+// Node attribute texture (for node shape attributes)
+uniform sampler2D u_layerAttributeTexture;
+uniform int u_layerAttributeTextureWidth;
+uniform int u_layerAttributeTexelsPerNode;
+
 // Render params needed for clamping
 uniform float u_sizeRatio;
 uniform float u_correctionRatio;
@@ -342,6 +384,10 @@ ${textureFetch.vertexVaryingDeclarations}
 out float v_sourceNodeSize;
 out float v_targetNodeSize;
 
+// Node shape attributes per endpoint, and the ones querySDF reads
+${nodeAttributeDeclarations}
+${dynamicAttributeGlobals}
+
 // Scattered output written to the edge-frame texel: [tStart, tEnd, straightenFactor, pathLength]
 out vec4 v_clamp;
 
@@ -354,7 +400,7 @@ ${GLSL_READ_NODE_FLAGS}
 
 // Shape SDFs for node boundary clamping
 ${getAllShapeGLSL()}
-${generateShapeSelectorGLSL()}
+${generateShapeSelectorGLSL(new Set(nodeAttributeNames))}
 
 // Path functions
 ${generateAllPathsGLSL(paths)}
@@ -384,6 +430,12 @@ void main() {
   // Fetch path/layer attributes and assign to path-function globals
 ${textureFetch.fetchCode}
 ${textureFetch.varyingAssignments}
+
+  // Fetch node shape attributes for both endpoints
+${sourceAttributeFetch.fetchCode}
+${sourceAttributeFetch.varyingAssignments}
+${targetAttributeFetch.fetchCode}
+${targetAttributeFetch.varyingAssignments}
 
   // Fetch node geometry (texel 0) and rotation flags (texel 1).
   vec4 srcNodeData = readNodeData(u_nodeDataTexture, u_nodeDataTextureWidth, srcIdx);
@@ -415,7 +467,9 @@ ${textureFetch.varyingAssignments}
   // SDF clamping: find where the edge body meets the node boundaries. Always
   // searched (ungated) so labels get a true boundary clamp; the body re-applies
   // its extremity gating in-shader.
+${setGlobalsFromSource}
   float tStart = queryFindSourceClampT(pathId, a_source, a_sourceSize, int(a_sourceShapeId), a_sourceRotateAlign, a_target, 0.0);
+${setGlobalsFromTarget}
   float tEnd = queryFindTargetClampT(pathId, a_source, a_target, a_targetSize, int(a_targetShapeId), a_targetRotateAlign, 0.0);
 
   // straightenFactor (frame .z) is consumed only by the body, which runs to the
@@ -481,6 +535,7 @@ ${textureFetch.varyingAssignments}
   // toward straight-line clamp positions.
   if (straightenFactor > 0.001) {
     if (tailLengthRatio > 0.0) {
+${setGlobalsFromSource}
       float srcExtent = a_sourceSize * u_correctionRatio / u_sizeRatio * 2.0;
       float srcEffective = 1.0 - u_correctionRatio / srcExtent;
       float srcCa = u_cameraAngle * (1.0 - a_sourceRotateAlign);
@@ -496,6 +551,7 @@ ${textureFetch.varyingAssignments}
       tStart = mix(tStart, (lo + hi) * 0.5, straightenFactor);
     }
     if (headLengthRatio > 0.0) {
+${setGlobalsFromTarget}
       float tgtExtent = a_targetSize * u_correctionRatio / u_sizeRatio * 2.0;
       float tgtEffective = 1.0 - u_correctionRatio / tgtExtent;
       float tgtCa = u_cameraAngle * (1.0 - a_targetRotateAlign);
