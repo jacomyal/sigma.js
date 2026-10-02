@@ -10,7 +10,7 @@ By default, sigma renders all nodes as circles. To use other shapes, declare the
 
 ## Built-in shapes
 
-Sigma ships with four built-in SDF shapes: `sdfCircle()`, `sdfSquare()`, `sdfTriangle()`, and `sdfDiamond()`. Each node selects its shape through the `shape` style property:
+Sigma ships with five built-in SDF shapes: `sdfCircle()`, `sdfSquare()`, `sdfTriangle()`, `sdfDiamond()`, and `sdfRectangle()`. Each node selects its shape through the `shape` style property:
 
 <SigmaExample id="styling/node-shapes" height="500px" />
 
@@ -33,13 +33,39 @@ new Sigma(graph, container, {
 });
 ```
 
+## Rectangles
+
+`sdfRectangle()` draws a rectangle inside the node's bounding square: its long side spans the node's full size. Its `aspectRatio` (width / height) is either a fixed number, or read from a node attribute. By default, it reads each node's `aspectRatio` attribute, and falls back to `1` (a square):
+
+```typescript
+import { sdfRectangle } from "sigma/rendering";
+
+// Same aspect ratio for every node:
+sdfRectangle({ aspectRatio: 2 });
+
+// Aspect ratio read from each node's "aspectRatio" attribute:
+sdfRectangle();
+
+// Aspect ratio read from another attribute:
+sdfRectangle({ aspectRatio: { attribute: "imageRatio", default: 1 } });
+```
+
+This makes it easy to draw images with their real proportions:
+
+<SigmaExample id="cookbook/rectangular-image-nodes" height="500px" />
+
 ## Custom shapes
 
 You can create custom shapes by implementing the `SDFShape` interface. A shape is defined by a GLSL [signed distance function](https://en.wikipedia.org/wiki/Signed_distance_function), i.e. a function that returns the distance from a point to the shape boundary (negative inside, positive outside).
 
-The GLSL function must follow the naming convention `sdf_{name}(vec2 uv, float size, ...)`. The `uv` parameter is the pixel offset from the node center, and `size` is the node radius. Additional parameters correspond to uniforms declared in the `uniforms` array.
+The GLSL function must follow the naming convention `sdf_{name}(vec2 uv, float size, ...)`. The `uv` parameter is the position in the node's quad, normalized to [-1, 1] with (0, 0) at the node center, and `size` is the shape's half-size in the same units (about 1). Additional parameters are, in order:
 
-The `inradiusFactor` controls how edge endpoints are clamped to the shape boundary (ratio of inradius to circumradius). For a circle it's 1.0, for a square it's ~0.707 (half of `Math.sqrt(2)`).
+1. The float uniforms declared in the `uniforms` array, baked into the shader as constants
+2. The per-node attributes declared in the optional `attributes` array, read from the node attribute texture
+
+Shape attributes work like layer attributes: declare the matching `variables` on the shape, and they become style properties, read from node attributes by default.
+
+The `inradiusFactor` is the ratio of inradius to circumradius. Sigma uses it to size backdrops around the shape, and layers like `layerBorder()` use it to know how deep the shape is. For a circle it's 1.0, for a square it's ~0.707 (half of `Math.sqrt(2)`). When the depth varies per node, `inradiusFactorGLSL` can override it for layers with a GLSL expression, reading shape attributes as `v_<name>` (e.g. `"0.7 / v_aspectRatio"`). Backdrops still use `inradiusFactor`, so keep it as a safe upper bound.
 
 For a comprehensive catalog of 2D SDF primitives, see [Inigo Quilez's reference](https://iquilezles.org/articles/distfunctions2d/).
 

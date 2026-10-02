@@ -43,12 +43,13 @@ node selects its shape via the `shape` style property.
 
 Built-in factories (from `sigma/rendering`):
 
-| Factory            | Name         | Options                      |
-| ------------------ | ------------ | ---------------------------- |
-| `sdfCircle()`      | `"circle"`   | -                            |
-| `sdfSquare(opts?)` | `"square"`   | `cornerRadius?`, `rotation?` |
-| `sdfTriangle()`    | `"triangle"` | -                            |
-| `sdfDiamond()`     | `"diamond"`  | -                            |
+| Factory               | Name          | Options                                                                        |
+| --------------------- | ------------- | ------------------------------------------------------------------------------ |
+| `sdfCircle()`         | `"circle"`    | -                                                                              |
+| `sdfSquare(opts?)`    | `"square"`    | `cornerRadius?`, `rotation?`                                                   |
+| `sdfTriangle(opts?)`  | `"triangle"`  | `cornerRadius?`, `rotation?`                                                   |
+| `sdfDiamond(opts?)`   | `"diamond"`   | `cornerRadius?`, `rotation?`                                                   |
+| `sdfRectangle(opts?)` | `"rectangle"` | `aspectRatio?` (accepts a `ValueSource<number>`), `cornerRadius?`, `rotation?` |
 
 ### layers
 
@@ -115,7 +116,9 @@ the moment.
 
 ### variables
 
-Custom typed attributes that layers can consume and that become available as style properties.
+Custom typed attributes that layers can consume and that become available as style properties. Shapes declaring their
+own `variables` (like `sdfRectangle()`'s `aspectRatio`) don't need them here. A variable declared here wins over a shape's
+on a name clash.
 
 ```typescript
 variables: {
