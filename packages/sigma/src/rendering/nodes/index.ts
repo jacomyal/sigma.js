@@ -35,8 +35,8 @@ export type {
 export { isAttributeSource } from "./types";
 
 // SDF Shapes
-export { sdfCircle, sdfSquare, sdfTriangle, sdfDiamond } from "./shapes";
-export type { SquareOptions, TriangleOptions, DiamondOptions } from "./shapes";
+export { sdfCircle, sdfSquare, sdfTriangle, sdfDiamond, sdfRectangle } from "./shapes";
+export type { SquareOptions, TriangleOptions, DiamondOptions, RectangleOptions } from "./shapes";
 
 // Fragment Layers (core)
 export { layerFill, type LayerFillOptions } from "./layers";
