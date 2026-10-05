@@ -1491,7 +1491,7 @@ export default class Sigma<
   }
 
   /**
-   * Update a node the internal data structures.
+   * Update a node in the internal data structures.
    * @private
    * @param key The node's graphology ID
    */
