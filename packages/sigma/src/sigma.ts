@@ -1212,6 +1212,8 @@ export default class Sigma<
     gl.viewport(0, 0, this.width * this.internals.pixelRatio, this.height * this.internals.pixelRatio);
     gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
 
+    const showLabels = !this.internals.settings.hideLabelsOnMove || !moving;
+
     for (const depth of this.depthLayers) {
       // Custom layer programs registered at this depth, in registration order
       for (const customLayer of this.customLayerPrograms.values()) {
@@ -1230,7 +1232,7 @@ export default class Sigma<
       // text). The background ribbon is the picking hitbox when
       // edgeLabelEvents is on; picking buffer is skipped otherwise to save
       // GPU work.
-      if (this.internals.settings.renderEdgeLabels && (!this.internals.settings.hideLabelsOnMove || !moving)) {
+      if (this.internals.settings.renderEdgeLabels && showLabels) {
         this.labelRenderer.renderEdgeLabelBackgrounds(
           KIND_REGISTRY.edgeLabel.writesPickingThisFrame(this.internals)
             ? params
@@ -1255,6 +1257,8 @@ export default class Sigma<
           if (count > 0) this.nodeProgram.render(params, offset, count);
         }
       }
+
+      if (!showLabels) continue;
 
       // Label attachments for this depth (after nodes, before labels).
       // Attachments are not pickable, so pass null picking buffer to prevent the atlas texture
@@ -1301,9 +1305,6 @@ export default class Sigma<
     this.pollGpuTimerQueries();
 
     if (debugPrograms) this.logRenderStats(debugPrograms);
-
-    // Do not display labels on move per setting
-    if (this.internals.settings.hideLabelsOnMove && moving) return exitRender();
 
     return exitRender();
   }
