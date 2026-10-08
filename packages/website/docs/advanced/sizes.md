@@ -56,4 +56,4 @@ Also, note that when disabling `autoRescale`, the `itemSizesReference` setting b
 
 ### Example
 
-You can play with these three options, in the **["Customize how sigma handles sizes and positions"](https://www.sigmajs.org/storybook/?path=/story/fit-sizes-to-positions--story)** story in the [StoryBook](https://www.sigmajs.org/storybook).
+You can play with these three options, in the **["Customize how sigma handles sizes and positions"](https://v3.sigmajs.org/storybook/?path=/story/fit-sizes-to-positions--story)** story in the [StoryBook](https://v3.sigmajs.org/storybook).

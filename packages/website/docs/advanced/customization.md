@@ -13,7 +13,7 @@ A fundamental way to influence the look of your graph is by specifying sizes and
 
 ### Dynamic appearance with reducers
 
-Reducers offer a dynamic approach to adjust the appearance. They are particularly useful when you want to emphasize specific parts of the graph or highlight the neighborhood of a particular node. For hands-on examples of how to employ reducers for dynamic appearance adjustments, refer to the [`use-reducers`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/1-core-features/4-use-reducers/index.ts) and [`events`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/1-core-features/2-events/index.ts) examples.
+Reducers offer a dynamic approach to adjust the appearance. They are particularly useful when you want to emphasize specific parts of the graph or highlight the neighborhood of a particular node. For hands-on examples of how to employ reducers for dynamic appearance adjustments, refer to the [`use-reducers`](https://github.com/jacomyal/sigma.js/blob/archive/v3/packages/storybook/stories/1-core-features/4-use-reducers/index.ts) and [`events`](https://github.com/jacomyal/sigma.js/blob/archive/v3/packages/storybook/stories/1-core-features/2-events/index.ts) examples.
 
 ## Labels and hovered nodes
 
@@ -32,10 +32,10 @@ Beyond these settings, sigma.js allows for more advanced customization of labels
 
 For most common cases (i.e. straight edges and round nodes), you can directly override the `defaultDrawEdgeLabel`, `defaultDrawNodeLabel` and `defaultDrawNodeHover` settings. When you start having various shapes of nodes and/or edges (square nodes, curved edges...), you need to specify labels and hovered items renderers for each program. Each node program can have optional `drawLabel` and `drawHover` methods, and each edge program can have an optional `drawLabel` method.
 
-For a practical demonstration of this method, check out the website's demo, specifically the [`canvas-utils.ts` section](https://github.com/jacomyal/sigma.js/blob/main/packages/demo/src/canvas-utils.ts).
+For a practical demonstration of this method, check out the website's demo, specifically the [`canvas-utils.ts` section](https://github.com/jacomyal/sigma.js/blob/archive/v3/packages/demo/src/canvas-utils.ts).
 
 ## Custom renderers
 
 For those seeking a deeper level of customization, sigma.js allows the creation of custom renderers. This option is ideal for those who want nodes and edges rendered in non-standard ways, such as nodes with borders or unique shapes.
 
-The [`custom-rendering`](https://github.com/jacomyal/sigma.js/blob/main/packages/storybook/stories/1-core-features/5-custom-rendering/index.ts) example provides a detailed guide on how to craft bordered nodes, serving as a starting point for those interested in exploring this advanced customization avenue.
+The [`custom-rendering`](https://github.com/jacomyal/sigma.js/blob/archive/v3/packages/storybook/stories/1-core-features/5-custom-rendering/index.ts) example provides a detailed guide on how to craft bordered nodes, serving as a starting point for those interested in exploring this advanced customization avenue.

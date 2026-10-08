@@ -10,7 +10,7 @@ const config = {
   favicon: "img/favicon.ico",
 
   // Set the production url of your site here
-  url: "https://www.sigmajs.org/",
+  url: "https://v3.sigmajs.org/",
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
@@ -66,7 +66,7 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
-          editUrl: "https://github.com/jacomyal/sigma.js/tree/main/packages/website",
+          editUrl: "https://github.com/jacomyal/sigma.js/tree/archive/v3/packages/website",
         },
         theme: {
           customCss: require.resolve("./src/css/custom.css"),
@@ -78,6 +78,14 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      announcementBar: {
+        id: "v3-archive",
+        content:
+          'This is the archived website for sigma.js <strong>v3</strong>. <a href="https://www.sigmajs.org">Go to the current <strong>v4</strong> website</a>',
+        backgroundColor: "#f9f7ed",
+        textColor: "#000",
+        isCloseable: false,
+      },
       navbar: {
         items: [
           {

@@ -31,7 +31,7 @@ function Footer() {
           <div className="footer__col col">
             <p>
               It is developed under{" "}
-              <a href="https://github.com/jacomyal/sigma.js/blob/main/LICENSE.txt">the MIT License</a>.
+              <a href="https://github.com/jacomyal/sigma.js/blob/archive/v3/LICENSE.txt">the MIT License</a>.
             </p>
             <p>
               This website uses <a href="https://themeui.net/hauora-sans-free-font/">Hauroa Sans</a>,{" "}

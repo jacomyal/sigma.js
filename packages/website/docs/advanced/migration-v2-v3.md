@@ -39,9 +39,9 @@ Breaking everything in the programs was the opportunity to rename existing progr
 
 ### New API
 
-A **node program** must extend the [**`NodeProgram`** classe](https://github.com/jacomyal/sigma.js/blob/main/packages/sigma/src/rendering/node.ts), and an **edge program** must extend the [**`EdgeProgram`** classe](https://github.com/jacomyal/sigma.js/blob/main/packages/sigma/src/rendering/edge.ts). Those two classes are designed so that only specific code remains in the programs, without all the boilerplate.
+A **node program** must extend the [**`NodeProgram`** classe](https://github.com/jacomyal/sigma.js/blob/archive/v3/packages/sigma/src/rendering/node.ts), and an **edge program** must extend the [**`EdgeProgram`** classe](https://github.com/jacomyal/sigma.js/blob/archive/v3/packages/sigma/src/rendering/edge.ts). Those two classes are designed so that only specific code remains in the programs, without all the boilerplate.
 
-**The best to do to understand how to write programs for sigma v3 is to read the existing programs.** The simplest ones are [**`edge.line`**](https://github.com/jacomyal/sigma.js/tree/main/packages/sigma/src/rendering/programs/edge-line) and [**`node.point`**](https://github.com/jacomyal/sigma.js/tree/main/packages/sigma/src/rendering/programs/node-point).
+**The best to do to understand how to write programs for sigma v3 is to read the existing programs.** The simplest ones are [**`edge.line`**](https://github.com/jacomyal/sigma.js/tree/archive/v3/packages/sigma/src/rendering/programs/edge-line) and [**`node.point`**](https://github.com/jacomyal/sigma.js/tree/archive/v3/packages/sigma/src/rendering/programs/node-point).
 
 Some insights, though:
 
@@ -88,9 +88,9 @@ v_color = a_color;
 
 In sigma v2, there were a lot of repeated data transmitted to the GPU. For instance, to render an edge as a rectangle, all the required data were written [four times](https://github.com/jacomyal/sigma.js/blob/7b3a5ead355f7c54449002e6909a9af2eecae6db/src/rendering/webgl/programs/edge.ts#L166-L193). To fixe this issue, sigma v3 uses _instanced rendering_. Basically, there are now two different buffers: one that carries data related to each item (node or edge), and another that carries data related to each vertex. Then, the program will handle those buffers to send to the _vertex shader_ both the item related data and the vertex related data.
 
-All programs do not use instanced rendering. For instance, [**`node.point`**](https://github.com/jacomyal/sigma.js/tree/main/packages/sigma/src/rendering/programs/node-point) does need it, since there is only one vertex per node. Basically, every program that use the `WebGLRenderingContext.TRIANGLES` method should probably use instanced rendering.
+All programs do not use instanced rendering. For instance, [**`node.point`**](https://github.com/jacomyal/sigma.js/tree/archive/v3/packages/sigma/src/rendering/programs/node-point) does need it, since there is only one vertex per node. Basically, every program that use the `WebGLRenderingContext.TRIANGLES` method should probably use instanced rendering.
 
-So, to use instanced rendering, the `getDefinition` method of a program must provide a **`CONSTANT_ATTRIBUTES`** array, shaped as the `ATTRIBUTES` array, but with attributes that are related to each vertex, and a **`CONSTANT_DATA`** that stores an array of data for each vertex. The simplest program that uses instanced rendering might be [**`node.circle`**](https://github.com/jacomyal/sigma.js/tree/main/packages/sigma/src/rendering/programs/node-circle). **It is certainly a good program to read to better understand how to write a program using instanced rendering**.
+So, to use instanced rendering, the `getDefinition` method of a program must provide a **`CONSTANT_ATTRIBUTES`** array, shaped as the `ATTRIBUTES` array, but with attributes that are related to each vertex, and a **`CONSTANT_DATA`** that stores an array of data for each vertex. The simplest program that uses instanced rendering might be [**`node.circle`**](https://github.com/jacomyal/sigma.js/tree/archive/v3/packages/sigma/src/rendering/programs/node-circle). **It is certainly a good program to read to better understand how to write a program using instanced rendering**.
 
 ### Canvas labels and hovered nodes rendering
 

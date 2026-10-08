@@ -1,6 +1,6 @@
 /**
  * Sigma has been designed to display any graph in a "readable way" by default:
- * https://www.sigmajs.org/docs/advanced/coordinate-systems
+ * https://v3.sigmajs.org/docs/advanced/coordinate-systems
  *
  * This design principle is enforced by three main features:
  * 1. Graph is rescaled and centered to fit by default in the viewport

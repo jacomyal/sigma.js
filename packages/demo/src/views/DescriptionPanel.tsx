@@ -46,11 +46,11 @@ const DescriptionPanel: FC = () => {
           react
         </a>{" "}
         and{" "}
-        <a target="_blank" rel="noreferrer" href="https://www.sigmajs.org">
+        <a target="_blank" rel="noreferrer" href="https://v3.sigmajs.org">
           sigma.js
         </a>
         . You can read the source code{" "}
-        <a target="_blank" rel="noreferrer" href="https://github.com/jacomyal/sigma.js/tree/main/packages/demo">
+        <a target="_blank" rel="noreferrer" href="https://github.com/jacomyal/sigma.js/tree/archive/v3/packages/demo">
           on GitHub
         </a>
         .

@@ -530,7 +530,7 @@ footer ul {
   }
 }
 
-.v4-notice {
+.version-notice {
   background: #f9f7ed;
   text-align: center;
   padding: 0.5rem 1rem;
@@ -538,7 +538,7 @@ footer ul {
   border-bottom: 1px solid #ccc;
   line-height: 1.75;
 }
-.v4-notice a {
+.version-notice a {
   color: var(--ruby);
   white-space: nowrap;
 }
