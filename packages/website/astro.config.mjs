@@ -142,9 +142,6 @@ export default defineConfig({
               }),
             ]),
       ],
-      components: {
-        PageFrame: "./src/components/PageFrame.astro",
-      },
       title: "sigma.js",
       tagline: "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges",
       favicon: "/img/favicon-32x32.png",
@@ -157,6 +154,11 @@ export default defineConfig({
         mastodon: "https://vis.social/@sigmajs",
       },
       head: [
+        // Sends old v3 paths (served as 404s) to their v4 equivalents
+        {
+          tag: "script",
+          content: `var m=location.pathname.match(/^\\/(storybook|demo|docs\\/typedoc)(\\/|$)/);if(m)location.replace({storybook:"/examples/",demo:"/embed/homepage/demo/","docs/typedoc":"/api/"}[m[1]]);`,
+        },
         {
           tag: "script",
           content: `var _paq=window._paq=window._paq||[];_paq.push(["trackPageView"]);_paq.push(["enableLinkTracking"]);(function(){var u="https://matomo.ouestware.com/";_paq.push(["setTrackerUrl",u+"matomo.php"]);_paq.push(["setSiteId","26"]);var d=document,g=d.createElement("script"),s=d.getElementsByTagName("script")[0];g.async=true;g.src=u+"matomo.js";s.parentNode.insertBefore(g,s)})();`,

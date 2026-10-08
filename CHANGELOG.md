@@ -4,8 +4,8 @@
 
 This new version carries a **complete rewrite** of the programs system, initially to address various depth or opacity
 related issues, but that ended up covering much more (_styles_ and _primitives_ APIs, better node shapes and edge paths
-support...). Please read the ["Migrating from v3 to v4"](https://v4.sigmajs.org/how-to/technical/migration-v3-v4/) guide
-to know more.
+support...). Please read the ["Migrating from v3 to v4"](https://www.sigmajs.org/how-to/technical/migration-v3-v4/)
+guide to know more.
 
 ### Rendering engine
 
@@ -17,13 +17,13 @@ to know more.
 ### New programs system
 
 - Replaces multi-programs support with
-  [**primitives**](https://v4.sigmajs.org/concepts/styles-and-primitives/#primitives) (node shapes, edge paths and
+  [**primitives**](https://www.sigmajs.org/concepts/styles-and-primitives/#primitives) (node shapes, edge paths and
   extremities...) based single-program compilation
-- Implements declarative [**styles**](https://v4.sigmajs.org/concepts/styles-and-primitives/#styles) API, to link graph
+- Implements declarative [**styles**](https://www.sigmajs.org/concepts/styles-and-primitives/#styles) API, to link graph
   data and state to the primitives (should replace `nodeReducer` and `edgeReducer` in most cases)
 - Implements `depth` layers, to allow rendering any type of items at any depth
-- Adds various styles and primitives, to render [label attachments](https://v4.sigmajs.org/how-to/labels/attachments/),
-  [label backdrops](https://v4.sigmajs.org/how-to/labels/backdrops/) and label backgrounds
+- Adds various styles and primitives, to render [label attachments](https://www.sigmajs.org/how-to/labels/attachments/),
+  [label backdrops](https://www.sigmajs.org/how-to/labels/backdrops/) and label backgrounds
 - Adds various built-in edge paths (`pathLine`, `pathCurved`, `pathCurvedS`, `pathStep`, `pathStepCurved`, `pathLoop`)
 - Adds `layerDashed` for edges ([#1497](https://github.com/jacomyal/sigma.js/issues/1497))
 - Adds `opacity` for nodes and edges ([#1426](https://github.com/jacomyal/sigma.js/issues/1426))

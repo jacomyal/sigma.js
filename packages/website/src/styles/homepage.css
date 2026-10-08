@@ -98,21 +98,6 @@ main {
 }
 
 /**
- * V4 NOTICE:
- */
-.v4-notice {
-  background: var(--cream);
-  text-align: center;
-  padding: 0.5rem 1rem;
-  font-size: 0.85rem;
-  border-bottom: 1px solid var(--light-grey);
-  line-height: 1.75;
-}
-.v4-notice a {
-  color: var(--ruby);
-}
-
-/**
  * HERO:
  */
 .hero {

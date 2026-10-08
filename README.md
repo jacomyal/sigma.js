@@ -4,15 +4,12 @@
 
 ![Sigma.js](packages/website/public/img/logo-sigma-text.svg)
 
-**[Website](https://v4.sigmajs.org/)** | **[Documentation](https://v4.sigmajs.org/docs)** | <strong><a rel="me" href="https://vis.social/@sigmajs">Mastodon</a></strong>
+**[Website](https://www.sigmajs.org/)** | **[Documentation](https://www.sigmajs.org/docs)** | <strong><a rel="me" href="https://vis.social/@sigmajs">Mastodon</a></strong>
 
 ---
 
-[Sigma.js](https://v4.sigmajs.org) is an open-source JavaScript library aimed at visualizing graphs of thousands of
+[Sigma.js](https://www.sigmajs.org) is an open-source JavaScript library aimed at visualizing graphs of thousands of
 nodes and edges using WebGL, and built on top of [graphology](https://graphology.github.io/).
-
-> **Note:** This branch tracks sigma v4, currently published as `4.0.0-alpha.x`. The stable v3 release is on the
-> [`main`](https://github.com/jacomyal/sigma.js/tree/main) branch.
 
 ## Usage
 
@@ -59,8 +56,8 @@ Sigma ships as a family of packages living in this monorepo. Install only what y
 
 - **GitHub Project:** The source code and collaborative development efforts for Sigma.js are hosted on
   [GitHub](https://github.com/jacomyal/sigma.js).
-- **Website:** The official website, [v4.sigmajs.org](https://v4.sigmajs.org), showcases the library's capabilities.
-- **Documentation:** A detailed documentation is available at [v4.sigmajs.org/docs](https://v4.sigmajs.org/docs). It
+- **Website:** The official website, [sigmajs.org](https://www.sigmajs.org), showcases the library's capabilities.
+- **Documentation:** A detailed documentation is available at [sigmajs.org/docs](https://www.sigmajs.org/docs). It
   provides extensive guides, interactive examples, and API references for users.
 
 ## Local development
@@ -100,8 +97,8 @@ Since v4, sigma's development also includes help from LLMs. They are used to dra
 architecture, API design, and core logic remain human-authored. Notably, they have been used for the following features:
 
 - [GLSL](https://en.wikipedia.org/wiki/OpenGL_Shading_Language) handling in programs generations
-- [Styles and primitives](https://v4.sigmajs.org/concepts/styles-and-primitives/) engines
-- [Label attachments](https://v4.sigmajs.org/how-to/labels/attachments/) rendering
+- [Styles and primitives](https://www.sigmajs.org/concepts/styles-and-primitives/) engines
+- [Label attachments](https://www.sigmajs.org/how-to/labels/attachments/) rendering
 
 ## Professional support
 

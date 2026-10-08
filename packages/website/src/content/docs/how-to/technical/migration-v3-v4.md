@@ -6,6 +6,10 @@ description: What changed between sigma.js v3 and v4, and how to migrate.
 Sigma.js v4 replaces the imperative, class-based rendering system with a declarative configuration approach. This guide
 covers the major changes and shows how to migrate existing code.
 
+:::note
+The v3 documentation and examples are archived at [v3.sigmajs.org](https://v3.sigmajs.org).
+:::
+
 ## What's new
 
 ### Primitives

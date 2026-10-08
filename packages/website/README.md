@@ -1,4 +1,4 @@
-# Sigma.js - v4.sigmajs.org website
+# Sigma.js - sigmajs.org website
 
 This website is built using [Astro Starlight](https://starlight.astro.build/), a modern static website generator.
 
