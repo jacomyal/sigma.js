@@ -1,9 +1,9 @@
-name: Website
+name: Website (v3)
 
 on:
   push:
     branches:
-      - main
+      - archive/v3
 
 jobs:
   publish:
@@ -22,12 +22,10 @@ jobs:
       - name: Build website
         run: npm run website:build
 
-      - name: Deploy to GitHub Pages
-        uses: crazy-max/ghaction-github-pages@v4
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v4
         with:
-          target_branch: gh-pages
-          build_dir: packages/website/build
-          fqdn: www.sigmajs.org
-          jekyll: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy packages/website/build --project-name=sigma-v3
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
