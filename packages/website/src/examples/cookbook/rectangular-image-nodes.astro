@@ -12,25 +12,38 @@
   import Sigma, { DEFAULT_STYLES } from "sigma";
   import { extremityArrow, layerFill, pathCurved, sdfRectangle } from "sigma/rendering";
 
+  import { registerControls } from "../_controls";
   import { getSmallGraph } from "../_data/small-graph";
 
   const container = document.getElementById("sigma-container") as HTMLElement;
 
-  const IMAGE_SIZES: Record<string, { width: number; height: number }> = {
-    a: { width: 600, height: 400 },
-    b: { width: 400, height: 600 },
-    c: { width: 600, height: 600 },
-    d: { width: 800, height: 300 },
-    e: { width: 300, height: 800 },
-    f: { width: 500, height: 350 },
+  const { objectFit } = registerControls({
+    objectFit: {
+      type: "select",
+      label: "Object fit",
+      default: "contain",
+      options: [
+        { label: "Contain", value: "contain" },
+        { label: "Cover", value: "cover" },
+      ],
+    },
+  });
+
+  const IMAGE_SIZES: Record<string, { id: number; width: number; height: number }> = {
+    a: { id: 10, width: 600, height: 400 },
+    b: { id: 15, width: 400, height: 600 },
+    c: { id: 28, width: 600, height: 600 },
+    d: { id: 29, width: 800, height: 300 },
+    e: { id: 37, width: 300, height: 800 },
+    f: { id: 42, width: 500, height: 350 },
   };
 
   const graph = getSmallGraph();
 
   graph.forEachNode((node) => {
-    const { width, height } = IMAGE_SIZES[node];
+    const { id, width, height } = IMAGE_SIZES[node];
     graph.mergeNodeAttributes(node, {
-      image: `https://picsum.photos/${width}/${height}`,
+      image: `https://picsum.photos/id/${id}/${width}/${height}`,
       aspectRatio: width / height,
       label: `${width} x ${height}`,
     });
@@ -43,7 +56,7 @@
         variables: {
           image: { type: "string", default: "" },
         },
-        layers: [layerFill({ color: "#eee" }), layerImage({ textureManagerOptions: { objectFit: "contain" } })],
+        layers: [layerFill({ color: "#eee" }), layerImage({ textureManagerOptions: { objectFit: objectFit as "contain" | "cover" } })],
       },
       edges: {
         paths: [pathCurved({ curvature: 0.5 })],
