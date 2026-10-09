@@ -1,0 +1,7 @@
+import{P as s}from"./graphology.BwGEgIxD.js";function m(){return`#version 300 es
+in vec2 a_position;
+
+void main() {
+  gl_Position = vec4(a_position, 0.0, 1.0);
+}
+  `}const a=[-1,1,1,1,-1,-1,1,-1],R=new Float32Array(a);class f extends s{constructor(r,t,e){super(r,t,e),this.verticesCount=a.length/2;const{buffer:o}=this.normalProgram;r.bindBuffer(r.ARRAY_BUFFER,o),r.bufferData(r.ARRAY_BUFFER,R,r.STATIC_DRAW),r.bindBuffer(r.ARRAY_BUFFER,null)}getDefinition(){const{FRAGMENT_SHADER_SOURCE:r,CAMERA_UNIFORMS:t,DATA_UNIFORMS:e}=this.getCustomLayerDefinition();return{UNIFORMS:[...t,...e],FRAGMENT_SHADER_SOURCE:r,VERTEX_SHADER_SOURCE:m(),VERTICES:4,METHOD:WebGL2RenderingContext.TRIANGLE_STRIP,ATTRIBUTES:[{name:"a_position",size:2,type:WebGL2RenderingContext.FLOAT}]}}hasNothingToRender(){return!1}setUniforms(r,t){this.setCameraUniforms(r,t)}cacheData(){const{gl:r}=this.normalProgram;r.useProgram(this.normalProgram.program),this.cacheDataUniforms(this.normalProgram)}render(r){this.bindProgram(this.normalProgram),this.renderProgram(r,this.normalProgram),this.unbindProgram(this.normalProgram)}drawWebGL(r,{gl:t}){t.drawArrays(r,0,a.length/2)}bindProgram(r){const{gl:t,buffer:e}=r;t.bindBuffer(t.ARRAY_BUFFER,e);let o=0;this.ATTRIBUTES.forEach(i=>o+=this.bindAttribute(i,r,o))}}let A=0;function h(n,r,t,e=`webgl-layer-${A++}`){return r.addCustomLayerProgram(e,n,o=>new t(o,null,r)),()=>r.removeCustomLayerProgram(e)}export{a as Q,f as W,h as b};

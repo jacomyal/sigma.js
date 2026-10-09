@@ -1,0 +1,1 @@
+function e(r,a){return{type:"number",default:r,variable:a?.variable}}function n(r,a){return{type:"color",default:r,variable:a?.variable}}function t(r,a){return{type:"array",items:r,minItems:a?.minItems}}export{t as a,n as c,e as n};
