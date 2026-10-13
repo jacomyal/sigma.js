@@ -126,8 +126,13 @@ const renderer = new Sigma(graph, container, {
 - **`nodeProgramClasses` / `edgeProgramClasses` settings**: replaced by the `primitives` configuration
 - **`defaultNodeType` / `defaultEdgeType` settings**: node and edge rendering is now configured through primitives and
   layers
-- **Standalone node/edge program packages** (like the old `@sigma/node-square`): shapes are now built-in;
-  `@sigma/node-border`, `@sigma/node-image`, and `@sigma/node-piechart` still exist but as layer plugins
+- **`@sigma/node-square`**: removed, since node shapes are now primitives. Use the built-in `sdfSquare()` shape from
+  `sigma/rendering` instead
+- **`@sigma/edge-curve`**: removed, since edge paths are now primitives. Use the built-in `pathCurved()` path from
+  `sigma/rendering` instead. [Parallel edges and self-loops](/how-to/edges/parallel-edges-self-loops/) are now handled
+  natively by sigma, so `indexParallelEdgesIndex` and `createDrawCurvedEdgeLabel` have no replacement
+- **Other satellite packages**: `@sigma/node-border`, `@sigma/node-image`, and `@sigma/node-piechart` still exist, but
+  now provide layer primitives instead of programs (see [step 5](#5-update-imports-from-removed-packages))
 - **`NodeProgram` / `EdgeProgram` class pattern**: replaced by the declarative primitives system
 - **`hidden` / `forceLabel` attributes**: replaced by `visibility` and `labelVisibility` style properties with `when`
   predicates
