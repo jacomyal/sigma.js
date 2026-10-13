@@ -441,6 +441,7 @@ export default class Sigma<
       getFrameBuffer: () => this.pickingFrameBuffer,
       getPixelRatio: () => this.internals.pixelRatio,
       getDownSizingRatio: () => this.internals.settings.pickingDownSizingRatio,
+      isRenderPending: () => this.renderFrame !== null,
       onIndex: (index, event) => updateHover(this.internals, this.pickingState.lookup[index] ?? null, event),
     });
 

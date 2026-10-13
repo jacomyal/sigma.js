@@ -16,6 +16,7 @@ export interface HoverResolverOptions {
   getFrameBuffer(): WebGLFramebuffer | null;
   getPixelRatio(): number;
   getDownSizingRatio(): number;
+  isRenderPending(): boolean;
   onIndex(pickingId: number, event: MouseCoords): void;
 }
 
@@ -48,6 +49,8 @@ export class HoverResolver {
   pointerMoved(event: MouseCoords): void {
     this.lastEvent = event;
     this.active = true;
+    // Skip if render pending (the next render will trigger the read)
+    if (this.options.isRenderPending()) return;
     this.request();
   }
 
@@ -128,7 +131,7 @@ export class HoverResolver {
 
     if (this.dirty) {
       this.dirty = false;
-      if (this.active && this.lastEvent) this.startRead();
+      if (this.active && this.lastEvent && !this.options.isRenderPending()) this.startRead();
     }
   }
 
