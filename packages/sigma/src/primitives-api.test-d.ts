@@ -186,7 +186,7 @@ describe("defineSigmaOptions - Error Cases", () => {
       },
       styles: {
         // @ts-expect-error - 'nonExistentState' is not a valid state property
-        nodes: { color: { when: "nonExistentState", then: "#f00", else: "#666" } },
+        nodes: { color: { whenState: "nonExistentState", then: "#f00", else: "#666" } },
       },
     });
   });

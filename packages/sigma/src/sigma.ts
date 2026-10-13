@@ -43,8 +43,6 @@ import {
   DEFAULT_EDGE_DEPTH_LAYERS,
   DEFAULT_NODE_DEPTH_LAYERS,
   ExtractDepthLayersFromPrimitives,
-  ExtractEdgeVarsFromPrimitives,
-  ExtractNodeVarsFromPrimitives,
   PrimitivesDeclaration,
   generateEdgeProgram,
   generateNodeProgram,
@@ -79,6 +77,7 @@ import {
   PlainObject,
   RenderParams,
   SigmaEvents,
+  SigmaOptions,
   TypedEventEmitter,
 } from "./types";
 import { DEFAULT_STYLES } from "./types/styles";
@@ -86,7 +85,6 @@ import {
   BaseEdgeState,
   BaseGraphState,
   BaseNodeState,
-  ForbidBaseKeys,
   FullEdgeState,
   FullGraphState,
   FullNodeState,
@@ -269,29 +267,7 @@ export default class Sigma<
 
   private camera: Camera;
 
-  constructor(
-    graph: Graph<N, E, G>,
-    container: HTMLElement,
-    options: {
-      primitives?: P;
-      styles?: StylesDeclaration<
-        N,
-        E,
-        NoInfer<NS>,
-        NoInfer<ES>,
-        NoInfer<GS>,
-        ExtractNodeVarsFromPrimitives<P>,
-        ExtractEdgeVarsFromPrimitives<P>,
-        ExtractDepthLayersFromPrimitives<P>
-      >;
-      settings?: Partial<Settings>;
-      nodeReducer?: NodeReducer<N, E, G, NS, GS>;
-      edgeReducer?: EdgeReducer<N, E, G, ES, GS>;
-      customNodeState?: ForbidBaseKeys<BaseNodeState, NS>;
-      customEdgeState?: ForbidBaseKeys<BaseEdgeState, ES>;
-      customGraphState?: ForbidBaseKeys<BaseGraphState, GS>;
-    } = {},
-  ) {
+  constructor(graph: Graph<N, E, G>, container: HTMLElement, options: SigmaOptions<N, E, G, NS, ES, GS, P> = {}) {
     super();
 
     // Extract options

@@ -12,9 +12,19 @@ import {
   DEFAULT_EDGE_PRIMITIVES as PRIMITIVES_DEFAULT_EDGE_PRIMITIVES,
   DEFAULT_NODE_PRIMITIVES as PRIMITIVES_DEFAULT_NODE_PRIMITIVES,
   DEFAULT_PRIMITIVES as PRIMITIVES_DEFAULT_PRIMITIVES,
+  type ExtractDepthLayersFromPrimitives,
+  type ExtractEdgeVarsFromPrimitives,
+  type ExtractNodeVarsFromPrimitives,
+  type PrimitivesDeclaration,
 } from "./primitives/types";
+import type { Settings } from "./settings";
 import {
   Attributes,
+  type BaseEdgeState,
+  type BaseGraphState,
+  type BaseNodeState,
+  type ForbidBaseKeys,
+  type StylesDeclaration,
   FullEdgeState,
   FullGraphState,
   FullNodeState,
@@ -488,6 +498,37 @@ export type { FontKey, FontDescriptor, GlyphMetrics, SDFAtlasOptions } from "./c
  * Options API:
  */
 export { defineSigmaOptions } from "./types/options";
+
+/**
+ * Type of the `options` argument of the Sigma constructor.
+ */
+export interface SigmaOptions<
+  N extends Attributes = Attributes,
+  E extends Attributes = Attributes,
+  G extends Attributes = Attributes,
+  NS = {}, // additional custom node state fields
+  ES = {}, // additional custom edge state fields
+  GS = {}, // additional custom graph state fields
+  P extends PrimitivesDeclaration = PrimitivesDeclaration,
+> {
+  primitives?: P;
+  styles?: StylesDeclaration<
+    N,
+    E,
+    NoInfer<NS>,
+    NoInfer<ES>,
+    NoInfer<GS>,
+    ExtractNodeVarsFromPrimitives<P>,
+    ExtractEdgeVarsFromPrimitives<P>,
+    ExtractDepthLayersFromPrimitives<P>
+  >;
+  settings?: Partial<Settings>;
+  nodeReducer?: NodeReducer<N, E, G, NS, GS>;
+  edgeReducer?: EdgeReducer<N, E, G, ES, GS>;
+  customNodeState?: ForbidBaseKeys<BaseNodeState, NS>;
+  customEdgeState?: ForbidBaseKeys<BaseEdgeState, ES>;
+  customGraphState?: ForbidBaseKeys<BaseGraphState, GS>;
+}
 
 /**
  * Styles API:
