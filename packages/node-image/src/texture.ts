@@ -255,16 +255,23 @@ export function drawTexture(
   for (let i = 0, l = refinedImagesArray.length; i < l; i++) {
     const { image, sourceSize, sourceX, sourceY, destinationSize, destinationX, destinationY } = refinedImagesArray[i];
 
+    // Keep the source rect inside the image, since "contain" or correctCentering can make it overflow
+    const scale = destinationSize / sourceSize;
+    const sx = Math.max(sourceX, 0);
+    const sy = Math.max(sourceY, 0);
+    const sw = Math.min(sourceX + sourceSize, image.width) - sx;
+    const sh = Math.min(sourceY + sourceSize, image.height) - sy;
+
     ctx.drawImage(
       image,
-      sourceX,
-      sourceY,
-      sourceSize,
-      sourceSize,
-      destinationX,
-      destinationY,
-      destinationSize,
-      destinationSize,
+      sx,
+      sy,
+      sw,
+      sh,
+      destinationX + (sx - sourceX) * scale,
+      destinationY + (sy - sourceY) * scale,
+      sw * scale,
+      sh * scale,
     );
   }
 
