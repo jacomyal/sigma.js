@@ -408,10 +408,13 @@ export function createNodeProgram<
       });
     }
 
-    protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
-      // Check for shader regeneration before rendering
+    render(params: RenderParams, offset?: number, count?: number): void {
+      // Regenerate before render() binds the program, so the frame draws with the new one
       this.maybeRegenerateShaders();
+      super.render(params, offset, count);
+    }
 
+    protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
       // Activate the program BEFORE calling beforeRender hooks
       // (hooks may set uniforms which requires an active program)
       const { gl, program } = programInfo;

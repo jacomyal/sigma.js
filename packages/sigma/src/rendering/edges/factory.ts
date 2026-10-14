@@ -455,8 +455,13 @@ export function createEdgeProgram<
       });
     }
 
-    protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
+    render(params: RenderParams, offset?: number, count?: number): void {
+      // Regenerate before render() binds the program, so the frame draws with the new one
       this.maybeRegenerateShaders();
+      super.render(params, offset, count);
+    }
+
+    protected renderProgram(params: RenderParams, programInfo: ProgramInfo): void {
       this.layerLifecycles.forEach((hooks) => hooks.beforeRender?.());
 
       super.renderProgram(params, programInfo);
