@@ -7,15 +7,10 @@
  *
  * @module
  */
-import { AbstractGraph } from "graphology-types";
+import { AbstractGraph, Attributes } from "graphology-types";
 
 import type { DefaultEdgeDepthLayer, DefaultNodeDepthLayer } from "../primitives/types";
 import { Easing } from "../utils/easings";
-
-/**
- * Generic attributes type (user-defined).
- */
-export type Attributes = Record<string, unknown>;
 
 /**
  * Empty record type for default program variables (no additional variables).

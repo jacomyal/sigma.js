@@ -88,7 +88,6 @@ import {
   FullEdgeState,
   FullGraphState,
   FullNodeState,
-  StylesDeclaration,
 } from "./types/styles";
 import {
   DepthRanges,
@@ -221,7 +220,7 @@ export default class Sigma<
   private autoRescaleFrozen = false;
 
   // New v4 API: primitives and styles declarations
-  private stylesDeclaration: StylesDeclaration<N, E, NS, ES, GS> | null = null;
+  private stylesDeclaration: NonNullable<SigmaOptions<N, E, G, NS, ES, GS, P>["styles"]> | null = null;
   private resolvedStageStyle: ResolvedStageStyle = {};
 
   // Internal states
@@ -298,8 +297,8 @@ export default class Sigma<
           nodes: styles.nodes ?? DEFAULT_STYLES.nodes,
           edges: styles.edges ?? DEFAULT_STYLES.edges,
           stage: styles.stage,
-        } as StylesDeclaration<N, E, NS, ES, GS>)
-      : (DEFAULT_STYLES as unknown as StylesDeclaration<N, E, NS, ES, GS>);
+        } as NonNullable<SigmaOptions<N, E, G, NS, ES, GS, P>["styles"]>)
+      : (DEFAULT_STYLES as unknown as NonNullable<SigmaOptions<N, E, G, NS, ES, GS, P>["styles"]>);
 
     // Store reducers
     this.nodeReducer = nodeReducer ?? null;
@@ -2509,7 +2508,7 @@ export default class Sigma<
    *
    * @return {StylesDeclaration} A copy of the styles declaration.
    */
-  getStyles(): StylesDeclaration<N, E, NS, ES, GS> {
+  getStyles(): NonNullable<SigmaOptions<N, E, G, NS, ES, GS, P>["styles"]> {
     return { ...this.stylesDeclaration! };
   }
 

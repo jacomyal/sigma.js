@@ -6,12 +6,11 @@
  *
  * @module
  */
-import { AbstractGraph } from "graphology-types";
+import { AbstractGraph, Attributes } from "graphology-types";
 
 import { EdgeDisplayData, NodeDisplayData } from "../types";
 import {
   AttributeBinding,
-  Attributes,
   BaseEdgeState,
   BaseGraphState,
   BaseNodeState,

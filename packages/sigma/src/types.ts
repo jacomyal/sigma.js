@@ -6,7 +6,7 @@
  * @module
  */
 import { EventEmitter } from "events";
-import Graph from "graphology-types";
+import Graph, { Attributes } from "graphology-types";
 
 import {
   DEFAULT_EDGE_PRIMITIVES as PRIMITIVES_DEFAULT_EDGE_PRIMITIVES,
@@ -19,7 +19,6 @@ import {
 } from "./primitives/types";
 import type { Settings } from "./settings";
 import {
-  Attributes,
   type BaseEdgeState,
   type BaseGraphState,
   type BaseNodeState,
