@@ -1,0 +1,108 @@
+---
+title: Fill layers
+sidebar:
+  label: "Fill layers"
+---
+
+import SigmaExample from "../../../../components/SigmaExample.astro";
+
+Edge appearance is built by compositing **layers** from back to front. These layers determine "how to colorize each
+pixel" along an edge's path. Sigma ships with three built-in layers: `layerPlain`, `layerDashed` and `layerGradient`.
+
+## How layers work
+
+Layers are declared in `primitives.edges.layers`. They are composited in order: earlier layers render behind later ones.
+When `primitives.edges.layers` is not set, sigma uses `[layerPlain()]`.
+
+All edges share the same WebGL program, so every edge runs every declared layer. To vary the look per edge, make a layer
+transparent for that edge so the layers below show through. For instance, `layerDashed()` renders transparent when its
+`dashSize` or `gapSize` is `0`, and `layerGradient()` does when the edge attribute read by its `enabled` option is
+`false`.
+
+## Available layers
+
+| Layer             | Package           | Description                                     |
+| ----------------- | ----------------- | ----------------------------------------------- |
+| `layerPlain()`    | `sigma/rendering` | Solid color fill, using the edge's `color`      |
+| `layerDashed()`   | `sigma/rendering` | Dash pattern, with configurable dashes and gaps |
+| `layerGradient()` | `sigma/rendering` | Gradient along a list of color stops            |
+
+Layer color options accept a constant color, an `{ attribute }` reference, or an endpoint node's color with
+`{ node: "source" }` or `{ node: "target" }`. See [Edge colors](/how-to/edges/types-colors/#edge-colors) for details.
+
+## Plain edges
+
+The `layerPlain()` function fills the edge with a solid color. Without options, it uses the edge's own `color` style.
+Its `color` option overrides it:
+
+```typescript
+new Sigma(graph, container, {
+  primitives: {
+    edges: {
+      // Every edge wears its source node's color:
+      layers: [layerPlain({ color: { node: "source" } })],
+    },
+  },
+});
+```
+
+## Dashed edges
+
+The `layerDashed()` function draws a dash pattern along the edge. The `dashSize` and `gapSize` options accept either a
+fixed `{ value, mode }` object or an `{ attribute }` reference to read per-edge values from graph data. Sizes are
+in pixels by default; set `mode: "relative"` to size them relative to the edge thickness. Gaps are transparent by
+default, so stacking `layerDashed()` over `layerPlain()` gives dashes over a solid edge body. Use `gapColor` to fill
+gaps instead.
+
+The `cap` option controls the shape of dash ends: `"butt"` (the default) gives straight ends, while `"round"` gives
+round caps. Round-capped dashes shorter than the edge thickness degenerate to circles, so dotted edges are simply:
+
+```typescript
+layerDashed({ cap: "round", dashSize: { value: 1, mode: "relative" }, gapSize: { value: 2, mode: "relative" } });
+```
+
+## Gradient edges
+
+The `layerGradient()` function fills the edge with a gradient along a list of color stops, from the source end to the
+target end. Each stop accepts any of the color forms above, so the typical use is blending the endpoint node colors:
+
+```typescript
+new Sigma(graph, container, {
+  primitives: {
+    edges: {
+      layers: [layerGradient({ stops: [{ node: "source" }, { node: "target" }] })],
+    },
+  },
+});
+```
+
+Stops follow the same positioning rules as CSS gradients: an optional `offset` in `[0, 1]` places a stop along the
+visible edge span, the first stop defaults to `0`, the last to `1`, and stops without an offset spread evenly between
+their positioned neighbors. Past the outermost offsets, the gradient pads with the nearest stop's color. The `offset`
+field sits directly on `{ node }` and `{ attribute }` stops, and constant colors take the `{ color, offset }` form.
+
+```typescript
+// Fade through transparent halfway:
+layerGradient({ stops: [{ node: "source" }, "transparent", { node: "target" }] });
+
+// Show only a short stub leaving the source node:
+layerGradient({ stops: [{ node: "source" }, { color: "transparent", offset: 0.1 }] });
+
+// Hard switch from source to target color at the midpoint:
+layerGradient({
+  stops: [
+    { node: "source", offset: 0.5 },
+    { node: "target", offset: 0.5 },
+  ],
+});
+```
+
+The optional `enabled` option reads a boolean edge attribute to toggle the gradient per edge; disabled edges fall
+through to the layers below.
+
+## Composing layers
+
+Layers compose naturally. The example below stacks a plain, a gradient and a dashed layer, composited in declaration
+order:
+
+<SigmaExample id="styling/edge-styles" height="500px" />

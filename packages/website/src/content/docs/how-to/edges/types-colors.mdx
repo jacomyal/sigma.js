@@ -7,7 +7,7 @@ sidebar:
 import SigmaExample from "../../../../components/SigmaExample.astro";
 
 Sigma v4 gives you full control over edge appearance through the **primitives** and **styles** system. You can combine
-different path geometries and fill layers.
+different path geometries and [fill layers](/how-to/edges/fill-layers/).
 
 <SigmaExample id="styling/edge-styles" height="500px" />
 
@@ -62,57 +62,6 @@ new Sigma(graph, container, {
 });
 ```
 
-## Dashed edges
-
-The `layerDashed()` function from `sigma/rendering` adds a dashed overlay on top of the plain edge body. The `dashSize`
-and `gapSize` options accept either a fixed `{ value, mode }` object or an `{ attribute }` reference to read per-edge
-values from graph data. Set `mode: "pixels"` for screen-space sizing.
-
-The `cap` option controls the shape of dash ends: `"butt"` (the default) gives straight ends, while `"round"` gives
-round caps. Round-capped dashes shorter than the edge thickness degenerate to circles, so dotted edges are simply:
-
-```typescript
-layerDashed({ cap: "round", dashSize: { value: 1, mode: "relative" }, gapSize: { value: 2, mode: "relative" } });
-```
-
-## Gradient edges
-
-The `layerGradient()` function from `sigma/rendering` fills the edge with a gradient along a list of color stops, from
-the source end to the target end. Each stop accepts any of the color forms above, so the typical use is blending the
-endpoint node colors:
-
-```typescript
-new Sigma(graph, container, {
-  primitives: {
-    edges: {
-      layers: [layerGradient({ stops: [{ node: "source" }, { node: "target" }] })],
-    },
-  },
-});
-```
-
-Stops follow the same positioning rules as CSS gradients: an optional `offset` in `[0, 1]` places a stop along the
-visible edge span, the first stop defaults to `0`, the last to `1`, and stops without an offset spread evenly between
-their positioned neighbors. Past the outermost offsets, the gradient pads with the nearest stop's color. The `offset`
-field sits directly on `{ node }` and `{ attribute }` stops, and constant colors take the `{ color, offset }` form.
-
-```typescript
-// Fade through transparent halfway:
-layerGradient({ stops: [{ node: "source" }, "transparent", { node: "target" }] });
-
-// Show only a short stub leaving the source node:
-layerGradient({ stops: [{ node: "source" }, { color: "transparent", offset: 0.1 }] });
-
-// Hard switch from source to target color at the midpoint:
-layerGradient({
-  stops: [
-    { node: "source", offset: 0.5 },
-    { node: "target", offset: 0.5 },
-  ],
-});
-```
-
-The optional `enabled` option reads a boolean edge attribute to toggle the gradient per edge; disabled edges fall
-through to the layers below.
+For dashed and gradient edges, and how layers compose, see [Fill layers](/how-to/edges/fill-layers/).
 
 For more on the styles and primitives system, see [Styles and primitives](/concepts/styles-and-primitives/).

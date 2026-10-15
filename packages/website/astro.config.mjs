@@ -191,6 +191,7 @@ export default defineConfig({
               label: "Styling edges",
               items: [
                 { slug: "how-to/edges/types-colors" },
+                { slug: "how-to/edges/fill-layers" },
                 { slug: "how-to/edges/extremities" },
                 { slug: "how-to/edges/parallel-edges-self-loops" },
               ],
