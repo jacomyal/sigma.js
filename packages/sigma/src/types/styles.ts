@@ -9,8 +9,8 @@
  */
 import { AbstractGraph, Attributes } from "graphology-types";
 
-import type { DefaultEdgeDepthLayer, DefaultNodeDepthLayer } from "../primitives/types";
-import { Easing } from "../utils/easings";
+import type { DefaultEdgeDepthLayer, DefaultNodeDepthLayer } from "../primitives";
+import { Easing } from "../utils";
 
 /**
  * Empty record type for default program variables (no additional variables).
@@ -846,10 +846,7 @@ export const DEPTHLESS_STYLES = {
  * - Replace entirely by providing their own styles object
  * - Use DEPTHLESS_STYLES instead when declaring custom `depthLayers`
  */
-export const DEFAULT_STYLES: {
-  nodes: NodeStyleRule<Attributes, BaseNodeState, BaseGraphState, EmptyVariables, DefaultNodeDepthLayer>;
-  edges: EdgeStyleRule<Attributes, BaseEdgeState, BaseGraphState, EmptyVariables, DefaultEdgeDepthLayer>;
-} = {
+export const DEFAULT_STYLES = {
   nodes: {
     ...baseNodeStyle,
     depth: {
@@ -866,4 +863,7 @@ export const DEFAULT_STYLES: {
       else: "edges",
     },
   },
-} as const;
+} as const satisfies {
+  nodes: NodeStyleRule<Attributes, BaseNodeState, BaseGraphState, EmptyVariables, DefaultNodeDepthLayer>;
+  edges: EdgeStyleRule<Attributes, BaseEdgeState, BaseGraphState, EmptyVariables, DefaultEdgeDepthLayer>;
+};
