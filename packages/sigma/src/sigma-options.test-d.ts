@@ -3,7 +3,7 @@
  */
 import Graph from "graphology";
 import type { Attributes } from "graphology-types";
-import Sigma from "sigma";
+import Sigma, { DEFAULT_STYLES } from "sigma";
 import { sdfCircle } from "sigma/rendering";
 import type { PrimitivesDeclaration, SigmaOptions } from "sigma/types";
 import { describe, expectTypeOf, test } from "vitest";
@@ -298,6 +298,20 @@ describe("getStyles() output fits SigmaOptions (regression #1560)", () => {
     const options: SigmaOptions = {
       settings: { ...sigma.getSettings() },
       styles: { ...sigma.getStyles() },
+    };
+    void options;
+  });
+});
+
+describe("DEFAULT_STYLES fits typed node attributes (regression #1561)", () => {
+  type Node = { color: string; size: number };
+  type NodeState = { isSelected: boolean };
+
+  test("DEFAULT_STYLES.nodes spliced into a styles array", () => {
+    const options: SigmaOptions<Node, Attributes, Attributes, NodeState> = {
+      styles: {
+        nodes: [DEFAULT_STYLES.nodes, { color: "#FF0000", size: 1 }],
+      },
     };
     void options;
   });
