@@ -289,3 +289,16 @@ describe("SigmaOptions with explicit NS", () => {
     expectTypeOf(nodeState.score).toBeNumber();
   });
 });
+
+describe("getStyles() output fits SigmaOptions (regression #1560)", () => {
+  const container = document.createElement("div");
+
+  test("with default generics", () => {
+    const sigma = new Sigma(new Graph(), container);
+    const options: SigmaOptions = {
+      settings: { ...sigma.getSettings() },
+      styles: { ...sigma.getStyles() },
+    };
+    void options;
+  });
+});
