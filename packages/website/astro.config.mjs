@@ -16,6 +16,9 @@ const starlightDir = path.dirname(require.resolve("@astrojs/starlight"));
 // eslint-disable-next-line no-undef
 const isDev = process.argv.includes("dev");
 
+// v3 API pages, now served by v3.sigmajs.org (list from its sitemap):
+const v3TypedocPaths = JSON.parse(fs.readFileSync(path.join(__dirname, "v3-typedoc-paths.json"), "utf8"));
+
 export default defineConfig({
   site: "https://www.sigmajs.org",
   vite: {
@@ -103,6 +106,9 @@ export default defineConfig({
     "/docs/advanced/sizes": "/concepts/sizes/",
     "/docs/advanced/new-packages": "/contributing/new-packages/",
     "/docs/advanced/publish": "/contributing/publish/",
+    // Static redirects drop the query, so stories land on the Storybook home:
+    "/storybook": "https://v3.sigmajs.org/storybook/",
+    ...Object.fromEntries(v3TypedocPaths.map((p) => [p, `https://v3.sigmajs.org${p}/`])),
   },
   integrations: [
     starlight({
