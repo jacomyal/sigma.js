@@ -5,7 +5,7 @@ const TAGLINE = "a JavaScript library aimed at visualizing graphs of thousands o
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "sigma.js",
+  title: "sigma.js v3",
   tagline: TAGLINE,
   favicon: "img/favicon.ico",
 
@@ -14,6 +14,8 @@ const config = {
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: "/",
+  // Matches Cloudflare Pages, which serves pages with a trailing slash:
+  trailingSlash: true,
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -102,7 +104,7 @@ const config = {
       metadata: [
         {
           name: "description",
-          content: TAGLINE,
+          content: `Archived documentation for sigma.js v3, ${TAGLINE}`,
         },
         {
           name: "theme-color",
