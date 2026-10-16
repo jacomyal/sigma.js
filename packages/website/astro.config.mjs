@@ -1,3 +1,4 @@
+import sitemap from "@astrojs/sitemap";
 import starlight from "@astrojs/starlight";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
@@ -265,6 +266,8 @@ export default defineConfig({
         },
       ],
     }),
+    // Embeds are iframe-only example pages, marked noindex:
+    sitemap({ filter: (page) => !new URL(page).pathname.startsWith("/embed/") }),
     icon(),
   ],
 });
