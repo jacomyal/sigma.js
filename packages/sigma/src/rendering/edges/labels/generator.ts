@@ -652,6 +652,7 @@ out vec4 fragColor;
 void main() {
   #ifdef PICKING_MODE
     // Edge labels are not pickable - discard all fragments in picking mode
+    fragColor = vec4(0.0);
     discard;
   #else
   // SDF stores normalized distance: 0.5 = on edge, >0.5 = inside glyph
