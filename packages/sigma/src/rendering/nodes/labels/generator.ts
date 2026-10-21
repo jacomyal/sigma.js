@@ -269,6 +269,7 @@ out vec4 fragColor;
 void main() {
   #ifdef PICKING_MODE
     // Labels are not pickable - discard all fragments in picking mode
+    fragColor = vec4(0.0);
     discard;
   #else
     // Sample SDF value from atlas (high = inside glyph, low = outside)
