@@ -54,6 +54,8 @@ export interface EdgeLabelShaderOptions {
   minVisibilityThreshold?: number;
   /** Visibility ratio for full opacity (default: 0.6) */
   fullVisibilityThreshold?: number;
+  /** Reverse labels that would read upside down on screen (default: true) */
+  keepUpright?: boolean;
 }
 
 // ============================================================================
@@ -91,6 +93,7 @@ export function generateEdgeLabelVertexShader(options: EdgeLabelShaderOptions): 
     fontSizeMode = "fixed",
     minVisibilityThreshold = 0.5,
     fullVisibilityThreshold = 0.6,
+    keepUpright = true,
   } = options;
   const isScaledMode = fontSizeMode === "scaled";
 
@@ -316,8 +319,17 @@ ${textureFetch.varyingAssignments}
   // -------------------------------------------------------------------------
   // Step 5: Compute character center offset (truncation check moved to after curvature adjustment)
   // -------------------------------------------------------------------------
+  // Body center in arc distance
+  float bodyCenterDist = (bodyStartDist + bodyEndDist) * 0.5;
+
+  float centerT = queryPathTAtDistance(pathId, bodyCenterDist, source, target);
+  float screenDir = computeEdgeLabelScreenDir(pathId, centerT, source, target, u_matrix);
+
+  // Reversed labels lay their characters out from target to source
+  float readingSign = ${keepUpright ? "screenDir" : "1.0"};
+
   // Character center position relative to label center (on centerline, before curvature adjustment)
-  float charCenterOffset = charOffsetWebGL + charAdvanceWebGL * 0.5 - textWidthWebGL * 0.5;
+  float charCenterOffset = readingSign * (charOffsetWebGL + charAdvanceWebGL * 0.5 - textWidthWebGL * 0.5);
 
   // -------------------------------------------------------------------------
   // Step 6: Compute perpendicular offset based on position mode
@@ -335,15 +347,12 @@ ${textureFetch.varyingAssignments}
   float halfTextHeight = baseFontSize * 0.35 * pixelToGraph;`
   }
   float perpOffset = computeEdgeLabelPerpOffset(
-    positionMode, halfThickness, marginWebGL, halfTextHeight, source, target, u_matrix
+    positionMode, halfThickness, marginWebGL, halfTextHeight, readingSign, screenDir
   );
 
   // -------------------------------------------------------------------------
   // Step 7: Position character on path using offset path traversal
   // -------------------------------------------------------------------------
-  // Body center in arc distance
-  float bodyCenterDist = (bodyStartDist + bodyEndDist) * 0.5;
-
   // For "over" mode (perpOffset = 0), use simple centerline placement
   // For above/below modes, walk along the offset path to find correct position
   float charT;
@@ -355,9 +364,6 @@ ${textureFetch.varyingAssignments}
   } else {
     // Offset path traversal: walk along the offset curve to find character position
     // This ensures even character spacing regardless of curvature
-
-    // Start from body center on offset path
-    float centerT = queryPathTAtDistance(pathId, bodyCenterDist, source, target);
 
     ${
       hasAnySharpCorners
@@ -535,9 +541,10 @@ ${textureFetch.varyingAssignments}
   // -------------------------------------------------------------------------
   // Step 9: Rotate quad to align with tangent
   // -------------------------------------------------------------------------
-  // Rotation matrix from tangent
-  // tangent = (cos(angle), sin(angle)), so we can build rotation directly
-  mat2 rotation = mat2(tangent.x, tangent.y, -tangent.y, tangent.x);
+  // Rotation matrix from the reading direction
+  // readingDir = (cos(angle), sin(angle)), so we can build rotation directly
+  vec2 readingDir = tangent * readingSign;
+  mat2 rotation = mat2(readingDir.x, readingDir.y, -readingDir.y, readingDir.x);
 
   // Convert pixel offset to WebGL units for rotation
   ${
@@ -586,7 +593,7 @@ ${hasBorder ? "  v_borderColor = a_borderColor;\n  v_borderColor.a *= bias;\n  v
   // Compute the arc position of THIS VERTEX (not just character center)
   // The quad extends from charCenter - advance/2 to charCenter + advance/2
   // a_quadCorner.x is 0 for left edge, 1 for right edge
-  float vertexLocalOffset = (a_quadCorner.x - 0.5) * charAdvanceWebGL;
+  float vertexLocalOffset = readingSign * (a_quadCorner.x - 0.5) * charAdvanceWebGL;
   float vertexArcOffset = charCenterOffset + vertexLocalOffset;
 
   // Compute distance from body edges (positive = inside body, negative = outside)

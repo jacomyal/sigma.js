@@ -359,7 +359,7 @@ export type LabelPosition = "right" | "left" | "above" | "below" | "over";
  * - "over": Centered on the path centerline
  * - "above": Above the edge (perpendicular offset)
  * - "below": Below the edge (perpendicular offset)
- * - "auto": GPU determines above/below based on which node is leftmost on screen
+ * - "auto": Above or below, whichever is on top on screen
  */
 export type EdgeLabelPosition = "over" | "above" | "below" | "auto";
 

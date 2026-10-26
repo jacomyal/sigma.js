@@ -211,6 +211,7 @@ Edge label rendering options.
 | `textBorder`              | `{ width: number, color: EdgeLabelColorSpecification }` | Outline around label characters for readability                                                              |
 | `minVisibilityThreshold`  | `number`                                                | Minimum label visibility ratio (`0–1`). Labels less visible than this are hidden. Default: `0.5`.            |
 | `fullVisibilityThreshold` | `number`                                                | Visibility ratio at which labels reach full opacity. Labels fade between the two thresholds. Default: `0.6`. |
+| `keepUpright`             | `boolean`                                               | Reverses labels whose edge points leftward on screen so they never read upside down. Default: `true`.        |
 
 ## Depth layers
 

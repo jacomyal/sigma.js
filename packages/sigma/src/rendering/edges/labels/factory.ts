@@ -126,7 +126,7 @@ export function createEdgeLabelProgram<
 ): EdgeLabelProgram<N, E, G> {
   const { color: labelColor, margin: labelMargin, textBorder } = options;
   const labelShaderConfig = resolveEdgeLabelShaderConfig(options);
-  const { paths, fontSizeMode, minVisibilityThreshold, fullVisibilityThreshold } = labelShaderConfig;
+  const { paths, fontSizeMode, minVisibilityThreshold, fullVisibilityThreshold, keepUpright } = labelShaderConfig;
 
   const hasBorder = !!textBorder;
 
@@ -138,6 +138,7 @@ export function createEdgeLabelProgram<
     fontSizeMode,
     minVisibilityThreshold,
     fullVisibilityThreshold,
+    keepUpright,
   });
 
   type EdgeLabelUniform = string;

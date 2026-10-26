@@ -95,23 +95,31 @@ float computeEdgeLabelAlpha(float bodyLength, float textWidthWebGL) {
 }
 
 /**
+ * Screen direction of a path at `t`: 1 if it points right on screen, -1 if it
+ * points left. Labels flip exactly when the path crosses vertical.
+ */
+export const EDGE_LABEL_SCREEN_DIR_GLSL = /*glsl*/ `
+float computeEdgeLabelScreenDir(int pathId, float t, vec2 source, vec2 target, mat3 matrix) {
+  vec2 tangent = queryPathTangent(pathId, t, source, target);
+  return (matrix * vec3(tangent, 0.0)).x < 0.0 ? -1.0 : 1.0;
+}
+`;
+
+/**
  * Perpendicular offset per position mode: 0=over, 1=above, 2=below, 3=auto.
- * "auto" picks above/below based on source/target screen-X ordering.
+ * "above"/"below" follow the text's reading direction (`readingSign`).
+ * "auto" stays on the screen-top side of the path (`screenDir`).
  */
 export const EDGE_LABEL_PERP_OFFSET_GLSL = /*glsl*/ `
 float computeEdgeLabelPerpOffset(
   float positionMode,
   float halfThickness, float marginWebGL, float halfTextHeight,
-  vec2 source, vec2 target, mat3 matrix
+  float readingSign, float screenDir
 ) {
   float magnitude = halfThickness + marginWebGL + halfTextHeight;
-  if (positionMode == 1.0) return magnitude;
-  if (positionMode == 2.0) return -magnitude;
-  if (positionMode == 3.0) {
-    vec3 sc = matrix * vec3(source, 1.0);
-    vec3 tc = matrix * vec3(target, 1.0);
-    return sc.x < tc.x ? magnitude : -magnitude;
-  }
+  if (positionMode == 1.0) return magnitude * readingSign;
+  if (positionMode == 2.0) return -magnitude * readingSign;
+  if (positionMode == 3.0) return magnitude * screenDir;
   return 0.0;
 }
 `;
@@ -204,11 +212,12 @@ ${generatePathSelector(paths, "queryPathTAtDistance", "t_at_distance", "float", 
 ${sharpCornersDispatch}
 
 // ============================================================================
-// Shared helpers (body bounds, alpha ramp, perpendicular offset)
+// Shared helpers (body bounds, alpha ramp, screen direction, perpendicular offset)
 // ============================================================================
 
 ${EDGE_LABEL_BODY_BOUNDS_GLSL}
 ${generateEdgeLabelAlphaGlsl(minVisibilityThreshold, fullVisibilityThreshold)}
+${EDGE_LABEL_SCREEN_DIR_GLSL}
 ${EDGE_LABEL_PERP_OFFSET_GLSL}
 `;
 }

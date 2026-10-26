@@ -25,6 +25,7 @@ export interface EdgeLabelShaderConfig {
   fontSizeMode: "fixed" | "scaled";
   minVisibilityThreshold: number;
   fullVisibilityThreshold: number;
+  keepUpright: boolean;
 }
 
 /**
@@ -40,6 +41,7 @@ export function resolveEdgeLabelShaderConfig(options: {
   fontSizeMode?: "fixed" | "scaled";
   minVisibilityThreshold?: number;
   fullVisibilityThreshold?: number;
+  keepUpright?: boolean;
 }): EdgeLabelShaderConfig {
   return {
     paths: options.paths,
@@ -48,5 +50,6 @@ export function resolveEdgeLabelShaderConfig(options: {
     fontSizeMode: options.fontSizeMode ?? "fixed",
     minVisibilityThreshold: options.minVisibilityThreshold ?? 0.7,
     fullVisibilityThreshold: options.fullVisibilityThreshold ?? 0.8,
+    keepUpright: options.keepUpright ?? true,
   };
 }

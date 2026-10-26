@@ -517,6 +517,14 @@ export interface EdgeLabelOptions {
    * Default: 0.6
    */
   fullVisibilityThreshold?: number;
+
+  /**
+   * Keeps labels readable: labels whose edge points leftward on screen are
+   * reversed so they never render upside down. The edge direction is kept.
+   * Labels flip as soon as their edge crosses vertical on screen.
+   * Default: true
+   */
+  keepUpright?: boolean;
 }
 
 /**

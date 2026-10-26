@@ -75,8 +75,15 @@ export interface EdgeLabelBackgroundData {
 // ============================================================================
 
 function generateVertexShader(config: EdgeLabelShaderConfig): string {
-  const { paths, fontSizeMode, headLengthRatio, tailLengthRatio, minVisibilityThreshold, fullVisibilityThreshold } =
-    config;
+  const {
+    paths,
+    fontSizeMode,
+    headLengthRatio,
+    tailLengthRatio,
+    minVisibilityThreshold,
+    fullVisibilityThreshold,
+    keepUpright,
+  } = config;
   const isScaledMode = fontSizeMode === "scaled";
   const layer = layerPlain();
   const attributeLayout = computeAttributeLayout([...paths, layer]);
@@ -213,13 +220,16 @@ ${textureFetch.varyingAssignments}
   }
 
   // --- Perpendicular offset (shared with edge label shader) ---
+  float bodyCenterDist = (bodyStartDist + bodyEndDist) * 0.5;
+  float centerT = queryPathTAtDistance(pathId, bodyCenterDist, source, target);
+  float screenDir = computeEdgeLabelScreenDir(pathId, centerT, source, target, u_matrix);
+  float readingSign = ${keepUpright ? "screenDir" : "1.0"};
   float halfThickness = webGLThickness * 0.5;
   float perpOffset = computeEdgeLabelPerpOffset(
-    a_positionMode, halfThickness, marginWebGL, halfTextHeight, source, target, u_matrix
+    a_positionMode, halfThickness, marginWebGL, halfTextHeight, readingSign, screenDir
   );
 
   // --- Ribbon span (clipped to body) ---
-  float bodyCenterDist = (bodyStartDist + bodyEndDist) * 0.5;
   float halfTextWebGL = textWidthWebGL * 0.5;
   float labelStartDist = max(bodyCenterDist - halfTextWebGL, bodyStartDist);
   float labelEndDist = min(bodyCenterDist + halfTextWebGL, bodyEndDist);
