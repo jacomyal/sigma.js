@@ -1,91 +1,63 @@
 # Contributor Guide
 
-Thank you for investing your time in contributing to our project!
+Thank you for investing your time in contributing to sigma.js!
 
-In this guide you will get an overview of the contribution workflow from opening an issue, creating a PR, reviewing, and
-merging the PR.
+Please report bugs on [GitHub](https://github.com/jacomyal/sigma.js/issues).
 
-## Development Workflow
+Before opening a pull request, check that:
 
-1.  If you are a first-time contributor:
-    - Go to https://github.com/jacomyal/sigma.js and click on the **fork** button to create your own copy of the
-      project.
+- Commit messages follow [our format](#commits).
+- Bug fixes come with a regression test, committed **before** the fix (see [Bug fixes](#bug-fixes)).
+- Your branch has no merge commits (see [Workflow](#workflow)).
+- `npm run test` passes on the last commit of your branch.
 
-    - Clone the project to your local computer: `git clone git@github.com:your-username/sigma.js.git`
+## Workflow
 
-    - Navigate to the folder sigma.js and add the upstream repository:
-      `git remote add upstream git@github.com:jacomyal/sigma.js.git`
+1. Fork the repository, clone your fork, add `git@github.com:jacomyal/sigma.js.git` as the `upstream` remote, and run
+   `npm install`.
+2. Create a branch from `main`, with a sensible name such as `bugfix-for-issue-1480`.
+3. Commit, push with `git push -u origin <branch>`, and open a pull request.
+4. If the PR closes an issue, write "Fixes #1480" in its description, so that GitHub closes the issue on merge.
 
-    - Now, you have remote repositories named:
-      - `upstream`, which refers to the `sigma.js` repository
-      - `origin`, which refers to your personal fork
-
-    - Next, you need to set up your build environment: `npm install`
-
-2.  Develop your contribution:
-    - Pull the latest changes from upstream
-
-      ```
-      git checkout main
-      git pull upstream main
-      ```
-
-    - Create a branch for the feature you want to work on. Since the branch name will appear in the merge message, use a
-      sensible name such as 'bugfix-for-issue-1480': `git checkout -b bugfix-for-issue-1480`
-
-    - Commit locally as you progress (`git add` and `git commit`)
-
-3.  Test your contribution:
-    - Run the test suite locally: `npm run test`
-
-4.  Submit your contribution:
-    - Push your changes back to your fork on GitHub: `git push origin bugfix-for-issue-1480`
-
-    - Go to GitHub. The new branch will show up with a green Pull Request button, just click it.
-
-5.  Review process:
-    - Every Pull Request (PR) update triggers a set of
-      [continuous integration](https://en.wikipedia.org/wiki/Continuous_integration) services that check that the code
-      is up to standards and passes all our tests. These checks must pass before your PR can be merged. If one of the
-      checks fails, you can find out why by clicking on the "failed" icon (red cross) and inspecting the build and test
-      log.
-
-    - Reviewers (the other developers and interested community members) will write inline and/or general comments on
-      your PR to help you improve its implementation, documentation, and style. It's a friendly conversation from which
-      we all learn and the overall code quality benefits. Don't let the review discourage you from contributing, its
-      only aim is to improve the quality of project, not to criticize. We are, after all, very grateful for the time
-      you're donating!
-
-    - To update your PR, make your changes on your local repository and commit. As soon as those changes are pushed up
-      (to the same branch as before) the PR will update automatically.
-
-> **_NOTE:_** If the PR closes an issue, make sure that GitHub knows to automatically close the issue when the PR is merged.
-> For example, if the PR closes issue number 1480, you could use the phrase "Fixes #1480" in the PR description or commit message.
-
-## Divergence from `upstream main`
-
-If GitHub indicates that the branch of your Pull Request can no longer be merged automatically, merge the main branch
-into yours :
+If your branch diverges from `upstream/main`, rebase it, fix any conflicts, and force-push:
 
 ```
 git fetch upstream main
 git rebase upstream/main
+git push --force-with-lease
 ```
 
-If any conflicts occur, they need to be fixed before continuing.
+CI checks must pass before merging. Reviews are friendly conversations, meant to improve the code, not to criticize:
+we are very grateful for your time! Push changes to the same branch to update the PR.
 
-> **_NOTE:_** Please use **rebase** and not **merge**,
+## Commits
 
-## Starting a new package
+We do not use [Conventional Commits](https://www.conventionalcommits.org/). The first line is `[scope] Description`:
 
-Run `npm run createPackage` from the project root. It will:
+- The scope is the name of the package folder you changed (`sigma`, `node-image`, `website`...), `test` for
+  `packages/browser-tests`, or `all` when the change spans many packages.
+- The description starts with a third-person verb ("Fixes", "Adds", "Removes"...), and fits in 50 characters.
 
-- Ask you the new package name
-- Copy the `packages/template` folder
-- Update the new package `package.json` entries (name, description, exports)
-- Update various other files (buildable packages list in `tsconfig.json`, Preconstruct compatible packages list in
-  `package.json`...)
+The body is optional for small changes. Otherwise, it describes precisely what the commit contains, and references
+the related issue if any. Wrap lines at 72 characters.
 
-## Bugs
+Examples:
 
-Please report bugs on [GitHub](https://github.com/jacomyal/sigma.js/issues).
+- Short: [`[website] Adds canonical URL to the homepage`](https://github.com/jacomyal/sigma.js/commit/d20413f3)
+- Detailed: [`[sigma] Adds per-node attributes to SDF shapes`](https://github.com/jacomyal/sigma.js/commit/21d1f1e1)
+
+Release commits (`Publish`) are created by maintainers with Lerna, and do not follow this format.
+
+## Bug fixes
+
+When you fix a bug, use two commits:
+
+1. A regression test that fails without the fix. Its message mentions that it is currently failing.
+2. The fix that makes the test pass. Its message references the issue.
+
+This way, anyone can check out the first commit and see the test fail.
+
+Examples:
+
+1. [`[sigma] Adds regression test for #1558`](https://github.com/jacomyal/sigma.js/commit/eb624233)
+2. [`[sigma] Fixes hover flicker on overlapping nodes`](https://github.com/jacomyal/sigma.js/commit/98ddf850)
