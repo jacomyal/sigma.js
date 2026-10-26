@@ -167,6 +167,9 @@ export function createEdgeLabelProgram<
     /** Flag indicating the atlas texture needs to be uploaded to GPU */
     private atlasNeedsUpdate = false;
 
+    /** Pending refresh after an atlas update, cancelled on kill */
+    private refreshTimeout: ReturnType<typeof setTimeout> | null = null;
+
     /** Cache of pre-computed glyph layout data per label */
     private labelGlyphCache: Map<string, EdgeLabelGlyphCache> = new Map();
 
@@ -223,7 +226,11 @@ export function createEdgeLabelProgram<
         this.atlasNeedsUpdate = true;
         // Trigger re-render to update vertex data with new glyph metrics
         // Use setTimeout to defer refresh to next tick, avoiding interference with ongoing render
-        setTimeout(() => this.renderer.refresh(), 0);
+        if (this.refreshTimeout !== null) clearTimeout(this.refreshTimeout);
+        this.refreshTimeout = setTimeout(() => {
+          this.refreshTimeout = null;
+          this.renderer.refresh();
+        }, 0);
       });
 
       // Register the default font
@@ -705,6 +712,11 @@ export function createEdgeLabelProgram<
 
     kill(): void {
       const gl = this.normalProgram.gl;
+
+      if (this.refreshTimeout !== null) {
+        clearTimeout(this.refreshTimeout);
+        this.refreshTimeout = null;
+      }
 
       if (this.atlasTexture) {
         gl.deleteTexture(this.atlasTexture);
