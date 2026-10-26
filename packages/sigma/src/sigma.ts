@@ -2139,8 +2139,10 @@ export default class Sigma<
           `it must be declared in primitives.depthLayers. Current layers: ${this.depthLayers.join(", ")}`,
       );
     this.customLayerPrograms.get(id)?.program.kill();
-    this.customLayerPrograms.set(id, { depth, factory, program: factory(this.webGLContext!) });
-    this.refresh();
+    const program = factory(this.webGLContext!);
+    this.customLayerPrograms.set(id, { depth, factory, program });
+    if (program.cacheData) program.cacheData();
+    this.scheduleRender();
     return this;
   }
 
