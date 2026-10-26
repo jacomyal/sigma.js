@@ -40,7 +40,12 @@
   const EDGE_COLOR = "#5B8FF9";
   const LABEL_BACKGROUND_COLOR = "#c3d2f1";
 
-  const { fontSizeMode, headType, tailType } = registerControls({
+  const { keepUpright, fontSizeMode, headType, tailType } = registerControls({
+    keepUpright: {
+      type: "boolean",
+      label: "Keep labels upright",
+      default: true,
+    },
     fontSizeMode: {
       type: "select",
       label: "Font size mode",
@@ -113,6 +118,7 @@
         defaultTail: tailType === "none" ? undefined : tailType,
         variables: { curvature: { type: "number", default: 0 } },
         label: {
+          keepUpright,
           fontSizeMode: fontSizeMode as EdgeLabelFontSizeMode,
           color: "#041a47",
           textBorder: { width: 12, color: "#ffffff" },
