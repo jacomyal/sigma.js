@@ -6,7 +6,16 @@
   --grey: #999;
   --dark-grey: #666;
   --cream: #f9f7ed;
+  --bg: #fff;
+  --text: #1a1a1a;
   --border: 1px solid var(--light-grey);
+}
+:root[data-theme="dark"] {
+  --light-grey: #3a3c44;
+  --dark-grey: #a3a5ad;
+  --cream: #24252b;
+  --bg: #17181c;
+  --text: #e8e9ec;
 }
 
 /* Titles font */

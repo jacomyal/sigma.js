@@ -74,3 +74,30 @@
 .sl-markdown-content code {
   white-space: nowrap;
 }
+
+/* Sharp search box, like the rest of the site */
+site-search button[data-open-modal],
+site-search dialog {
+  border-radius: 0 !important;
+}
+
+/* Pages without sidebar (homepage, 404): header blends into the page until scrolled */
+:root:not([data-has-sidebar]) .header {
+  background-color: var(--sl-color-bg);
+  border-bottom: 1px solid transparent;
+  transition:
+    background-color ease-out 200ms,
+    border-color ease-out 200ms;
+}
+:root:not([data-has-sidebar])[data-scrolled] .header {
+  background-color: color-mix(in srgb, var(--sl-color-bg) 80%, transparent);
+  border-bottom: var(--border);
+  backdrop-filter: blur(8px);
+}
+/* Same breakpoint as Starlight's field-like search button; icon only below */
+@media (min-width: 50rem) {
+  :root:not([data-has-sidebar]) site-search button[data-open-modal] {
+    border-color: transparent;
+    background-color: var(--sl-color-gray-7);
+  }
+}

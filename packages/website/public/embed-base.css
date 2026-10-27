@@ -1,8 +1,3 @@
-/* Shared base styles for all sigma example embeds */
-:root {
-  --ruby: #e22653;
-}
-
 *,
 *::before,
 *::after {
@@ -16,8 +11,8 @@ body {
     system-ui,
     -apple-system,
     sans-serif;
-  color: #1a1a1a;
-  background: #ffffff;
+  color: var(--text);
+  background: var(--bg);
 }
 
 /* Controls bar (mounted by registerControls) */
@@ -31,8 +26,8 @@ body {
   align-items: center;
   gap: 1rem;
   padding: 0.4rem 0.75rem;
-  border-top: 1px solid #e0e0e0;
-  background: var(--sl-color-gray-7, #f6f7f8);
+  border-top: var(--border);
+  background: var(--cream);
   font-size: 0.8rem;
 }
 
@@ -52,14 +47,14 @@ body {
 }
 
 .controls-label {
-  color: #555;
+  color: var(--dark-grey);
   white-space: nowrap;
 }
 
 .controls-bar input[type="number"],
 .controls-bar select {
   padding: 0.15rem 0.3rem;
-  border: 1px solid #ccc;
+  border: var(--border);
   border-radius: 3px;
   font: inherit;
   font-size: 0.8rem;
@@ -89,16 +84,16 @@ body {
   width: 24px;
   height: 24px;
   padding: 3px;
-  border: 1px solid #ccc;
+  border: var(--border);
   border-radius: 3px;
-  background: #fff;
+  background: var(--bg);
   cursor: pointer;
-  color: #555;
+  color: var(--dark-grey);
 }
 
 .controls-icon-button:hover:not(:disabled) {
-  background: #eee;
-  color: #333;
+  background: var(--cream);
+  color: var(--text);
 }
 
 .controls-icon-button:disabled {
@@ -115,19 +110,19 @@ body {
 .controls-button,
 .controls-toggle {
   padding: 0.2rem 0.6rem;
-  border: 1px solid #ccc;
+  border: var(--border);
   border-radius: 3px;
-  background: #fff;
+  background: var(--bg);
   font: inherit;
   font-size: 0.8rem;
   cursor: pointer;
-  color: #333;
+  color: var(--text);
   white-space: nowrap;
 }
 
 .controls-button:hover,
 .controls-toggle:hover {
-  background: #eee;
+  background: var(--cream);
 }
 
 .controls-toggle.active {
@@ -141,9 +136,9 @@ body {
 }
 
 .controls-toggle:disabled {
-  background: #ddd;
-  border-color: #ccc;
-  color: #999;
+  background: var(--cream);
+  border-color: var(--light-grey);
+  color: var(--grey);
   cursor: default;
 }
 

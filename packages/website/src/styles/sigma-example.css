@@ -7,7 +7,7 @@
   overflow: hidden;
 
   --toolbar-border-color: var(--sl-color-gray-5, #e0e0e0);
-  --toolbar-bg: var(--sl-color-gray-7, #f5f5f5);
+  --toolbar-bg: var(--sl-color-gray-6, #f5f5f5);
   --toolbar-text-color: var(--sl-color-gray-3, #666);
   --toolbar-accent-color: var(--sl-color-text-accent, #c41e47);
 }

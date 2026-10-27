@@ -10,6 +10,7 @@
  * See src/scripts/sigma-embed-aware.ts to see how it's done.
  */
 import { Code } from "astro-expressive-code/components";
+import "../../styles/base.css";
 
 export async function getStaticPaths() {
   const examples = import.meta.glob("../../examples/**/*.astro", { eager: true });
@@ -106,8 +107,8 @@ const { Component, source } = Astro.props;
   .tabs {
     display: flex;
     flex-shrink: 0;
-    border-bottom: 1px solid #e0e0e0;
-    background: #f8f8f8;
+    border-bottom: var(--border);
+    background: var(--cream);
   }
 
   .tabs .tab {
@@ -117,7 +118,7 @@ const { Component, source } = Astro.props;
     font: inherit;
     font-size: 0.85rem;
     cursor: pointer;
-    color: #666;
+    color: var(--dark-grey);
     border-bottom: 2px solid transparent;
   }
 
@@ -214,7 +215,7 @@ const { Component, source } = Astro.props;
     }
 
     .panel-source {
-      border-left: 1px solid #e0e0e0;
+      border-left: var(--border);
       flex: 0 0 45%;
     }
   }

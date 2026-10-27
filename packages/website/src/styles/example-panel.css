@@ -4,7 +4,7 @@
 .example-panel {
   position: absolute;
   z-index: 1;
-  background: rgba(255, 255, 255, 0.92);
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
   border: var(--border);
   padding: 0.75em 1em;
   font-size: 12px;
@@ -61,4 +61,6 @@
   font-family: inherit;
   border: var(--border);
   border-radius: 2px;
+  background: var(--bg);
+  color: var(--text);
 }

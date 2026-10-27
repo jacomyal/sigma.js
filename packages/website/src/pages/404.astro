@@ -1,0 +1,24 @@
+---
+// Replaces Starlight's 404 (see disable404Route) to share the homepage layout
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+
+import SplashFooter from "../components/SplashFooter.astro";
+import "../styles/splash.css";
+---
+
+<StarlightPage frontmatter={{ title: "404", template: "splash", pagefind: false, editUrl: false }}>
+  <div class="splash not-content">
+    <section>
+      <h1 class="text-ruby">404</h1>
+      <p>Page not found</p>
+    </section>
+
+    <SplashFooter />
+  </div>
+</StarlightPage>
+
+<style>
+  section {
+    text-align: center;
+  }
+</style>

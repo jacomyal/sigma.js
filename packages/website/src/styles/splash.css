@@ -1,0 +1,81 @@
+/* Splash pages styles (homepage, 404; shared styles are in base.css) */
+
+/**
+ * PAGE LAYOUT:
+ * Starlight wrappers are flattened, so that .page lays out the header, the
+ * content and the footer, with the footer at the bottom of short pages.
+ */
+:root:has(.splash) .page {
+  min-height: 100dvh;
+  justify-content: space-between;
+}
+/* In the flow, so that it is the first flex item */
+:root:has(.splash) .header {
+  position: sticky;
+}
+:root:has(.splash)
+  :is(.main-frame, .lg\:sl-flex, .main-pane, main, .content-panel, .sl-container, .sl-markdown-content, .splash) {
+  display: contents;
+}
+/* Starlight's footer is empty here */
+:root:has(.splash) .sl-container > footer {
+  display: none;
+}
+/* Visually hidden, but still rendered as the skip link target (#_top is Starlight's page title) */
+:root:has(.splash) .content-panel:has(#_top) {
+  display: block;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* Flex items with auto margins shrink to fit their content otherwise */
+.splash > * {
+  width: 100%;
+}
+
+.splash {
+  --text: var(--sl-color-white);
+  --text-muted: var(--sl-color-gray-3);
+  --grid-size: 1000px;
+  --grid-h-padding: 2em;
+  --transition: all ease-out 300ms;
+}
+
+.splash .text-grey {
+  color: var(--grey);
+}
+.splash .text-ruby {
+  color: var(--sl-color-text-accent);
+}
+
+/**
+ * TYPOGRAPHY:
+ */
+.splash {
+  font-size: 1.2rem;
+  line-height: 1.5;
+}
+/* Restores the margins Starlight's reset removes */
+.splash h2 {
+  margin: 0.83em 0;
+}
+.splash p,
+.splash ul {
+  margin: 1em 0;
+}
+.splash a {
+  color: var(--text);
+  transition: var(--transition);
+}
+.splash a:hover {
+  color: var(--text-muted);
+}
+
+@media (max-width: 768px) {
+  .splash {
+    font-size: 1rem;
+  }
+}

@@ -171,6 +171,10 @@ export default defineConfig({
           content: `var _paq=window._paq=window._paq||[];_paq.push(["trackPageView"]);_paq.push(["enableLinkTracking"]);(function(){var u="https://matomo.ouestware.com/";_paq.push(["setTrackerUrl",u+"matomo.php"]);_paq.push(["setSiteId","26"]);var d=document,g=d.createElement("script"),s=d.getElementsByTagName("script")[0];g.async=true;g.src=u+"matomo.js";s.parentNode.insertBefore(g,s)})();`,
         },
       ],
+      components: {
+        Header: "./src/components/Header.astro",
+      },
+      disable404Route: true,
       customCss: ["./src/styles/base.css", "./src/styles/custom.css", "./src/styles/sigma-example.css"],
       sidebar: [
         {

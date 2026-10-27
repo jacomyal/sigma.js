@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - uses: actions/setup-node@v4
         with:
@@ -18,6 +20,12 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      # The build step gets the count, not the token; an empty count hides it
+      - name: Fetch GitHub stars
+        run: echo "GITHUB_STARS=$(gh api repos/jacomyal/sigma.js --jq .stargazers_count)" >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build website
         run: npm run website:build

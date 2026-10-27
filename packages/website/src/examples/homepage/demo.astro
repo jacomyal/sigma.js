@@ -77,15 +77,15 @@
 
   const FONT_FAMILY = '"Public Sans", Lato, Arial, sans-serif';
 
-  const BACKGROUND = "#f0f0f0";
-  const NODES_PALETTE = {
-    0: "#756cff",
-    1: "#ef368b",
-    2: "#011acc",
-    3: "#b900af",
-    4: "#201887",
-    5: "#c904ff",
-  };
+  // Set by the inline script below
+  const IS_DARK = document.documentElement.dataset.theme === "dark";
+
+  const BACKGROUND = IS_DARK ? "#1f2026" : "#f0f0f0";
+  const SURFACE = IS_DARK ? "#2a2b33" : "#ffffff";
+  const TEXT_COLOR = IS_DARK ? "#e8e9ec" : "#333333";
+  const NODES_PALETTE = IS_DARK
+    ? { 0: "#8f88ff", 1: "#ff5aa5", 2: "#5470ff", 3: "#e040d8", 4: "#7d70ff", 5: "#d65cff" }
+    : { 0: "#756cff", 1: "#ef368b", 2: "#011acc", 3: "#b900af", 4: "#201887", 5: "#c904ff" };
   const EDGE_PALETTE = {
     cites: "#e3a95b",
     coauthored: "#e22653",
@@ -101,7 +101,7 @@
     return {
       type: "svg",
       svg: `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="19">
-        <text x="4" y="13" font-family='${FONT_FAMILY}' font-size="${fontSize}" fill="#333">${escape(author)}</text>
+        <text x="4" y="13" font-family='${FONT_FAMILY}' font-size="${fontSize}" fill="${TEXT_COLOR}">${escape(author)}</text>
       </svg>`,
     };
   }
@@ -143,7 +143,7 @@
           layerFill(),
           layerBorder({
             borders: [
-              { size: 0.1, color: "white", mode: "relative" },
+              { size: 0.1, color: SURFACE, mode: "relative" },
               { fill: true, color: { attribute: "color" } },
             ],
           }),
@@ -170,9 +170,11 @@
             dict: NODES_PALETTE,
           },
           labelFont: FONT_FAMILY,
+          labelColor: TEXT_COLOR,
+          backdropColor: SURFACE,
           backdropShadowColor: "transparent",
           backdropLabelPadding: 10,
-          labelBackgroundColor: "#ffffff66",
+          labelBackgroundColor: `${SURFACE}66`,
           size: {
             attribute: "score",
             min: 50,
@@ -351,4 +353,23 @@
     hoveredNode = null;
     focusNode(selectedNode);
   });
+</script>
+
+<script is:inline>
+  // Follows the docs theme (stored by Starlight), and reloads when it changes so the graph can redraw
+  const getTheme = () => {
+    try {
+      const stored = localStorage.getItem("starlight-theme");
+      if (stored === "light" || stored === "dark") return stored;
+    } catch {
+      // Storage can be blocked in third-party iframes
+    }
+    return matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  };
+  document.documentElement.dataset.theme = getTheme();
+  const reloadOnThemeChange = () => {
+    if (getTheme() !== document.documentElement.dataset.theme) location.reload();
+  };
+  window.addEventListener("storage", reloadOnThemeChange);
+  matchMedia("(prefers-color-scheme: light)").addEventListener("change", reloadOnThemeChange);
 </script>

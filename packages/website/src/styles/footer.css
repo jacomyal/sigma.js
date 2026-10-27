@@ -1,0 +1,48 @@
+/* Splash pages footer (see SplashFooter.astro) */
+.splash footer {
+  padding: 2em var(--grid-h-padding);
+  max-width: var(--grid-size);
+  margin: 0 auto;
+}
+.splash footer ul {
+  list-style: none;
+  padding: 0;
+}
+.splash .row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  column-gap: 1em;
+}
+.splash .row > * {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+/* Theme select reads as an inline link in the footer text */
+.splash footer .theme-select starlight-theme-select,
+.splash footer .theme-select label {
+  display: inline-flex;
+  color: inherit;
+}
+.splash footer .theme-select .label-icon {
+  font-size: 0.9em;
+}
+.splash footer .theme-select select {
+  width: auto;
+  margin-inline: 0;
+  padding-block: 0;
+  padding-inline: 1.2em 1.4em;
+  font-size: inherit;
+}
+.splash .footer-icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: text-bottom;
+  margin-right: 0.2em;
+}
+
+@media (max-width: 768px) {
+  .splash .row {
+    display: block;
+  }
+}

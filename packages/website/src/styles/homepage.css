@@ -1,71 +1,17 @@
-/* Homepage-specific styles (shared styles are in base.css) */
+/* Homepage-specific styles (splash styles are in splash.css) */
 @import "./example-toolbar.css";
-:root {
-  --grid-size: 1000px;
-  --grid-h-padding: 2em;
+
+.homepage {
   --showcase-width: 1400px;
   --showcase-height: 800px;
   --showcase-max-height: calc(100vh - 2em);
-  --transition: all ease-out 300ms;
   --hover-opacity: 0.7;
-}
-
-.text-grey {
-  color: var(--grey);
-}
-.text-ruby {
-  color: var(--ruby);
-}
-
-/**
- * TYPOGRAPHY:
- */
-html {
-  scroll-behavior: smooth;
-}
-body {
-  font-size: 1.2em;
-  font-family: "Public Sans", Lato, Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-pre,
-code {
-  font-family: Cascadia, monospace;
-  background: var(--cream);
-}
-a {
-  color: black;
-  transition: var(--transition);
-}
-a:hover {
-  color: var(--dark-grey);
-}
-
-/**
- * LAYOUT:
- */
-main {
-  flex-grow: 1;
-}
-.row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  column-gap: 1em;
-}
-.row > * {
-  flex-grow: 1;
-  flex-basis: 0;
 }
 
 /**
  * BUTTONS:
  */
-.button {
+.homepage .button {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
@@ -79,62 +25,62 @@ main {
   transition: var(--transition);
   text-align: center;
 }
-.button:not([disabled]):hover {
+.homepage .button:not([disabled]):hover {
   opacity: var(--hover-opacity);
 }
-.button-icon {
+.homepage .button-icon {
   width: 1.2em;
   height: 1.2em;
   vertical-align: -0.15em;
 }
-.button-primary {
-  background: var(--ruby);
-  color: white !important;
+.homepage .button-primary {
+  background: var(--sl-color-text-accent);
+  color: var(--sl-color-black) !important;
 }
-.button-outline {
+.homepage .button-outline {
   background: transparent;
-  border: 2px solid black;
-  color: black !important;
+  border: 2px solid var(--text);
+  color: var(--text) !important;
 }
 
 /**
  * HERO:
  */
-.hero {
+.homepage .hero {
   max-width: var(--grid-size);
   margin: 0 auto;
   padding: 14em var(--grid-h-padding) 10em;
   text-align: center;
 }
-.hero h1 {
+.homepage .hero h1 {
   font-size: 2.4em;
   margin: 0 0 0.3em;
   display: flex;
   align-items: center;
   justify-content: center;
 }
-.hero .hero-logo {
+.homepage .hero .hero-logo {
   height: 1em;
   margin-right: 0.2em;
 }
-.hero .tagline {
+.homepage .hero .tagline {
   font-family: Hauora, Roboto, Arial, sans-serif;
   font-size: 1.6em;
   font-weight: bold;
   margin: 0 0 0.5em;
 }
-.hero .subtitle {
+.homepage .hero .subtitle {
   font-size: 1.15em;
-  color: var(--dark-grey);
+  color: var(--text-muted);
   margin: 0 auto 1em;
   max-width: 550px;
   line-height: 1.5;
 }
-.hero .subtitle a {
-  color: var(--dark-grey);
+.homepage .hero .subtitle a {
+  color: var(--text-muted);
   text-decoration: underline;
 }
-.hero .ctas {
+.homepage .hero .ctas {
   display: flex;
   gap: 1em;
   justify-content: center;
@@ -144,103 +90,103 @@ main {
 /**
  * SHOWCASE / DEMO:
  */
-.showcase {
+.homepage .showcase {
   max-width: var(--showcase-width);
   margin: 0 auto;
   padding: 0 var(--grid-h-padding) 3em;
 
   --toolbar-border-color: var(--light-grey);
-  --toolbar-bg: var(--cream);
-  --toolbar-text-color: var(--dark-grey);
-  --toolbar-accent-color: var(--ruby);
+  --toolbar-bg: var(--sl-color-gray-6);
+  --toolbar-text-color: var(--text-muted);
+  --toolbar-accent-color: var(--sl-color-text-accent);
   --toolbar-disabled-color: var(--grey);
 }
-.showcase .wrapper {
+.homepage .showcase .wrapper {
   position: relative;
   border: var(--border);
   box-sizing: border-box;
   overflow: hidden;
 }
-.showcase iframe {
+.homepage .showcase iframe {
   display: block;
   width: 100%;
   height: var(--showcase-height);
   max-height: var(--showcase-max-height);
   border: none;
 }
-.showcase .example-toolbar {
+.homepage .showcase .example-toolbar {
   position: relative;
   z-index: 1;
 }
 /**
  * WHY SIGMA:
  */
-.why-sigma {
+.homepage .why-sigma {
   max-width: var(--grid-size);
   margin: 0 auto;
   padding: 3em var(--grid-h-padding);
 }
-.why-sigma h2 {
+.homepage .why-sigma h2 {
   text-align: center;
   margin-bottom: 1.5em;
 }
-.why-sigma .cards {
+.homepage .why-sigma .cards {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1.5em;
 }
-.why-sigma .card {
+.homepage .why-sigma .card {
   padding: 1.5em;
   border: var(--border);
 }
-.why-sigma .card h3 {
+.homepage .why-sigma .card h3 {
   display: flex;
   align-items: center;
   gap: 0.4em;
   margin: 0 0 0.5em;
   font-size: 1.05em;
 }
-.why-sigma .card .card-icon {
+.homepage .why-sigma .card .card-icon {
   width: 1.2em;
   height: 1.2em;
   flex-shrink: 0;
-  color: var(--ruby);
+  color: var(--sl-color-text-accent);
 }
-.why-sigma .card p {
+.homepage .why-sigma .card p {
   margin: 0;
   font-size: 0.9em;
   line-height: 1.5;
-  color: var(--dark-grey);
+  color: var(--text-muted);
 }
-.why-sigma .card p a {
-  color: var(--dark-grey);
+.homepage .why-sigma .card p a {
+  color: var(--text-muted);
 }
 
 /**
  * IN THE WILD:
  */
-.in-the-wild {
+.homepage .in-the-wild {
   max-width: var(--grid-size);
   margin: 0 auto;
   padding: 3em var(--grid-h-padding);
 }
-.in-the-wild h2 {
+.homepage .in-the-wild h2 {
   text-align: center;
 }
-.in-the-wild .intro {
+.homepage .in-the-wild .intro {
   text-align: center;
-  color: var(--dark-grey);
+  color: var(--text-muted);
   margin-bottom: 2em;
 }
 
 /* Shared thumbnail styles */
-.in-the-wild .thumbnail {
+.homepage .in-the-wild .thumbnail {
   display: block;
   overflow: hidden;
   border: var(--border);
   transition: var(--transition);
 }
-.in-the-wild .thumbnail > div {
+.homepage .in-the-wild .thumbnail > div {
   height: 100%;
   background-size: cover;
   background-position: center;
@@ -249,102 +195,77 @@ main {
   background-color: lightgray;
   transition: var(--transition);
 }
-.in-the-wild .thumbnail:hover {
-  border-color: var(--dark-grey);
+.homepage .in-the-wild .thumbnail:hover {
+  border-color: var(--text-muted);
 }
-.in-the-wild .thumbnail:hover > div {
+.homepage .in-the-wild .thumbnail:hover > div {
   background-color: transparent;
 }
-.in-the-wild .sumup {
+.homepage .in-the-wild .sumup {
   padding: 0.8em 0;
 }
-.in-the-wild .sumup h3,
-.in-the-wild .sumup p {
+.homepage .in-the-wild .sumup h3,
+.homepage .in-the-wild .sumup p {
   margin: 0;
 }
-.in-the-wild .sumup p {
+.homepage .in-the-wild .sumup p {
   font-size: 0.85em;
-  color: var(--dark-grey);
+  color: var(--text-muted);
 }
 
 /* Featured projects — larger thumbnails */
-.in-the-wild .featured {
+.homepage .in-the-wild .featured {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5em;
   margin-bottom: 1.5em;
 }
-.in-the-wild .featured .thumbnail {
+.homepage .in-the-wild .featured .thumbnail {
   height: 220px;
 }
 
 /* Other projects — smaller grid */
-.in-the-wild .others {
+.homepage .in-the-wild .others {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1em;
 }
-.in-the-wild .others .thumbnail {
+.homepage .in-the-wild .others .thumbnail {
   height: 140px;
-}
-
-/**
- * FOOTER:
- */
-footer {
-  padding: 2em var(--grid-h-padding);
-  max-width: var(--grid-size);
-  margin: auto;
-}
-footer ul {
-  list-style: none;
-  padding: 0;
-}
-.footer-icon {
-  width: 1em;
-  height: 1em;
-  vertical-align: text-bottom;
-  margin-right: 0.2em;
 }
 
 /**
  * RESPONSIVENESS:
  */
 @media (max-width: 1024px) {
-  .why-sigma .cards {
+  .homepage .why-sigma .cards {
     grid-template-columns: repeat(2, 1fr);
   }
-  .in-the-wild .others {
+  .homepage .in-the-wild .others {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 768px) {
-  body {
-    font-size: 1em;
-  }
-  .hero {
+  .homepage .hero {
     padding: 5em 1.5em 4em;
   }
-  .hero h1 {
+  .homepage .hero h1 {
     font-size: 1.8em;
   }
-  .hero .tagline {
+  .homepage .hero .tagline {
     font-size: 1.3em;
   }
-  .showcase {
+  .homepage .showcase {
     padding: 0 0 2em;
   }
-  .why-sigma .cards {
+  .homepage .why-sigma .cards {
     grid-template-columns: 1fr;
   }
-  .in-the-wild .featured {
+  .homepage .in-the-wild .featured {
     grid-template-columns: 1fr;
   }
-  .in-the-wild .others {
+  .homepage .in-the-wild .others {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .row {
-    display: block;
   }
 }

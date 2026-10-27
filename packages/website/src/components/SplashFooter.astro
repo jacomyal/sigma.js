@@ -1,0 +1,52 @@
+---
+import ThemeSelect from "@astrojs/starlight/components/ThemeSelect.astro";
+import { Icon } from "astro-icon/components";
+
+import "../styles/footer.css";
+---
+
+<footer class="row">
+  <section>
+    <p>
+      <strong class="text-ruby">sigma</strong><strong class="text-grey">.js</strong>
+      is published by <a href="https://medialab.sciencespo.fr/en/">Sciences Po médialab</a> and
+      <a href="https://ouestware.com/en">OuestWare</a>, with the support of <a href="https://gdotv.com">gdotv</a>.
+    </p>
+    <ul>
+      <li>
+        <a href="/get-started/quickstart/">
+          <Icon name="ph:book-open-bold" class="footer-icon" /> Documentation
+        </a>
+      </li>
+      <li>
+        <a rel="me" href="https://vis.social/@sigmajs">
+          <Icon name="ph:mastodon-logo-bold" class="footer-icon" /> @sigmajs@vis.social
+        </a>
+      </li>
+      <li>
+        <a href="https://github.com/jacomyal/sigma.js">
+          <Icon name="ph:github-logo-bold" class="footer-icon" /> github.com/jacomyal/sigma.js
+        </a>
+      </li>
+      <li>
+        <a href="https://stackoverflow.com/questions/tagged/sigma.js">
+          <Icon name="ph:stack-overflow-logo-bold" class="footer-icon" /> StackOverflow
+        </a>
+      </li>
+    </ul>
+  </section>
+  <section>
+    <p>
+      It is developed under
+      <a href="https://github.com/jacomyal/sigma.js/blob/main/LICENSE.txt">the MIT License</a>.
+    </p>
+    <p>
+      This website is built with <a href="https://astro.build/">Astro</a>, using
+      <a href="https://phosphoricons.com/">Phosphor</a> icons and
+      <a href="https://themeui.net/hauora-sans-free-font/">Hauroa Sans</a>,
+      <a href="https://public-sans.digital.gov/">Public Sans</a> and
+      <a href="https://github.com/microsoft/cascadia-code">Cascadia Code</a> fonts. Its theme is set to
+      <span class="theme-select"><ThemeSelect /></span>.
+    </p>
+  </section>
+</footer>

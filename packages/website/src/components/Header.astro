@@ -1,0 +1,140 @@
+---
+import Search from "@astrojs/starlight/components/Search.astro";
+import SiteTitle from "@astrojs/starlight/components/SiteTitle.astro";
+import ThemeSelect from "@astrojs/starlight/components/ThemeSelect.astro";
+import { Icon } from "astro-icon/components";
+
+import { GITHUB_STARS } from "../github-stars";
+import { SIGMA_VERSION } from "../versions";
+
+const stars =
+  GITHUB_STARS === null
+    ? null
+    : new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(GITHUB_STARS);
+---
+
+<div class="sigma-header">
+  <div class="left">
+    <SiteTitle />
+    <Search />
+  </div>
+  <div class="right print:hidden">
+    <a href="https://github.com/jacomyal/sigma.js/blob/main/CHANGELOG.md" class="version">v{SIGMA_VERSION}</a>
+    <a href="/get-started/quickstart/" class="nav-link">
+      <Icon name="ph:book-open-bold" />
+      <span>Docs</span>
+    </a>
+    <a href="/examples/" class="nav-link">
+      <Icon name="ph:graph-bold" />
+      <span>Examples</span>
+    </a>
+    <a href="https://github.com/jacomyal/sigma.js" class:list={["link", { "has-stars": stars }]}>
+      <Icon name="ph:github-logo-bold" class="github-icon" />
+      <span>GitHub</span>
+      {
+        stars && (
+          <span class="stars">
+            {stars} <Icon name="ph:star" />
+          </span>
+        )
+      }
+    </a>
+    <div class="theme-select sl-hidden md:sl-flex">
+      <ThemeSelect />
+    </div>
+  </div>
+</div>
+
+<script>
+  const update = () => document.documentElement.toggleAttribute("data-scrolled", window.scrollY > 0);
+  update();
+  window.addEventListener("scroll", update, { passive: true });
+</script>
+
+<style>
+  .sigma-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sl-nav-gap);
+    height: 100%;
+  }
+  .left,
+  .right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+  .left {
+    flex-grow: 1;
+  }
+  .left :global(site-search) {
+    flex-grow: 1;
+  }
+  .left :global(button[data-open-modal]) {
+    max-width: 16rem;
+  }
+  .right {
+    gap: 1.25rem;
+    font-size: var(--sl-text-sm);
+    white-space: nowrap;
+  }
+  .right a {
+    display: flex;
+    align-items: center;
+    gap: 0.35em;
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+  }
+  .right a:hover {
+    color: var(--sl-color-text-accent);
+  }
+  .version {
+    font-family: var(--sl-font-mono);
+  }
+  .stars {
+    display: flex;
+    align-items: center;
+    gap: 0.2em;
+  }
+  .right :global(svg) {
+    font-size: 1.1em;
+  }
+
+  /* Nav links only where there is no sidebar to navigate (homepage, 404) */
+  :global(:root[data-has-sidebar]) .nav-link {
+    display: none;
+  }
+  /* Splash pages footer has its own theme select */
+  :global(:root:has(.splash)) .theme-select {
+    display: none;
+  }
+  /* The star icon is enough next to the "GitHub" text */
+  .has-stars :global(.github-icon) {
+    display: none;
+  }
+
+  /* Icons only on small screens */
+  @media (max-width: 50rem) {
+    /* Visually hidden, still read as the link names */
+    .right a span {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+    }
+    .version {
+      display: none;
+    }
+    /* Same size as the .right icons */
+    .left :global(button[data-open-modal]) {
+      font-size: calc(1.1 * var(--sl-text-sm));
+    }
+    .has-stars :global(.github-icon) {
+      display: inline;
+    }
+  }
+</style>
