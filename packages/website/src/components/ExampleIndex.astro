@@ -67,7 +67,7 @@ for (const topicKey of topicOrder) {
       id,
       name: id.split("/").pop()!,
       embedUrl: "/embed/" + id + "/",
-      sourceUrl: "https://github.com/jacomyal/sigma.js/blob/v4/packages/website/src/examples/" + id + ".astro",
+      sourceUrl: "https://github.com/jacomyal/sigma.js/blob/main/packages/website/src/examples/" + id + ".astro",
       pages: exampleToPages.get(id) ?? [],
     })),
   });
