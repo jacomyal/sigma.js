@@ -12,6 +12,10 @@
  */
 import Graph from "graphology-types";
 
+function groupKey(source: string, target: string): string {
+  return source < target ? `${source}\0${target}` : `${target}\0${source}`;
+}
+
 /**
  * Manages grouping and ordering of parallel edges (edges that share both
  * endpoints). Calls the provided callback whenever a group's membership or
@@ -28,9 +32,7 @@ export class EdgeGroupIndex {
   ) {}
 
   private getGroupKey(edge: string): string {
-    const source = this.graph.source(edge);
-    const target = this.graph.target(edge);
-    return source < target ? `${source}\0${target}` : `${target}\0${source}`;
+    return groupKey(this.graph.source(edge), this.graph.target(edge));
   }
 
   // Canonical-source edges sort before reverse-direction ones.
@@ -52,7 +54,7 @@ export class EdgeGroupIndex {
     }
     if (!group.includes(edge)) group.push(edge);
     this.edgeToGroupKey.set(edge, groupKey);
-    this.sortGroup(group, groupKey);
+    if (group.length > 1) this.sortGroup(group, groupKey);
     this.onGroupChanged(group, group.length);
   }
 
@@ -88,19 +90,19 @@ export class EdgeGroupIndex {
     this.groups.clear();
     this.edgeToGroupKey.clear();
 
-    this.graph.forEachEdge((edge) => {
-      const groupKey = this.getGroupKey(edge);
-      let group = this.groups.get(groupKey);
+    this.graph.forEachEdge((edge, _attributes, source, target) => {
+      const key = groupKey(source, target);
+      let group = this.groups.get(key);
       if (!group) {
         group = [];
-        this.groups.set(groupKey, group);
+        this.groups.set(key, group);
       }
       group.push(edge);
-      this.edgeToGroupKey.set(edge, groupKey);
+      this.edgeToGroupKey.set(edge, key);
     });
 
-    for (const [groupKey, group] of this.groups) {
-      this.sortGroup(group, groupKey);
+    for (const [key, group] of this.groups) {
+      if (group.length > 1) this.sortGroup(group, key);
       this.onGroupChanged(group, group.length);
     }
   }
