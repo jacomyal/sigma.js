@@ -1,3 +1,4 @@
+[![npm version](https://img.shields.io/npm/v/sigma)](https://www.npmjs.com/package/sigma)
 [![Build Status](https://github.com/jacomyal/sigma.js/workflows/Tests/badge.svg)](https://github.com/jacomyal/sigma.js/actions)
 
 <br />
