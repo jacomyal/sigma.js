@@ -1,5 +1,44 @@
 # sigma.js - changelog:
 
+## 4.0.4
+
+### Bug fixes
+
+- [#1544](https://github.com/jacomyal/sigma.js/issues/1544) - Keeps edge labels upright, as in v3 (set the new `keepUpright` edge label option to `false` to keep the previous v4 behavior)
+- [#1562](https://github.com/jacomyal/sigma.js/issues/1562) - Fixes WebGL errors in label picking
+- Fixes pending edge label refresh running after `kill()`
+
+### Performance
+
+- Creates edge label programs lazily, on the first frame that renders edge labels (`createEdgeProgram` bundles now
+  expose `createLabelPrograms()` instead of label program instances)
+- Speeds up edge groups rebuild (parallel edges, self-loops)
+- Stops `addCustomLayerProgram` from triggering a full graph refresh
+
+## 4.0.3
+
+### Bug fixes
+
+- [#1560](https://github.com/jacomyal/sigma.js/issues/1560) - Fixes `getStyles()` typing vs `SigmaOptions`
+- [#1561](https://github.com/jacomyal/sigma.js/issues/1561) - Keeps `DEFAULT_STYLES` literal type
+
+## 4.0.2
+
+### Bug fixes
+
+- [#1559](https://github.com/jacomyal/sigma.js/issues/1559) - Fixes blank frame on shader regeneration
+
+## 4.0.1
+
+### Features
+
+- Adds and exports `SigmaOptions` type
+
+### Bug fixes
+
+- [#1558](https://github.com/jacomyal/sigma.js/issues/1558) - Fixes hover flicker on overlapping nodes
+- `@sigma/node-image@4.0.1` - Keeps image crop inside the image
+
 ## 4.0.0
 
 This new version carries a **complete rewrite** of the programs system, initially to address various depth or opacity
