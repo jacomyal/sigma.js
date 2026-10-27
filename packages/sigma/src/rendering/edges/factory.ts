@@ -67,13 +67,6 @@ float extremity_none(vec2 uv, float lengthRatio, float widthRatio) {
   };
 }
 
-/**
- * Builds an edge program suite from paths, extremities, and layers. The
- * suite is a flat bundle of instances: the edge program plus the matching
- * label and label-background (ribbon) programs.
- *
- * @returns A bundle `{ edgeProgram, labelProgram, labelBackgroundProgram }`
- */
 export interface ResolvedEdgeIds {
   pathId: number;
   headId: number;
@@ -82,6 +75,13 @@ export interface ResolvedEdgeIds {
   tailLengthRatio: number;
 }
 
+/**
+ * Builds an edge program suite from paths, extremities, and layers. The
+ * suite is a flat bundle: the edge program, its frame pass, and a factory
+ * for the matching label and label-background (ribbon) programs.
+ *
+ * @returns A bundle `{ edgeProgram, createLabelPrograms, framePass }`
+ */
 export function createEdgeProgram<
   N extends Attributes = Attributes,
   E extends Attributes = Attributes,
@@ -507,9 +507,12 @@ export function createEdgeProgram<
   // consume the same resolved shader config, so the ribbon cannot drift
   // from the text it pairs with. The label background gets the picking
   // framebuffer so label events can be wired onto the ribbon.
-  const labelProgram = createEdgeLabelProgram(gl, null, renderer, labelFactoryOptions);
-  const labelBackgroundProgram = createEdgeLabelBackgroundProgram(gl, pickingBuffer, renderer, {
-    shaderConfig: labelShaderConfig,
+  // Created on demand: most graphs never render edge labels.
+  const createLabelPrograms = () => ({
+    labelProgram: createEdgeLabelProgram(gl, null, renderer, labelFactoryOptions),
+    labelBackgroundProgram: createEdgeLabelBackgroundProgram(gl, pickingBuffer, renderer, {
+      shaderConfig: labelShaderConfig,
+    }),
   });
 
   // The shape-aware pass that computes every edge's source/target clamp once
@@ -520,8 +523,7 @@ export function createEdgeProgram<
 
   return {
     edgeProgram: new EdgeProgramClass(gl, null, renderer),
-    labelProgram,
-    labelBackgroundProgram,
+    createLabelPrograms,
     framePass,
   };
 }
@@ -551,7 +553,9 @@ export interface EdgeProgramBundle<
   G extends Attributes = Attributes,
 > {
   edgeProgram: EdgeProgram<N, E, G>;
-  labelProgram: EdgeLabelProgram<N, E, G>;
-  labelBackgroundProgram: EdgeLabelBackgroundProgram<N, E, G>;
+  createLabelPrograms(): {
+    labelProgram: EdgeLabelProgram<N, E, G>;
+    labelBackgroundProgram: EdgeLabelBackgroundProgram<N, E, G>;
+  };
   framePass: EdgeFramePass;
 }

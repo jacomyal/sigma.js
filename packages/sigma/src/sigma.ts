@@ -54,6 +54,7 @@ import {
   EdgeFramePass,
   EdgePath,
   EdgeProgram,
+  EdgeProgramBundle,
   FrameTexture,
   NodeDataTexture,
   NodeLabelFramePass,
@@ -239,6 +240,7 @@ export default class Sigma<
   private nodeFramePass!: NodeLabelFramePass;
   private edgeProgram!: EdgeProgram<N, E, G>;
   private edgeFramePass!: EdgeFramePass;
+  private createEdgeLabelPrograms!: EdgeProgramBundle<N, E, G>["createLabelPrograms"];
 
   // Resolved depth layers (fixed at construction, cached to avoid repeated spreading)
   private depthLayers: readonly string[] = [...DEFAULT_DEPTH_LAYERS];
@@ -1092,6 +1094,13 @@ export default class Sigma<
 
     this.frameId++;
 
+    // Created on first use: most graphs never render edge labels
+    if (this.internals.settings.renderEdgeLabels && !this.internals.edgeLabelProgram) {
+      const { labelProgram, labelBackgroundProgram } = this.createEdgeLabelPrograms();
+      this.internals.edgeLabelProgram = labelProgram;
+      this.internals.edgeLabelBackgroundProgram = labelBackgroundProgram;
+    }
+
     const debugPrograms = this.internals.settings.DEBUG_logRenderStats ? this.getDebugPrograms() : null;
     if (debugPrograms) debugPrograms.forEach((program) => program.resetDebugStats());
 
@@ -1924,8 +1933,7 @@ export default class Sigma<
 
     const {
       edgeProgram,
-      labelProgram: edgeLabelProgram,
-      labelBackgroundProgram: edgeLabelBackgroundProgram,
+      createLabelPrograms: createEdgeLabelPrograms,
       framePass: edgeFramePass,
       variables: edgeVariables,
       paths: edgePaths,
@@ -1937,6 +1945,7 @@ export default class Sigma<
       settings.antialiasEdges,
       primitives?.nodes,
     );
+    this.createEdgeLabelPrograms = createEdgeLabelPrograms;
     this.edgeProgram = edgeProgram;
     this.edgeFramePass = edgeFramePass;
     this.edgeVariableEntries = Object.entries(edgeVariables) as [string, { type: string; default: unknown }][];
@@ -1944,8 +1953,8 @@ export default class Sigma<
 
     return {
       labelProgram,
-      edgeLabelProgram,
-      edgeLabelBackgroundProgram,
+      edgeLabelProgram: null,
+      edgeLabelBackgroundProgram: null,
       backdropProgram,
       labelBackgroundProgram,
       attachmentProgram,
@@ -3340,8 +3349,8 @@ export default class Sigma<
     this.edgeProgram.kill();
     this.edgeFramePass.kill();
     this.internals.labelProgram.kill();
-    this.internals.edgeLabelProgram.kill();
-    this.internals.edgeLabelBackgroundProgram.kill();
+    this.internals.edgeLabelProgram?.kill();
+    this.internals.edgeLabelBackgroundProgram?.kill();
     this.internals.backdropProgram.kill();
     this.internals.labelBackgroundProgram.kill();
     this.internals.attachmentProgram?.kill();

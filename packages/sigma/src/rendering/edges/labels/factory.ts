@@ -111,8 +111,7 @@ interface EdgeLabelGlyphCache {
  * program renders text labels along edge paths using an SDF (Signed
  * Distance Field) atlas for crisp text at any zoom level.
  *
- * `createEdgeProgram` calls this internally and exposes the instance in
- * its `labelProgram` field.
+ * `createEdgeProgram` exposes it through its `createLabelPrograms` method.
  */
 export function createEdgeLabelProgram<
   N extends Attributes = Attributes,

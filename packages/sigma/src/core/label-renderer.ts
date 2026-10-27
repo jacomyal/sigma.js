@@ -691,6 +691,7 @@ export class LabelRenderer<
   renderEdgeLabels(params: RenderParams, depth?: string): void {
     const { graph, nodeDataCache, edgeDataCache, primitives, edgeLabelProgram, nodeDataTexture, edgeDataTexture } =
       this.internals;
+    if (!edgeLabelProgram) return;
 
     const edgesToRender = this.filterEdgeLabelsForDepth(depth);
     for (const edge of edgesToRender) this.displayedEdgeLabels.add(edge);
@@ -775,7 +776,7 @@ export class LabelRenderer<
    */
   renderEdgeLabelBackgrounds(params: RenderParams, depth?: string): void {
     const { edgeLabelBackgroundProgram, edgeLabelProgram, edgeDataCache, primitives, edgeDataTexture } = this.internals;
-    if (!edgeDataTexture) return;
+    if (!edgeDataTexture || !edgeLabelProgram || !edgeLabelBackgroundProgram) return;
 
     const eventsEnabled = KIND_REGISTRY.edgeLabel.writesPickingThisFrame(this.internals);
     const defaultEdgeLabelMargin = primitives?.edges?.label?.margin ?? 5;

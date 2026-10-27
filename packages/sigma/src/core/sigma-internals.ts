@@ -67,8 +67,9 @@ export type SigmaInternals<
   pickingState: PickingState;
   // WebGL programs
   labelProgram: LabelProgram<string, N, E, G>;
-  edgeLabelProgram: EdgeLabelProgram<N, E, G>;
-  edgeLabelBackgroundProgram: EdgeLabelBackgroundProgram<N, E, G>;
+  // Null until the first frame rendering edge labels
+  edgeLabelProgram: EdgeLabelProgram<N, E, G> | null;
+  edgeLabelBackgroundProgram: EdgeLabelBackgroundProgram<N, E, G> | null;
   backdropProgram: BackdropProgram<N, E, G>;
   labelBackgroundProgram: LabelBackgroundProgram<N, E, G>;
   attachmentManager: AttachmentManager | null;
