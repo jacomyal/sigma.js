@@ -1,0 +1,1 @@
+var f,s;function o(){if(s)return f;s=1;function c(e){return!e||typeof e!="object"||typeof e=="function"||Array.isArray(e)||e instanceof Set||e instanceof Map||e instanceof RegExp||e instanceof Date}function u(e,i){e=e||{};var r={};for(var n in i){var a=e[n],t=i[n];if(!c(t)){r[n]=u(a,t);continue}a===void 0?r[n]=t:r[n]=a}return r}return f=u,f}export{o as r};

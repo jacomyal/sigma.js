@@ -1,0 +1,17 @@
+id,label,wealth,priorates,ties
+ACCIAIUOL,Acciaiuoli,10,53,2
+ALBIZZI,Albizzi,36,65,3
+BARBADORI,Barbadori,55,0,14
+BISCHERI,Bischeri,44,12,9
+CASTELLAN,Castellani,20,22,18
+GINORI,Ginori,32,0,9
+GUADAGNI,Guadagni,8,21,14
+LAMBERTES,Lamberteschi,42,0,14
+MEDICI,Medici,103,53,54
+PAZZI,Pazzi,48,0,7
+PERUZZI,Peruzzi,49,42,32
+PUCCI,Pucci,3,0,1
+RIDOLFI,Ridolfi,27,38,4
+SALVIATI,Salviati,10,35,5
+STROZZI,Strozzi,146,74,29
+TORNABUON,Tornabuoni,48,0,7

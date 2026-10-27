@@ -1,0 +1,1 @@
+var t,o;function e(){return o||(o=1,t=function(r){return r!==null&&typeof r=="function"&&typeof r.prototype=="object"&&typeof r.prototype.addUndirectedEdgeWithKey=="function"&&typeof r.prototype.dropNode=="function"}),t}export{e as r};
