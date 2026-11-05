@@ -116,7 +116,7 @@ const renderer = new Sigma(graph, container, {
     if (hoveredNode) {
       const [source, target] = graph.extremities(key);
       if (source !== hoveredNode && target !== hoveredNode) {
-        return { ...computed, hidden: true };
+        return { ...computed, visibility: "hidden" };
       }
     }
     return computed;

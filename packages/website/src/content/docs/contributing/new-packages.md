@@ -26,4 +26,4 @@ Each package should have examples in the website's `packages/website/src/example
 
 Since most additional packages only handle rendering, unit-testing them is too challenging. In the future, we plan to include all examples in our end-to-end tests to detect rendering regressions.
 
-However, some packages might export unit-testable helpers (such as `@sigma/utils`). In that case, you can add a `package-name` folder in `packages/test/unit`, with test suites in it.
+However, some packages might export unit-testable helpers (such as `@sigma/utils`). In that case, you can colocate test suites next to the code as `src/**/*.test.ts`, and run them with the package `test` script (vitest).

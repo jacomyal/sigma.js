@@ -72,7 +72,6 @@ Node label rendering options.
 | ------------------------------ | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | `font`                         | `{ family?, weight?, style?, size? }` | Default font settings                                                                                                            |
 | `color`                        | `string`                              | Default label color                                                                                                              |
-| `position`                     | `LabelPosition`                       | Default label position                                                                                                           |
 | `margin`                       | `number`                              | Gap between node edge and label                                                                                                  |
 | `zoomToLabelSizeRatioFunction` | `(ratio: number) => number`           | Maps camera ratio to a label size factor. Returning a value `< 1` makes labels bigger. Defaults to `() => 1` (fixed pixel size). |
 
@@ -104,7 +103,7 @@ Three content shapes are supported:
 labelAttachments: {
   hoverInfo: (ctx: LabelAttachmentContext) => ({
     type: "svg",
-    html: "<svg>...</svg>",
+    svg: "<svg>...</svg>",
   }),
 }
 ```
@@ -155,14 +154,14 @@ handling self-loops, and selected automatically through `selfLoopPath`.
 
 Built-in factories (from `sigma/rendering`):
 
-| Factory                 | Name            | Options                                                              |
-| ----------------------- | --------------- | -------------------------------------------------------------------- |
-| `pathLine()`            | `"straight"`    | -                                                                    |
-| `pathCurved(opts?)`     | `"curved"`      | `segments?`, `curvature?` (accepts a `ValueSource<number>`)          |
-| `pathStep(opts?)`       | `"step"`        | `orientation?`, `rotateWithCamera?`, `offset?`, `cornerRadius?`, ... |
-| `pathStepCurved(opts?)` | `"step-curved"` | `orientation?`, `rotateWithCamera?`, `offset?`, ...                  |
-| `pathCurvedS(opts?)`    | `"curved-s"`    | curve control points / segments                                      |
-| `pathLoop(opts?)`       | `"loop"`        | self-loop geometry options                                           |
+| Factory                 | Name           | Options                                                                  |
+| ----------------------- | -------------- | ------------------------------------------------------------------------ |
+| `pathLine()`            | `"straight"`   | -                                                                        |
+| `pathCurved(opts?)`     | `"curved"`     | `segments?`, `curvature?` (accepts a `ValueSource<number>`)              |
+| `pathStep(opts?)`       | `"step"`       | `orientation?`, `rotateWithCamera?`, `offset?`, `innerCornerSkipFactor?` |
+| `pathStepCurved(opts?)` | `"stepCurved"` | `orientation?`, `rotateWithCamera?`, `offset?`, ...                      |
+| `pathCurvedS(opts?)`    | `"curvedS"`    | curve control points / segments                                          |
+| `pathLoop(opts?)`       | `"loop"`       | self-loop geometry options                                               |
 
 ### extremities
 
@@ -205,7 +204,6 @@ Edge label rendering options.
 | Field                     | Type                                                    | Description                                                                                                  |
 | ------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
 | `color`                   | `EdgeLabelColorSpecification`                           | Label color. Accepts a CSS string or `{ attribute, color? }` to read from an edge attribute.                 |
-| `position`                | `"over" \| "above" \| "below" \| "auto"`                | Default edge label placement                                                                                 |
 | `margin`                  | `number`                                                | Distance between label and edge path (in pixels) for `"above"`/`"below"`/`"auto"`                            |
 | `fontSizeMode`            | `"fixed" \| "scaled"`                                   | Whether labels scale with zoom                                                                               |
 | `textBorder`              | `{ width: number, color: EdgeLabelColorSpecification }` | Outline around label characters for readability                                                              |

@@ -47,12 +47,12 @@ renderer.setSettings({ hideEdgesOnMove: true });
 `nodeLabelEvents` and `edgeLabelEvents` accept:
 
 ```typescript
-false | "extend" | "separate" | (Partial<Record<Interaction, false | "extend" | "separate">> & { default?: false | "extend" | "separate" })
+false | "extend" | "separate" | (Partial<Record<MouseInteraction, false | "extend" | "separate">> & { default?: false | "extend" | "separate" })
 ```
 
 - `"extend"` routes label hits to the parent node/edge event.
 - `"separate"` makes labels standalone targets that fire their own events.
-- The `Record` form lets each interaction (click, hover, …) pick its own mode, with an optional `default` fallback.
+- The `Record` form lets each interaction (`click`, `enter`, `leave`, …) pick its own mode, with an optional `default` fallback.
 
 See [Label events](/reference/events/#label-events) for the full description and an example.
 

@@ -20,6 +20,6 @@ Unfortunately, even if the HTML+CSS renderer is probably the easier to use for d
 2. **Assign** it to nodes via the `labelAttachment` style property, typically with a conditional to show it on hover.
 3. **Position** it with `labelAttachmentPlacement`.
 
-The renderer function receives a `LabelAttachmentContext` with `attributes`, `state`, and `graphState`. It returns a `LabelAttachmentContent` object with `type: "svg"` and an `svg` string.
+The renderer function receives a `LabelAttachmentContext` with `node`, `attributes`, `pixelRatio`, `labelWidth`, and `labelHeight`. It returns a `LabelAttachmentContent` object with `type: "svg"` and an `svg` string.
 
 <SigmaExample id="styling/label-attachments" height="500px" />

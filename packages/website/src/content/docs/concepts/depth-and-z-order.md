@@ -154,7 +154,7 @@ Any numeric attribute works directly as a `zIndex` — no range to bind, no clam
 
 ```typescript
 primitives: {
-  depthLayers: ["edges", "nodes", "topNodes"],
+  depthLayers: ["edges", "nodes", "topEdges", "topNodes"],
 },
 styles: {
   nodes: [
