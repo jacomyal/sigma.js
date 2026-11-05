@@ -29,6 +29,8 @@ jobs:
 
       - name: Build website
         run: npm run website:build
+        env:
+          MATOMO_SITE_ID: ${{ vars.MATOMO_SITE_ID }}
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v4

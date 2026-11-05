@@ -9,6 +9,8 @@ import { fileURLToPath } from "node:url";
 import starlightLinksValidator from "starlight-links-validator";
 import starlightTypeDoc, { typeDocSidebarGroup } from "starlight-typedoc";
 
+import { MATOMO_SCRIPT } from "./src/matomo";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 const starlightDir = path.dirname(require.resolve("@astrojs/starlight"));
@@ -168,7 +170,7 @@ export default defineConfig({
         },
         {
           tag: "script",
-          content: `var _paq=window._paq=window._paq||[];_paq.push(["trackPageView"]);_paq.push(["enableLinkTracking"]);(function(){var u="https://matomo.ouestware.com/";_paq.push(["setTrackerUrl",u+"matomo.php"]);_paq.push(["setSiteId","26"]);var d=document,g=d.createElement("script"),s=d.getElementsByTagName("script")[0];g.async=true;g.src=u+"matomo.js";s.parentNode.insertBefore(g,s)})();`,
+          content: MATOMO_SCRIPT,
         },
       ],
       components: {

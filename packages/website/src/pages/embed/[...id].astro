@@ -11,6 +11,7 @@
  */
 import { Code } from "astro-expressive-code/components";
 import "../../styles/base.css";
+import { MATOMO_SCRIPT } from "../../matomo";
 
 export async function getStaticPaths() {
   const examples = import.meta.glob("../../examples/**/*.astro", { eager: true });
@@ -50,6 +51,7 @@ const { Component, source } = Astro.props;
       if (params.has("stage-only")) document.documentElement.dataset.stageOnly = "";
       if (params.has("controls")) document.documentElement.dataset.controls = "";
     </script>
+    <script is:inline set:html={MATOMO_SCRIPT} />
   </head>
   <body>
     <div class="viewer">
