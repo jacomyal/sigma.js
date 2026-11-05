@@ -124,6 +124,10 @@ Payload: `{ edge: string, event, preventSigmaDefault() }`. Emitted only for inte
 - **resize**: emitted when the sigma instance undergoes resizing
 - **kill**: emitted when the sigma instance is terminated
 
+- **afterTexturesUpload**: emitted each frame after data textures are uploaded, before anything reads them
+- **webglContextLost**: emitted when the browser drops the WebGL context
+- **webglContextRestored**: emitted once the WebGL context is restored and programs are rebuilt
+
 These lifecycle events do not come with any payload.
 
 ## Drag events

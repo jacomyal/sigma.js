@@ -27,13 +27,13 @@ Constrain panning:
 ```typescript
 new Sigma(graph, container, {
   settings: {
-    cameraPanBoundaries: { tolerance: 0.2 },
+    cameraPanBoundaries: { tolerance: 50 },
   },
 });
 ```
 
-The `tolerance` value controls how far past the graph bounding box the user can pan, as a fraction of the viewport. Set
-`cameraPanBoundaries: true` for the default tolerance, or `null` (default) to disable.
+The `tolerance` value controls how far past the graph bounding box the user can pan, in pixels (default `0`). Set
+`cameraPanBoundaries: true` to constrain panning to the graph extent, or `null` (default) to disable.
 
 ## Animated transitions
 

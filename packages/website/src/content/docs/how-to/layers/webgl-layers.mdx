@@ -108,6 +108,7 @@ By default, each layer gets a generated id. Pass an explicit `id` as the last ar
 replace a layer instead of stacking a new one. It can be useful when re-binding on every data change:
 
 ```typescript
-// Re-running this keeps a single "heatmap" layer instead of accumulating them:
+// Re-running this keeps a single "heatmap" layer instead of accumulating them
+// (the "heatmap" depth must be declared in depthLayers):
 bindWebGLLayer("heatmap", renderer, createHeatmapProgram(nodes, options), "heatmap");
 ```

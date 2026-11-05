@@ -6,7 +6,7 @@ sidebar:
 
 import SigmaExample from "../../../../components/SigmaExample.astro";
 
-Label attachments let you display custom SVG content anchored to a node's label. This is useful for tooltips, info cards, or interactive UI. The way it works is that, when sigma needs to render an attachment for a given node, it will call a function that will return the content as an SVG string of a Canvas element directly. It will then draw it in a texture, and render it directly with the WebGL engine.
+Label attachments let you display custom SVG content anchored to a node's label. This is useful for tooltips, info cards, or interactive UI. The way it works is that, when sigma needs to render an attachment for a given node, it will call a function that will return the content as an SVG string or a Canvas element directly. It will then draw it in a texture, and render it directly with the WebGL engine.
 
 :::note
 In the code, sigma actually supports **three** different types of attachments at the moment: `"canvas"`, `"svg"` and **`"html"`**.

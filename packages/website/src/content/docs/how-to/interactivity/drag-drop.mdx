@@ -42,19 +42,11 @@ const renderer = new Sigma(graph, container, {
     enableNodeDrag: true,
   },
   styles: {
-    nodes: {
+    nodes: [
+      DEFAULT_STYLES.nodes,
       // Dragged nodes appear on top with their label visible
-      depth: {
-        whenState: "isDragged",
-        then: "topNodes",
-        else: "nodes",
-      },
-      labelVisibility: {
-        whenState: "isDragged",
-        then: "visible",
-        else: "auto",
-      },
-    },
+      { whenState: "isDragged", then: { depth: "topNodes", labelVisibility: "visible" } },
+    ],
   },
 });
 ```

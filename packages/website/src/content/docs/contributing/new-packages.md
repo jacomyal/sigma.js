@@ -11,6 +11,7 @@ As of now, the features are prefixed by their general purpose:
 
 - `@sigma/node-xxx` and `@sigma/edge-xxx` refer to node and edge renderers
 - `@sigma/layer-xxx` refers to additional layers that can be added to sigma instances
+- `@sigma/layout-xxx` refers to layout algorithms
 - `@sigma/export-xxx` refers to packages that allow exporting somehow a sigma instance
 - `@sigma/utils` stores various small specific helpers
 
@@ -24,6 +25,4 @@ Each package should have examples in the website's `packages/website/src/example
 
 ## Adding tests
 
-Since most additional packages only handle rendering, unit-testing them is too challenging. In the future, we plan to include all examples in our end-to-end tests to detect rendering regressions.
-
-However, some packages might export unit-testable helpers (such as `@sigma/utils`). In that case, you can colocate test suites next to the code as `src/**/*.test.ts`, and run them with the package `test` script (vitest).
+Unit tests sit next to the code as `src/**/*.test.ts`, and run with the package `test` script (vitest). The website examples are also covered by the end-to-end tests in `packages/browser-tests`.

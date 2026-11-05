@@ -8,7 +8,7 @@ import SigmaExample from "../../../../components/SigmaExample.astro";
 
 Extremities are shapes drawn at the endpoints of edges, most commonly arrowheads on directed graphs.
 
-Declare the available extremity types in `primitives.edges.extremities`, then assign them per-edge via the `head` and `tail` style properties. Use `tail` for the source end. If `head` or `tail` is not set, no extremity is drawn on that end.
+Declare the available extremity types in `primitives.edges.extremities`, then assign them per-edge via the `head` and `tail` style properties. Use `tail` for the source end. If `head` or `tail` is not set, sigma falls back to `primitives.edges.defaultHead` / `defaultTail` (`"none"` by default).
 
 To render arrows on all edges without per-edge attributes, use a fixed value: `head: "arrow"`.
 

@@ -116,11 +116,11 @@ A concise conditional within a single property.
 }
 ```
 
-| Field                             | Type              | Required | Description                                                                    |
-| --------------------------------- | ----------------- | -------- | ------------------------------------------------------------------------------ |
-| `whenState` / `whenData` / `when` | predicate         | Yes      | Condition to test (see Predicates below)                                       |
-| `then`                            | `GraphicValue<T>` | Yes      | Value when condition is true (can be any value type except inline conditional) |
-| `else`                            | `GraphicValue<T>` | No       | Value when condition is false                                                  |
+| Field                             | Type              | Required | Description                              |
+| --------------------------------- | ----------------- | -------- | ---------------------------------------- |
+| `whenState` / `whenData` / `when` | predicate         | Yes      | Condition to test (see Predicates below) |
+| `then`                            | `GraphicValue<T>` | Yes      | Value when condition is true             |
+| `else`                            | `GraphicValue<T>` | No       | Value when condition is false            |
 
 ## Rule-level conditionals
 

@@ -57,8 +57,8 @@ If you want sizes to scale with the node positions at **all zoom levels**, combi
 ### `autoRescale` setting
 
 To disable rule #3, use the `autoRescale` setting. Setting `autoRescale` as `false` prevents Sigma from automatically
-resizing the graph. Then, node positions are interpreted in pixels, for the default zoom level. The graph remains
-centered in the viewport, though.
+resizing the graph. Then, node positions are interpreted in pixels, for the default zoom level, with the origin `(0, 0)` at the viewport
+center.
 
 ### `autoRescaleContent` setting
 

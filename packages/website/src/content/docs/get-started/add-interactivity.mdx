@@ -1,17 +1,16 @@
 ---
 title: "Add interactivity"
-description: Highlight neighbors on hover and add a search bar with camera animation.
+description: Highlight a node's neighbors on hover.
 ---
 
 import SigmaExample from "../../../components/SigmaExample.astro";
 
 In [Part 3](/get-started/style-the-graph/), you styled the graph declaratively and added a hover effect. In this final step, you will highlight a
-node's neighbors on hover and add a search bar that focuses the camera on results.
+node's neighbors on hover.
 
 ## The goal
 
-When the user hovers a node, its neighbors stay colored while everything else fades to grey. A search bar lets the user
-type a node name, highlights matches, and animates the camera to the selected node.
+When the user hovers a node, its neighbors stay colored while everything else fades to grey.
 
 This requires **custom state**: sigma's built-in `isHovered` flag only applies to the single hovered node. To grey out
 everything else, you need a way to mark which nodes and edges are "active" (part of the hovered neighborhood).

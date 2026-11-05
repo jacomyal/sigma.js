@@ -36,7 +36,8 @@ Sigma re-renders automatically when:
 - **State changes**: `setNodeState`, `setEdgeState`, or `setGraphState` schedule a style re-evaluation and render.
 - **Settings change**: `setSetting` or `setSettings` schedule a full refresh.
 - **Camera updates**: mouse and touch events update the camera, which triggers a render.
-- **The container resizes**: sigma detects size changes and schedule a full refresh.
+- **The window resizes**: sigma schedules a full refresh. Sigma does not watch the container itself: if only the
+  container resizes, sigma notices on its next render. Call `refresh()` yourself to apply the new size right away.
 
 ## Manual triggers
 

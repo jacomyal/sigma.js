@@ -29,10 +29,13 @@ interface BaseEdgeState {
   isLabelHovered: boolean; // Mouse is over this edge's label (set when hover is resolved to "separate" via edgeLabelEvents)
   isHidden: boolean; // Edge is hidden from rendering
   isHighlighted: boolean; // Edge is highlighted
+  parallelIndex: number; // 0-based position among edges sharing the same extremities
+  parallelCount: number; // Number of edges sharing the same extremities (1 when alone)
 }
 ```
 
-Default: all `false`.
+The booleans default to `false`. `parallelIndex` and `parallelCount` are maintained by sigma, and updated whenever
+edges are added or removed between the same pair of nodes: don't set them yourself.
 
 ## Graph state
 

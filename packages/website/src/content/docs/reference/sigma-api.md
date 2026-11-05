@@ -106,16 +106,16 @@ Most of the time, these generics will be inferred from Sigma's constructor argum
 
 ## Coordinate conversion
 
-| Method                          | Returns       | Description                                                             |
-| ------------------------------- | ------------- | ----------------------------------------------------------------------- |
-| `graphToViewport(coords)`       | `Coordinates` | Convert graph-space coordinates to screen pixels                        |
-| `viewportToGraph(coords)`       | `Coordinates` | Convert screen pixels to graph-space coordinates                        |
-| `framedGraphToViewport(coords)` | `Coordinates` | Convert normalized (0–1) graph space to screen pixels                   |
-| `viewportToFramedGraph(coords)` | `Coordinates` | Convert screen pixels to normalized graph space                         |
-| `getGraphToViewportRatio()`     | `number`      | Distance multiplier between graph and viewport spaces                   |
-| `viewRectangle()`               | `object`      | Get the visible area in graph coordinates: `{ x1, y1, x2, y2, height }` |
+| Method                          | Returns       | Description                                                                    |
+| ------------------------------- | ------------- | ------------------------------------------------------------------------------ |
+| `graphToViewport(coords)`       | `Coordinates` | Convert graph-space coordinates to screen pixels                               |
+| `viewportToGraph(coords)`       | `Coordinates` | Convert screen pixels to graph-space coordinates                               |
+| `framedGraphToViewport(coords)` | `Coordinates` | Convert normalized (0–1) graph space to screen pixels                          |
+| `viewportToFramedGraph(coords)` | `Coordinates` | Convert screen pixels to normalized graph space                                |
+| `getGraphToViewportRatio()`     | `number`      | Distance multiplier between graph and viewport spaces                          |
+| `viewRectangle()`               | `object`      | Get the visible area in framed graph coordinates: `{ x1, y1, x2, y2, height }` |
 
-All coordinate methods accept an optional `override` parameter to use custom camera state, matrix, or dimensions instead of the current ones.
+The four conversion methods above accept an optional `override` parameter to use custom camera state, matrix, or dimensions instead of the current ones.
 
 ## Bounding box
 
@@ -157,7 +157,7 @@ Sigma v4 has a shortcut for that, using the `autoRescale: 'once'` setting.
 | Method              | Returns       | Description                                                       |
 | ------------------- | ------------- | ----------------------------------------------------------------- |
 | `getCamera()`       | `Camera`      | Get the camera instance. See [Camera API](/reference/camera-api/) |
-| `setCamera(camera)` | `void`        | Replace the camera instance                                       |
+| `setCamera(camera)` | `this`        | Replace the camera instance                                       |
 | `getMouseCaptor()`  | `MouseCaptor` | Get the mouse event captor                                        |
 | `getTouchCaptor()`  | `TouchCaptor` | Get the touch event captor                                        |
 

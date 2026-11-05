@@ -78,6 +78,7 @@ Override `labelDepth` to detach the label from its parent:
 ```typescript
 styles: {
   nodes: [
+    DEFAULT_STYLES.nodes,
     // Nodes geometry stays in "nodes", but node labels paint above everything else:
     { labelDepth: "topNodes" },
   ],
@@ -90,11 +91,11 @@ This is the v4 answer to the recurring v3 issue of "labels hidden under unrelate
 
 The built-in `DEFAULT_STYLES` already does the most common interaction:
 
-| State                       | Effect                                    |
-| --------------------------- | ----------------------------------------- |
-| Hovered node                | `depth: "topNodes"`, `zIndex: 1`          |
-| Hovered or highlighted edge | `depth: "topEdges"`, `zIndex: 1`          |
-| Otherwise                   | `depth: "nodes"` / `"edges"`, `zIndex: 0` |
+| State                       | Effect                       |
+| --------------------------- | ---------------------------- |
+| Hovered node                | `depth: "topNodes"`          |
+| Hovered or highlighted edge | `depth: "topEdges"`          |
+| Otherwise                   | `depth: "nodes"` / `"edges"` |
 
 If you spread `DEFAULT_STYLES.nodes` into your rules, you keep this behavior for free. Add further rules to promote
 items into your own buckets.
@@ -158,6 +159,7 @@ primitives: {
 },
 styles: {
   nodes: [
+    DEFAULT_STYLES.nodes,
     // Nodes geometry stays in "nodes" so other nodes can still overlap:
     { depth: "nodes", labelDepth: "topNodes" },
   ],

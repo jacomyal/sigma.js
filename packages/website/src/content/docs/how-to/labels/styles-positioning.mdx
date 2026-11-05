@@ -42,6 +42,7 @@ You can also set `labelAngle` for rotated labels.
 ```typescript
 styles: {
   nodes: [
+    DEFAULT_STYLES.nodes,
     {
       labelColor: "#333",
       labelSize: 14,
@@ -113,6 +114,7 @@ primitives: {
 },
 styles: {
   nodes: [
+    DEFAULT_STYLES.nodes,
     // Geometry stays in "nodes", but labels paint above everything else:
     { depth: "nodes", labelDepth: "topNodes" },
   ],
@@ -162,7 +164,7 @@ Edge labels can be placed relative to the edge path:
 
 ```typescript
 styles: {
-  edges: [{ labelPosition: "above" }],
+  edges: [DEFAULT_STYLES.edges, { labelPosition: "above" }],
 }
 ```
 

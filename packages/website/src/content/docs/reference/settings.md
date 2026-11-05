@@ -27,20 +27,31 @@ renderer.setSettings({ hideEdgesOnMove: true });
 
 ## Rendering
 
-| Setting                  | Type      | Default | Description                                                           |
-| ------------------------ | --------- | ------- | --------------------------------------------------------------------- |
-| `renderLabels`           | `boolean` | `true`  | Whether to render node labels                                         |
-| `renderEdgeLabels`       | `boolean` | `false` | Whether to render edge labels                                         |
-| `enableEdgeEvents`       | `boolean` | `false` | Enable mouse events on edges (has a performance cost)                 |
-| `nodeLabelEvents`        | see below | `false` | Enable node label events.                                             |
-| `edgeLabelEvents`        | see below | `false` | Enable edge label events.                                             |
-| `stagePadding`           | `number`  | `30`    | Padding around the graph in pixels                                    |
-| `minEdgeThickness`       | `number`  | `1.7`   | Minimum edge thickness in pixels                                      |
-| `antiAliasingFeather`    | `number`  | `1`     | Anti-aliasing feather amount for WebGL rendering                      |
-| `pickingDownSizingRatio` | `number`  | `2`     | Down-sizing ratio for the picking framebuffer                         |
-| `nodePickingPadding`     | `number`  | `0`     | Extra pixel padding added around nodes when picking under the cursor  |
-| `edgePickingPadding`     | `number`  | `4`     | Extra pixel padding added around edges when picking under the cursor  |
-| `labelPickingPadding`    | `number`  | `10`    | Extra pixel padding added around labels when picking under the cursor |
+| Setting                  | Type      | Default        | Description                                                           |
+| ------------------------ | --------- | -------------- | --------------------------------------------------------------------- |
+| `renderLabels`           | `boolean` | `true`         | Whether to render node labels                                         |
+| `renderEdgeLabels`       | `boolean` | `false`        | Whether to render edge labels                                         |
+| `edgeLabelAnchors`       | see below | `"nodeLabels"` | Which nodes drive automatic edge label display                        |
+| `enableEdgeEvents`       | `boolean` | `false`        | Enable mouse events on edges (has a performance cost)                 |
+| `nodeLabelEvents`        | see below | `false`        | Enable node label events.                                             |
+| `edgeLabelEvents`        | see below | `false`        | Enable edge label events.                                             |
+| `stagePadding`           | `number`  | `30`           | Padding around the graph in pixels                                    |
+| `minEdgeThickness`       | `number`  | `1.7`          | Minimum edge thickness in pixels                                      |
+| `antiAliasingFeather`    | `number`  | `1`            | Anti-aliasing feather amount for WebGL rendering                      |
+| `antialiasEdges`         | `boolean` | `true`         | Anti-alias edges. Disabling it is much faster on large graphs         |
+| `antialiasNodes`         | `boolean` | `true`         | Anti-alias nodes                                                      |
+| `pickingDownSizingRatio` | `number`  | `2`            | Down-sizing ratio for the picking framebuffer                         |
+| `nodePickingPadding`     | `number`  | `0`            | Extra pixel padding added around nodes when picking under the cursor  |
+| `edgePickingPadding`     | `number`  | `4`            | Extra pixel padding added around edges when picking under the cursor  |
+| `labelPickingPadding`    | `number`  | `10`           | Extra pixel padding added around labels when picking under the cursor |
+
+### Edge label anchors
+
+With `labelVisibility: "auto"`, an edge label shows when one of its extremities is hovered or highlighted, or when both
+extremities are anchors. `edgeLabelAnchors` picks the anchors:
+
+- `"nodeLabels"` (default): nodes whose label is displayed.
+- `"allNodes"`: nodes picked with the same density-based culling as node labels, whether their label shows or not.
 
 ### Label events
 
@@ -102,11 +113,11 @@ The `cameraPanBoundaries` setting accepts:
 
 - `null`: no boundaries (default)
 - `true`: automatically constrain to the graph extent
-- An object with `tolerance` and/or `boundaries`:
+- An object with `tolerance` (in pixels, default `0`) and/or `boundaries` (in graph coordinates):
 
 ```typescript
 {
-  tolerance: 0.1,
+  tolerance: 50,
   boundaries: { x: [-100, 100], y: [-100, 100] }
 }
 ```
@@ -115,7 +126,7 @@ The `cameraPanBoundaries` setting accepts:
 
 | Setting                   | Type                                 | Default       | Description                                                                                                                                                                                                                                                                                                                           |
 | ------------------------- | ------------------------------------ | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `itemSizesReference`      | `"screen" \| "positions"`            | `"positions"` | Reference space for node/edge sizes. `"positions"`: sizes live in graph space and scale with zoom. `"screen"`: sizes stay constant in screen pixels regardless of zoom. In both modes `zoomToSizeRatioFunction` still applies                                                                                                         |
+| `itemSizesReference`      | `"screen" \| "positions"`            | `"positions"` | Reference space for node/edge sizes. `"positions"`: sizes are in the same units as node positions. `"screen"`: sizes are pixels at the default zoom. In both modes, `zoomToSizeRatioFunction` controls how sizes change with zoom                                                                                                     |
 | `zoomToSizeRatioFunction` | `(ratio: number) => number`          | `Math.sqrt`   | Maps camera zoom ratio to a size scaling factor. Applied in both `"screen"` and `"positions"` modes                                                                                                                                                                                                                                   |
 | `autoRescale`             | `boolean \| "once"`                  | `true`        | Automatically rescale the graph to fit the viewport. `"once"` captures the initial extent and freezes it, useful for drag-and-drop scenarios                                                                                                                                                                                          |
 | `autoRescaleContent`      | `"positions" \| "nodes" \| "labels"` | `"positions"` | What the auto-rescale fit encloses. `"positions"`: node centers only (default). `"nodes"`: centers and node sizes. `"labels"`: centers, sizes, and labels. Each level contains the previous one. Ignored when `autoRescale` is `false` or a custom bounding box is set. `"labels"` is **expensive** (only use it on small-ish graphs) |
@@ -170,3 +181,8 @@ The `cameraPanBoundaries` setting accepts:
 | Setting                     | Type      | Default | Description                                                     |
 | --------------------------- | --------- | ------- | --------------------------------------------------------------- |
 | `DEBUG_displayPickingLayer` | `boolean` | `false` | Display the picking layer for debugging node/edge hit detection |
+| `DEBUG_logShaders`          | `boolean` | `false` | Log each program's generated shader sources, once               |
+| `DEBUG_logRenderStats`      | `boolean` | `false` | Log draw calls, vertices and uploaded bytes on every frame      |
+| `DEBUG_gpuTimerQueries`     | `boolean` | `false` | Log the GPU time of each frame                                  |
+
+See [Improve rendering performances](/how-to/technical/performance/#debugging) for details.
