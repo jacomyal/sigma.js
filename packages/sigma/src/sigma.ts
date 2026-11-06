@@ -667,6 +667,10 @@ export default class Sigma<
         clearEdgeIndices: this.clearEdgeIndices.bind(this),
         clearNodeIndices: this.clearNodeIndices.bind(this),
         refresh: this.refresh.bind(this),
+        scheduleProcess: () => {
+          this.pendingProcess = "full";
+          this.scheduleRender();
+        },
         markNodesDirty: (nodes) => {
           // Only graph-state styles and reducers can read the graph topology:
           if (this.internals.nodeStyleAnalysis.dependency !== "graph-state") return;

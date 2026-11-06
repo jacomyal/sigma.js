@@ -223,6 +223,7 @@ export function bindGraphHandlers(
     clearEdgeIndices(): void;
     clearNodeIndices(): void;
     refresh(opts?: RefreshOpts): void;
+    scheduleProcess(): void;
     markNodesDirty(nodes: string[]): void;
   },
   activeListeners: PlainObject<Listener>,
@@ -253,7 +254,7 @@ export function bindGraphHandlers(
 
   activeListeners.dropNodeGraphUpdate = (payload: { key: string }): void => {
     ctx.removeNode(payload.key);
-    ctx.refresh({ schedule: true });
+    ctx.scheduleProcess();
   };
 
   activeListeners.addEdgeGraphUpdate = (payload: { key: string; source: string; target: string }): void => {
@@ -277,7 +278,7 @@ export function bindGraphHandlers(
     ctx.edgeGroups.unregister(edge);
     ctx.removeEdge(edge);
     for (const sib of siblings) ctx.addEdge(sib);
-    ctx.refresh({ schedule: true });
+    ctx.scheduleProcess();
   };
 
   activeListeners.clearEdgesGraphUpdate = (): void => {
