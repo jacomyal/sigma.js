@@ -389,3 +389,62 @@ describe("Stale hover reads (regression)", () => {
     expect(sigma.getGraphState().hasHovered).toBe(false);
   });
 });
+
+describe("Batch drops (regression #1516)", () => {
+  test("dropping nodes does not re-evaluate every remaining node", async () => {
+    const graph = new Graph();
+    for (let i = 0; i < 100; i++) graph.addNode(`n${i}`, { x: i * 100, y: 0 });
+
+    let calls = 0;
+    const sigma = mount(graph, {
+      nodeReducer: (_key, data) => {
+        calls++;
+        return data;
+      },
+    });
+    let processes = 0;
+    let renders = 0;
+    sigma.on("beforeProcess", () => processes++);
+    sigma.on("beforeRender", () => renders++);
+    await nextFrame();
+
+    calls = processes = renders = 0;
+    for (let i = 0; i < 10; i++) graph.dropNode(`n${i}`);
+    expect(processes).toBe(0);
+    expect(renders).toBe(0);
+
+    await nextFrame();
+    expect(calls).toBe(0);
+    expect(processes).toBe(1);
+    expect(renders).toBe(1);
+  });
+
+  test("dropping edges does not re-evaluate every remaining edge", async () => {
+    const graph = new Graph();
+    for (let i = 0; i < 101; i++) graph.addNode(`n${i}`, { x: i * 100, y: 0 });
+    for (let i = 0; i < 100; i++) graph.addEdgeWithKey(`e${i}`, `n${i}`, `n${i + 1}`);
+
+    let calls = 0;
+    const sigma = mount(graph, {
+      edgeReducer: (_key, data) => {
+        calls++;
+        return data;
+      },
+    });
+    let processes = 0;
+    let renders = 0;
+    sigma.on("beforeProcess", () => processes++);
+    sigma.on("beforeRender", () => renders++);
+    await nextFrame();
+
+    calls = processes = renders = 0;
+    for (let i = 0; i < 10; i++) graph.dropEdge(`e${i}`);
+    expect(processes).toBe(0);
+    expect(renders).toBe(0);
+
+    await nextFrame();
+    expect(calls).toBe(0);
+    expect(processes).toBe(1);
+    expect(renders).toBe(1);
+  });
+});
