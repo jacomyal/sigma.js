@@ -809,7 +809,6 @@ export default class Sigma<
       this.depthRanges.nodes[depth] = [{ offset: nodeProcessCount, count: items.length }];
       for (const node of items) {
         this.nodeBaseDepth[node] = depth;
-        this.nodeProgram.allocateNode(node);
         registerItem(this.pickingState, "node", node);
         this.addNodeToProgram(node, nodeProcessCount++);
       }
@@ -1512,6 +1511,7 @@ export default class Sigma<
     delete this.nodeGraphCoords[key];
     // Remove from node program index
     delete this.nodeProgramIndex[key];
+    this.internals.nodeDataTexture!.free(key);
     this.internals.dragManager.removeNode(key);
     // Remove from state
     this.stateManager.removeNode(key);
@@ -1641,7 +1641,8 @@ export default class Sigma<
     if (!this.autoRescaleFrozen) this.nodeExtent = { x: [0, 1], y: [0, 1] };
     this.internals.nodeDataCache = {};
     this.nodeGraphCoords = {};
-    this.edgeProgramIndex = {};
+    this.nodeProgramIndex = {};
+    this.internals.nodeDataTexture?.clear();
     this.internals.nodesWithForcedLabels.clear();
     this.internals.nodesWithBackdrop.clear();
     this.prevNodeVisibilities = {};
@@ -1659,6 +1660,7 @@ export default class Sigma<
     this.internals.edgeDataCache = {};
     this.edgeProgramIndex = {};
     this.edgeTextureIndexCache = {};
+    this.internals.edgeDataTexture?.clear();
     this.internals.edgesWithForcedLabels.clear();
     resetKind(this.pickingState, "edge");
     // Clear bucket data
@@ -1729,7 +1731,7 @@ export default class Sigma<
       data.color,
     );
     const textureIndex = this.internals.nodeDataTexture!.getIndex(node);
-    this.nodeProgram.process(pickingIdOf(this.pickingState, "node", node), position, data, textureIndex, node);
+    this.nodeProgram.process(pickingIdOf(this.pickingState, "node", node), position, data, textureIndex);
     this.nodeProgramIndex[node] = position;
   }
 

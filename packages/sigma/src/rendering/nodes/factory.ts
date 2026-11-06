@@ -283,20 +283,6 @@ export function createNodeProgram<
       );
     }
 
-    /**
-     * Allocates a node in the layer attribute texture.
-     */
-    allocateNode(nodeKey: string): void {
-      this.layerAttributeTexture.allocate(nodeKey);
-    }
-
-    /**
-     * Frees a node from the layer attribute texture.
-     */
-    freeNode(nodeKey: string): void {
-      this.layerAttributeTexture.free(nodeKey);
-    }
-
     getAttributeTexture(): ItemAttributeTexture | null {
       return this.layerAttributeTexture;
     }
@@ -308,7 +294,7 @@ export function createNodeProgram<
       this.layerAttributeTexture.upload();
     }
 
-    process(nodeIndex: number, offset: number, data: NodeDisplayData, textureIndex: number, nodeKey: string): void {
+    process(nodeIndex: number, offset: number, data: NodeDisplayData, textureIndex: number): void {
       let i = offset * this.STRIDE;
       // Hidden nodes get zeroed out so the GPU draws nothing for them, then
       // a_nodeIndex is flagged as HIDDEN_ITEM_INDEX: zero is a *valid* texture
@@ -321,7 +307,7 @@ export function createNodeProgram<
         this.floats[offset * this.STRIDE] = HIDDEN_ITEM_INDEX;
         return;
       }
-      this.processVisibleItem(indexToColor(nodeIndex), i, data, textureIndex, nodeKey);
+      this.processVisibleItem(indexToColor(nodeIndex), i, data, textureIndex);
     }
 
     processVisibleItem(
@@ -329,7 +315,6 @@ export function createNodeProgram<
       startIndex: number,
       data: NodeDisplayData,
       textureIndex: number,
-      nodeKey: string,
     ) {
       const { floats, ints } = this;
 
@@ -352,7 +337,7 @@ export function createNodeProgram<
         0,
       );
 
-      this.layerAttributeTexture.updateAllAttributes(nodeKey, packed);
+      this.layerAttributeTexture.updateAllAttributesAtRow(textureIndex, packed);
     }
 
     setUniforms(params: RenderParams, programInfo: ProgramInfo): void {
@@ -477,9 +462,7 @@ export interface NodeProgram<
   E extends Attributes = Attributes,
   G extends Attributes = Attributes,
 > extends Program<string, N, E, G> {
-  process(nodeIndex: number, offset: number, data: NodeDisplayData, textureIndex: number, nodeKey: string): void;
-  allocateNode(nodeKey: string): void;
-  freeNode(nodeKey: string): void;
+  process(nodeIndex: number, offset: number, data: NodeDisplayData, textureIndex: number): void;
   uploadLayerTexture(): void;
   /** The node attribute texture, read by the frame-passes and backdrops. */
   getAttributeTexture(): ItemAttributeTexture | null;
