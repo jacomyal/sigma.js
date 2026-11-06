@@ -121,6 +121,42 @@ describe("Adding items", () => {
 
     expect(sigma.getNodeDisplayData("n1")?.size).toBe(10);
   });
+
+  test("an added node is evaluated once", async () => {
+    const graph = createTestGraph();
+    let calls = 0;
+    mount(graph, {
+      nodeReducer: (_key, data) => {
+        calls++;
+        return data;
+      },
+    });
+    await nextFrame();
+
+    calls = 0;
+    graph.addNode("n4", { x: 300, y: 0 });
+    await nextFrame();
+
+    expect(calls).toBe(1);
+  });
+
+  test("an added edge is evaluated once", async () => {
+    const graph = createTestGraph();
+    let calls = 0;
+    mount(graph, {
+      edgeReducer: (_key, data) => {
+        calls++;
+        return data;
+      },
+    });
+    await nextFrame();
+
+    calls = 0;
+    graph.addEdgeWithKey("e13", "n1", "n3");
+    await nextFrame();
+
+    expect(calls).toBe(1);
+  });
 });
 
 describe("Dropping items", () => {
