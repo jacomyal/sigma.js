@@ -484,3 +484,43 @@ describe("Batch drops (regression #1516)", () => {
     expect(renders).toBe(1);
   });
 });
+
+describe("Data texture slots (regression)", () => {
+  // Adds `count` nodes and a chain of `count - 1` edges, with prefixed keys.
+  function fill(graph: Graph, prefix: string, count: number): void {
+    for (let i = 0; i < count; i++) graph.addNode(`${prefix}n${i}`, { x: i * 100, y: 0 });
+    for (let i = 1; i < count; i++) graph.addEdgeWithKey(`${prefix}e${i}`, `${prefix}n${i - 1}`, `${prefix}n${i}`);
+  }
+
+  test("clearing and refilling the graph reuses texture slots", async () => {
+    const graph = new Graph();
+    fill(graph, "c0", 100);
+    const sigma = mount(graph);
+    await nextFrame();
+
+    for (let cycle = 1; cycle <= 5; cycle++) {
+      graph.clear();
+      fill(graph, `c${cycle}`, 100);
+      await nextFrame();
+    }
+
+    expect(sigma.getNodeDataTexture().getHighWaterMark()).toBe(100);
+    expect(sigma["internals"].edgeDataTexture!.getHighWaterMark()).toBe(99);
+  });
+
+  test("dropping and adding nodes reuses texture slots", async () => {
+    const graph = new Graph();
+    fill(graph, "c0", 100);
+    const sigma = mount(graph);
+    await nextFrame();
+
+    for (let cycle = 1; cycle <= 5; cycle++) {
+      for (let i = 0; i < 100; i++) graph.dropNode(`c${cycle - 1}n${i}`);
+      fill(graph, `c${cycle}`, 100);
+      await nextFrame();
+    }
+
+    expect(sigma.getNodeDataTexture().getHighWaterMark()).toBe(100);
+    expect(sigma["internals"].edgeDataTexture!.getHighWaterMark()).toBe(99);
+  });
+});
