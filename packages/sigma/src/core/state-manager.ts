@@ -151,15 +151,20 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
 
   // Lifecycle: when an item is removed, clear hover for that item and any
   // dependent kind (e.g. a node's removal clears both `node` and `nodeLabel`).
+  // Graph flags may change too, so they are recomputed on the next refresh.
   removeNode(key: string): void {
     this.nodeStates.delete(key);
     this.dirtyNodes.delete(key);
     this.clearHoveredFor("node", key);
+    this.graphStateFlagsDirty = true;
+    this.scheduleRefresh();
   }
   removeEdge(key: string): void {
     this.edgeStates.delete(key);
     this.dirtyEdges.delete(key);
     this.clearHoveredFor("edge", key);
+    this.graphStateFlagsDirty = true;
+    this.scheduleRefresh();
   }
 
   pruneNodes(keep: (key: string) => boolean): void {
@@ -173,11 +178,15 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
     this.nodeStates.clear();
     this.dirtyNodes.clear();
     this.clearHoveredForKinds(kindsDependingOn("node"));
+    this.graphStateFlagsDirty = true;
+    this.scheduleRefresh();
   }
   clearEdges(): void {
     this.edgeStates.clear();
     this.dirtyEdges.clear();
     this.clearHoveredForKinds(kindsDependingOn("edge"));
+    this.graphStateFlagsDirty = true;
+    this.scheduleRefresh();
   }
   resetGraphState(): void {
     this.graphState = createGraphState<GS>(this.customGraphStateDefaults);
