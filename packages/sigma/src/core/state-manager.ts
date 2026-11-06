@@ -148,6 +148,10 @@ export class StateManager<NS = {}, ES = {}, GS = {}> {
       this.scheduleRefresh();
     }
   }
+  markNodesDirty(keys: string[]): void {
+    for (const key of keys) this.dirtyNodes.add(key);
+    this.scheduleRefresh();
+  }
 
   // Lifecycle: when an item is removed, clear hover for that item and any
   // dependent kind (e.g. a node's removal clears both `node` and `nodeLabel`).
