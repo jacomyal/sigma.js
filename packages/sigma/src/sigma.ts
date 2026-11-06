@@ -1662,7 +1662,6 @@ export default class Sigma<
     this.edgeTextureIndexCache = {};
     this.internals.edgeDataTexture?.clear();
     this.internals.edgesWithForcedLabels.clear();
-    resetKind(this.pickingState, "edge");
     // Clear bucket data
     this.itemBuckets.edges.clearAll();
     this.depthRanges.edges = {};
@@ -1699,6 +1698,7 @@ export default class Sigma<
   private clearEdgeState(): void {
     this.labelRenderer.clearEdgeLabels();
     this.stateManager.clearEdges();
+    resetKind(this.pickingState, "edge");
   }
 
   /**

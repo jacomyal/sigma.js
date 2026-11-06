@@ -11,11 +11,17 @@
  * "unchanged frame": render() is called again with nothing changed (e.g. an
  * animation loop driving a shader uniform). It must not redo work whose
  * inputs (label text, positions, camera) haven't changed.
+ *
+ * "pending refresh": a scheduled full refresh clears indices at once, but
+ * only reprocesses items on the next frame. Picking must keep resolving
+ * items in between.
  */
 import Graph from "graphology";
 import Sigma from "sigma";
 import { createElement } from "sigma/utils";
 import { describe, expect, test } from "vitest";
+
+import { findPickingPosition } from "./_test-helpers";
 
 describe("Render lifecycle", () => {
   test("state changes are applied when graph mutations and state changes coincide", async () => {
@@ -85,6 +91,33 @@ describe("Render lifecycle", () => {
 
     const { labelProgram } = sigma["internals"];
     expect(labelProgram.debugStats.bufferUploadBytes).toBe(0);
+
+    sigma.kill();
+    container.remove();
+  });
+
+  test("an edge stays pickable between a scheduled full refresh and the next render", async () => {
+    const graph = new Graph();
+    graph.addNode("n1", { x: 0, y: 0 });
+    graph.addNode("n2", { x: 100, y: 100 });
+    graph.addNode("n3", { x: 200, y: 0 });
+    graph.addEdgeWithKey("e12", "n1", "n2");
+    graph.addEdgeWithKey("e23", "n2", "n3");
+
+    const container = createElement("div", { width: "200px", height: "200px" });
+    document.body.append(container);
+
+    const sigma = new Sigma(graph, container, { settings: { enableEdgeEvents: true } });
+    await new Promise((r) => requestAnimationFrame(r));
+
+    const internals = sigma["internals"];
+    const position = findPickingPosition(sigma, "edge", "e12")!;
+    expect(position).not.toBeNull();
+    expect(internals.getHitAtPosition(position)).toEqual({ kind: "edge", key: "e12" });
+
+    sigma.scheduleRefresh();
+
+    expect(internals.getHitAtPosition(position)).toEqual({ kind: "edge", key: "e12" });
 
     sigma.kill();
     container.remove();
