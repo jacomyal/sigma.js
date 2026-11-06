@@ -212,7 +212,6 @@ export function bindGraphHandlers(
   ctx: {
     graph: Graph;
     edgeGroups: EdgeGroupIndex;
-    addNode(key: string): void;
     updateNode(key: string): void;
     removeNode(key: string): void;
     addEdge(key: string): void;
@@ -244,7 +243,6 @@ export function bindGraphHandlers(
   };
 
   activeListeners.addNodeGraphUpdate = (payload: { key: string }): void => {
-    ctx.addNode(payload.key);
     ctx.refresh({ partialGraph: { nodes: [payload.key] }, skipIndexation: false, schedule: true });
   };
 
@@ -261,9 +259,7 @@ export function bindGraphHandlers(
     const edge = payload.key;
     ctx.markNodesDirty([payload.source, payload.target]);
     ctx.edgeGroups.register(edge);
-    ctx.addEdge(edge);
     const siblings = ctx.edgeGroups.getSiblings(edge);
-    for (const sib of siblings) ctx.addEdge(sib);
     ctx.refresh({ partialGraph: { edges: [edge, ...siblings] }, schedule: true });
   };
 

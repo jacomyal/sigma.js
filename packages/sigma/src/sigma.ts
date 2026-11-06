@@ -656,7 +656,6 @@ export default class Sigma<
       {
         graph: this.internals.graph,
         edgeGroups: this.edgeGroups,
-        addNode: this.addNode.bind(this),
         updateNode: this.updateNode.bind(this),
         removeNode: this.removeNode.bind(this),
         addEdge: this.addEdge.bind(this),
