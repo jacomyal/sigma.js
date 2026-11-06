@@ -346,3 +346,46 @@ describe("Graph state after removals", () => {
     expect(sigma.getNodeDisplayData("n2")?.color).toBe("#666");
   });
 });
+
+describe("Stale hover reads (regression)", () => {
+  test("a hover read resolving after graph.clear() does not hover the removed node", async () => {
+    const graph = createTestGraph();
+    const sigma = mount(graph);
+    await nextFrame();
+    await hoverNode(sigma, "n1");
+
+    const internals = sigma["internals"];
+    const resolver = internals.hoverResolver;
+    const staleId = internals.pickingState.idsByKind.node.get("n1")!;
+    const lastEvent = resolver["lastEvent"]!;
+
+    graph.clear();
+    // Simulates an async picking read landing before the next render.
+    resolver["options"].onIndex(staleId, lastEvent);
+
+    expect(sigma.getNodeState("n1").isHovered).toBe(false);
+    expect(sigma.getGraphState().hasHovered).toBe(false);
+    expect(() => sigma.refresh()).not.toThrow();
+  });
+
+  test("a hover read resolving after a drop and re-add does not hover the new node", async () => {
+    const graph = createTestGraph();
+    const sigma = mount(graph);
+    await nextFrame();
+    await hoverNode(sigma, "n1");
+
+    const internals = sigma["internals"];
+    const resolver = internals.hoverResolver;
+    const staleId = internals.pickingState.idsByKind.node.get("n1")!;
+    const lastEvent = resolver["lastEvent"]!;
+
+    graph.dropNode("n1");
+    graph.addNode("n1", { x: 200, y: 200 });
+
+    // Simulates an async picking read landing before the next render.
+    resolver["options"].onIndex(staleId, lastEvent);
+
+    expect(sigma.getNodeState("n1").isHovered).toBe(false);
+    expect(sigma.getGraphState().hasHovered).toBe(false);
+  });
+});
