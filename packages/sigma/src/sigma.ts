@@ -25,6 +25,7 @@ import {
   registerItem,
   resetKind,
   samePickingAllocation,
+  unregisterItem,
 } from "./core/interactive-kinds";
 import { LabelRenderer } from "./core/label-renderer";
 import { SDFAtlasManager } from "./core/sdf-atlas";
@@ -1495,6 +1496,7 @@ export default class Sigma<
    * @param key The node's graphology ID
    */
   private removeNode(key: string): void {
+    unregisterItem(this.pickingState, "node", key);
     // Remove from bucket
     this.itemBuckets.nodes.remove(key);
     // Remove from node cache
@@ -1614,6 +1616,7 @@ export default class Sigma<
     delete this.edgeTextureIndexCache[key];
     // Free edge from edge data texture
     this.internals.edgeDataTexture!.free(key);
+    unregisterItem(this.pickingState, "edge", key);
     // Remove from state
     this.stateManager.removeEdge(key);
     // Remove from forced label
@@ -1676,6 +1679,7 @@ export default class Sigma<
     this.internals.dragManager.clear();
     this.autoRescaleFrozen = false;
     this.stateManager.clearNodes();
+    resetKind(this.pickingState, "node");
   }
 
   /**

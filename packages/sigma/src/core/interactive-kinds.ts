@@ -164,6 +164,16 @@ export function registerItem(state: PickingState, kind: KindName, key: string): 
   return id;
 }
 
+/** Forget `(kind, key)` and its label kinds, so stale picking reads resolve to null. */
+export function unregisterItem(state: PickingState, kind: KindName, key: string): void {
+  for (const k of kindsDependingOn(kind)) {
+    const id = state.idsByKind[k].get(key);
+    if (id === undefined) continue;
+    state.lookup[id] = null;
+    state.idsByKind[k].delete(key);
+  }
+}
+
 /**
  * After node + edge IDs are assigned, give each enabled parent-linked kind
  * its own contiguous range right after the existing allocation. Label kinds
