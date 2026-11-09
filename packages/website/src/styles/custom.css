@@ -71,7 +71,7 @@
   color: var(--grey);
 }
 
-.sl-markdown-content code {
+.sl-markdown-content :not(pre) > code {
   white-space: nowrap;
 }
 
