@@ -5,6 +5,12 @@ description: How to version and publish sigma.js packages to NPM.
 
 As the code is structured as a monorepo, we use [Lerna](https://github.com/lerna/lerna) to help version and publish the different packages handled in the repository.
 
+Lerna is not a dependency of the repository. Install it globally first:
+
+```bash
+npm install -g lerna
+```
+
 To check packages that require a new version, you can run:
 
 ```bash

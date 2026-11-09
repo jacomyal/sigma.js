@@ -41,7 +41,6 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.6.0",
-    "lerna": "^9.0.7",
     "playwright": "^1.60.0",
     "prettier": "^3.8.3",
     "prettier-plugin-astro": "^0.14.1",

@@ -40,7 +40,7 @@
     "iwanthue": "^2.0.0",
     "leaflet": "^1.9.4",
     "lodash-es": "^4.18.1",
-    "maplibre-gl": "^4.5.0",
+    "maplibre-gl": "^6.16.0",
     "papaparse": "^5.5.2",
     "seedrandom": "^3.0.0",
     "sharp": "^0.33",

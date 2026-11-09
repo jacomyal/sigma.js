@@ -41,7 +41,7 @@
     "@sigma/utils": "^4.0.0"
   },
   "peerDependencies": {
-    "maplibre-gl": "^4.5.0",
+    "maplibre-gl": "^4.5.0 || ^5.0.0 || ^6.0.0",
     "sigma": "^4.0.0"
   },
   "exports": {
