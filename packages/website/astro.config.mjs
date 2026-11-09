@@ -21,6 +21,7 @@ const v3TypedocPaths = JSON.parse(fs.readFileSync(path.join(__dirname, "v3-typed
 
 export default defineConfig({
   site: "https://www.sigmajs.org",
+  compressHTML: true,
   vite: {
     server: { strictPort: true },
     resolve: {
