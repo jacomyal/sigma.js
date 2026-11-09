@@ -237,6 +237,7 @@ export default defineConfig({
                 { slug: "how-to/technical/custom-sizes" },
                 { slug: "how-to/technical/export-image" },
                 { slug: "how-to/technical/performance" },
+                { slug: "how-to/technical/framework-integration" },
                 { slug: "how-to/technical/migration-v3-v4" },
               ],
             },
