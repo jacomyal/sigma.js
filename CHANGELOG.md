@@ -1,5 +1,21 @@
 # sigma.js - changelog:
 
+## 4.0.5
+
+### Bug fixes
+
+- Fixes graph state and styles depending on it after node or edge removals
+- Re-evaluates nodes when their edges change, when node styles depend on the graph state
+- Fixes stale hover hits on removed nodes and edges
+- Keeps edges pickable during a full refresh, until they are reprocessed
+- Frees data texture slots of dropped and cleared items, that made textures grow indefinitely
+- `@sigma/layer-maplibre@4.0.1` - Adds MapLibre 5 and 6 to the `maplibre-gl` peer range
+
+### Performance
+
+- [#1516](https://github.com/jacomyal/sigma.js/issues/1516) - Stops re-evaluating the whole graph on each node or edge drop
+- Evaluates added nodes and edges only once
+
 ## 4.0.4
 
 ### Bug fixes
