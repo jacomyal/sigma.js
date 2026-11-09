@@ -3,7 +3,6 @@ import starlight from "@astrojs/starlight";
 import icon from "astro-icon";
 import { defineConfig } from "astro/config";
 import fs from "node:fs";
-import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import starlightLinksValidator from "starlight-links-validator";
@@ -12,8 +11,7 @@ import starlightTypeDoc, { typeDocSidebarGroup } from "starlight-typedoc";
 import { MATOMO_SCRIPT } from "./src/matomo";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const require = createRequire(import.meta.url);
-const starlightDir = path.dirname(require.resolve("@astrojs/starlight"));
+const starlightDir = path.dirname(fileURLToPath(import.meta.resolve("@astrojs/starlight")));
 
 // eslint-disable-next-line no-undef
 const isDev = process.argv.includes("dev");
@@ -28,7 +26,10 @@ export default defineConfig({
     resolve: {
       alias: [
         // Bypass Starlight's exports map so our custom Icon can import its icon data
-        { find: "@astrojs/starlight/components/Icons", replacement: path.join(starlightDir, "components/Icons.ts") },
+        {
+          find: "@astrojs/starlight/components/Icons",
+          replacement: path.join(starlightDir, "components-internals/Icons.js"),
+        },
       ],
     },
     plugins: [
@@ -152,16 +153,15 @@ export default defineConfig({
             ]),
       ],
       title: "sigma.js",
-      tagline: "A JavaScript library aimed at visualizing graphs of thousands of nodes and edges",
       favicon: "/img/favicon-32x32.png",
       logo: {
         src: "./src/assets/logo-sigma-ruby.svg",
         alt: "sigma.js",
       },
-      social: {
-        github: "https://github.com/jacomyal/sigma.js",
-        mastodon: "https://vis.social/@sigmajs",
-      },
+      social: [
+        { icon: "github", label: "GitHub", href: "https://github.com/jacomyal/sigma.js" },
+        { icon: "mastodon", label: "Mastodon", href: "https://vis.social/@sigmajs" },
+      ],
       head: [
         // Sends old v3 paths (served as 404s) to their v4 equivalents
         {

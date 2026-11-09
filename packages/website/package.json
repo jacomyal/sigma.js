@@ -13,7 +13,7 @@
   "dependencies": {
     "@astrojs/check": "^0.9.9",
     "@astrojs/sitemap": "^3.7.2",
-    "@astrojs/starlight": "^0.32",
+    "@astrojs/starlight": "^0.42",
     "@iconify-json/ph": "^1",
     "@phosphor-icons/core": "^2",
     "@sigma/export-image": "*",
@@ -25,7 +25,7 @@
     "@sigma/node-image": "*",
     "@sigma/node-piechart": "*",
     "@sigma/utils": "*",
-    "astro": "^5",
+    "astro": "^7.4.7",
     "astro-icon": "^1",
     "graphology": "^0.26.0",
     "graphology-communities-louvain": "^2.0.2",
@@ -43,19 +43,14 @@
     "maplibre-gl": "^6.16.0",
     "papaparse": "^5.5.2",
     "seedrandom": "^3.0.0",
-    "sharp": "^0.33",
     "sigma": "*",
-    "starlight-links-validator": "^0.19.2",
-    "starlight-typedoc": "^0.21.5",
-    "typedoc": "^0.28",
-    "typescript": "^5.9.3"
+    "starlight-links-validator": "^0.27.0",
+    "starlight-typedoc": "^0.23.2",
+    "typedoc": "^0.28"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
     "@types/papaparse": "^5.5.2",
     "@types/seedrandom": "^3.0.8"
-  },
-  "engines": {
-    "node": ">=18.14"
   }
 }

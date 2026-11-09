@@ -27,10 +27,10 @@ interface Props {
 const { id, height = "500px", defaultTab = "result", controls = false } = Astro.props;
 
 let scriptSource = "";
-const sources = import.meta.glob("../examples/**/*.astro", { query: "?raw", eager: true });
+const sources = import.meta.glob("../examples/**/*.astro", { query: "?raw", import: "default", eager: true });
 const key = Object.keys(sources).find((k) => k.includes(`/${id}.astro`));
 if (key) {
-  const raw = (sources[key] as { default: string }).default;
+  const raw = sources[key];
   const match = raw.match(/<script[^>]*>([\s\S]*?)<\/script>/);
   if (match) {
     scriptSource = match[1].replace(/^\n/, "").replace(/\n$/, "").replace(/^  /gm, "");

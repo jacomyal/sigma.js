@@ -14,7 +14,6 @@
     "experimentalDecorators": false,
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
-    "importsNotUsedAsValues": "remove",
     "inlineSourceMap": false,
     "inlineSources": false,
     "isolatedModules": false,

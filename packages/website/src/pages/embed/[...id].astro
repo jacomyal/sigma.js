@@ -15,7 +15,7 @@ import { MATOMO_SCRIPT } from "../../matomo";
 
 export async function getStaticPaths() {
   const examples = import.meta.glob("../../examples/**/*.astro", { eager: true });
-  const sources = import.meta.glob("../../examples/**/*.astro", { query: "?raw", eager: true });
+  const sources = import.meta.glob("../../examples/**/*.astro", { query: "?raw", import: "default", eager: true });
 
   return Object.keys(examples).map((key) => {
     // Extract topic/name from path like "../../examples/core/events.astro"
@@ -25,7 +25,7 @@ export async function getStaticPaths() {
       params: { id },
       props: {
         Component: (examples[key] as { default: any }).default,
-        source: (sources[key] as { default: string })?.default ?? "",
+        source: sources[key] ?? "",
       },
     };
   });
@@ -182,6 +182,7 @@ const { Component, source } = Astro.props;
   .panel-source .expressive-code pre {
     height: 100%;
     max-height: none;
+    align-items: flex-start;
   }
 
   /* Stage-only mode: hide all chrome, show only the rendered example.

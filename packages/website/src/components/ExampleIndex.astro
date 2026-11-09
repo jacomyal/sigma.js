@@ -14,6 +14,7 @@ const exampleIds = Object.keys(exampleFiles)
 // Collect all doc files and find SigmaExample references
 const docFiles = import.meta.glob("../content/docs/**/*.{md,mdx}", {
   query: "?raw",
+  import: "default",
   eager: true,
 });
 
@@ -21,8 +22,7 @@ const RE_SIGMA_EXAMPLE = /<SigmaExample\s[^>]*id\s*=\s*"([^"]+)"/g;
 
 const exampleToPages = new Map<string, { slug: string; title: string }[]>();
 
-for (const [path, mod] of Object.entries(docFiles)) {
-  const raw = (mod as { default: string }).default;
+for (const [path, raw] of Object.entries(docFiles)) {
   const slug = path.replace(/^\.\.\/content\/docs\//, "").replace(/\.(md|mdx)$/, "");
   const titleMatch = raw.match(/^---[\s\S]*?title:\s*["']?(.+?)["']?\s*$/m);
   const title = titleMatch?.[1] ?? slug;
