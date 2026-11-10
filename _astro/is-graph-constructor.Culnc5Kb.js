@@ -1,0 +1,1 @@
+import{t as e}from"./rolldown-runtime.WkwZ5CU-.js";var t=e(((e,t)=>{t.exports=function(e){return e!==null&&typeof e==`function`&&typeof e.prototype==`object`&&typeof e.prototype.addUndirectedEdgeWithKey==`function`&&typeof e.prototype.dropNode==`function`}}));export{t};

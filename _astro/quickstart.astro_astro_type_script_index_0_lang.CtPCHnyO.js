@@ -1,0 +1,1 @@
+import{n as e,t}from"./graphology.DvPOi-Ni.js";var n=new t;n.addNode(`1`,{label:`Node 1`,x:0,y:0,size:1,color:`blue`}),n.addNode(`2`,{label:`Node 2`,x:5,y:10,size:1,color:`red`}),n.addNode(`3`,{label:`Node 3`,x:10,y:0,size:1,color:`green`}),n.addEdge(`1`,`2`,{size:1}),n.addEdge(`2`,`3`,{size:1}),n.addEdge(`3`,`1`,{size:1}),new e(n,document.getElementById(`sigma-container`));

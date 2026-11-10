@@ -1,0 +1,1 @@
+function e(e,t){return{type:`number`,default:e,variable:t?.variable}}function t(e,t){return{type:`color`,default:e,variable:t?.variable}}function n(e,t){return{type:`string`,default:e,variable:t?.variable}}function r(e,t){return{type:{enum:e},default:t,variable:!1}}function i(e,t){return{type:`array`,items:e,minItems:t?.minItems}}export{n as a,e as i,t as n,r,i as t};

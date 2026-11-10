@@ -1,0 +1,1 @@
+import{t as e}from"./rolldown-runtime.WkwZ5CU-.js";var t=e(((e,t)=>{function n(e){return!e||typeof e!=`object`||typeof e==`function`||Array.isArray(e)||e instanceof Set||e instanceof Map||e instanceof RegExp||e instanceof Date}function r(e,t){e||={};var i={};for(var a in t){var o=e[a],s=t[a];i[a]=n(s)?o===void 0?s:o:r(o,s)}return i}t.exports=r}));export{t};
