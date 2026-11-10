@@ -312,16 +312,13 @@ export function layerImage(inputOptions?: Partial<LayerImageOptions>): FragmentL
 
       return {
         init: () => {
-          // Listen for texture updates
+          // Listen first, so a redraw triggered by the clamp reaches this layer
           textureManager.on(TextureManager.NEW_TEXTURE_EVENT, onNewTexture);
+          textureManager.clampMaxTextureSize(gl.getParameter(gl.MAX_TEXTURE_SIZE));
 
-          // Initialize with current state
           atlas = textureManager.getAtlas();
           textureImages = textureManager.getTextures();
-          if (textureImages.length > 0) {
-            textures = textureImages.map(() => gl.createTexture() as WebGLTexture);
-            bindTextures();
-          }
+          bindTextures();
         },
 
         beforeRender: () => {

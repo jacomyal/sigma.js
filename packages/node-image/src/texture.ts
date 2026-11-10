@@ -30,7 +30,7 @@ export type TextureManagerOptions = {
   objectFit: "contain" | "cover" | "fill";
   // If true, the image is centered on its alpha barycenter.
   correctCentering: boolean;
-  // Max texture size (use gl.getParameter(gl.MAX_TEXTURE_SIZE)).
+  // Atlas size. Image layers lower it to the context MAX_TEXTURE_SIZE.
   maxTextureSize: number;
   // Minimal time (in ms) between two consecutive textures generations.
   // If null, then no timeout will be used (for debug purpose only!).
@@ -469,6 +469,22 @@ export class TextureManager extends EventEmitter {
         status: "error",
       };
     }
+  }
+  /**
+   * Lowers the atlas size to `limit` if needed, and schedules a redraw of all ready images.
+   */
+  clampMaxTextureSize(limit: number) {
+    if (limit >= this.options.maxTextureSize) return;
+
+    this.options.maxTextureSize = limit;
+    // Resizing clears the canvas, so all textures must be drawn again
+    this.canvas.width = limit;
+    this.canvas.height = limit;
+    this.atlas = {};
+    this.textures = [this.ctx.getImageData(0, 0, 1, 1)];
+    this.lastTextureCursor = { x: 0, y: 0, rowHeight: 0, maxRowWidth: 0 };
+
+    if (Object.values(this.imageStates).some((state) => state.status === "ready")) this.scheduleGenerateTexture();
   }
   getAtlas(): Atlas {
     return this.atlas;
