@@ -1,7 +1,12 @@
-import { DataTexture } from "sigma/rendering";
 import { beforeEach, describe, expect, test } from "vitest";
 
-import { ItemAttributeTexture, buildAttrDescriptors, computeAttributeLayout, packAttributes } from "./data-texture";
+import {
+  DataTexture,
+  ItemAttributeTexture,
+  buildAttrDescriptors,
+  computeAttributeLayout,
+  packAttributes,
+} from "./data-texture";
 
 class TestDataTexture extends DataTexture {
   constructor(gl: WebGL2RenderingContext, initialCapacity?: number) {
@@ -35,17 +40,19 @@ function createMockGL(): WebGL2RenderingContext {
     texSubImage2D: () => {},
     texParameteri: () => {},
     activeTexture: () => {},
-    TEXTURE_2D: 0x0de1,
-    RGBA32F: 0x8814,
-    RGBA: 0x1908,
-    FLOAT: 0x1406,
-    TEXTURE_MIN_FILTER: 0x2801,
-    TEXTURE_MAG_FILTER: 0x2800,
-    TEXTURE_WRAP_S: 0x2802,
-    TEXTURE_WRAP_T: 0x2803,
-    NEAREST: 0x2600,
-    CLAMP_TO_EDGE: 0x812f,
-    TEXTURE0: 0x84c0,
+    getParameter: () => 4096,
+    MAX_TEXTURE_SIZE: WebGL2RenderingContext.MAX_TEXTURE_SIZE,
+    TEXTURE_2D: WebGL2RenderingContext.TEXTURE_2D,
+    RGBA32F: WebGL2RenderingContext.RGBA32F,
+    RGBA: WebGL2RenderingContext.RGBA,
+    FLOAT: WebGL2RenderingContext.FLOAT,
+    TEXTURE_MIN_FILTER: WebGL2RenderingContext.TEXTURE_MIN_FILTER,
+    TEXTURE_MAG_FILTER: WebGL2RenderingContext.TEXTURE_MAG_FILTER,
+    TEXTURE_WRAP_S: WebGL2RenderingContext.TEXTURE_WRAP_S,
+    TEXTURE_WRAP_T: WebGL2RenderingContext.TEXTURE_WRAP_T,
+    NEAREST: WebGL2RenderingContext.NEAREST,
+    CLAMP_TO_EDGE: WebGL2RenderingContext.CLAMP_TO_EDGE,
+    TEXTURE0: WebGL2RenderingContext.TEXTURE0,
   } as unknown as WebGL2RenderingContext;
 }
 
@@ -217,5 +224,58 @@ describe("ItemAttributeTexture", () => {
     expect(texture.getCapacity()).toBeGreaterThan(64);
     expect(Array.from(texture.getData().slice(4, 8))).toEqual([10, 11, 12, 13]);
     expect(Array.from(texture.getData().slice(64 * 4, 64 * 4 + 4))).toEqual([40, 41, 42, 43]);
+  });
+});
+
+describe("Data texture size limit (regression #1565)", () => {
+  const MAX_TEXTURE_SIZE = 2048;
+
+  // Mock GL reporting a low limit (e.g. Firefox with resistFingerprinting), recording uploaded sizes.
+  function createLimitedGL() {
+    const sizes: { width: number; height: number }[] = [];
+    const gl = {
+      ...createMockGL(),
+      getParameter: (pname: number) => (pname === WebGL2RenderingContext.MAX_TEXTURE_SIZE ? MAX_TEXTURE_SIZE : 0),
+      texImage2D: (_target: number, _level: number, _format: number, width: number, height: number) => {
+        sizes.push({ width, height });
+      },
+    } as unknown as WebGL2RenderingContext;
+    return { gl, sizes };
+  }
+
+  test("keeps a 3-texel-per-item texture within MAX_TEXTURE_SIZE", () => {
+    // 9 floats: fill color + image layer coords and index
+    const layout = computeAttributeLayout([
+      { attributes: [{ name: "a_color", size: 4 }] },
+      { attributes: [{ name: "a_texture", size: 4 }] },
+      { attributes: [{ name: "a_textureIndex", size: 1 }] },
+    ]);
+    expect(layout.texelsPerItem).toBe(3);
+
+    const { gl, sizes } = createLimitedGL();
+    const texture = new ItemAttributeTexture(gl, layout);
+
+    expect(sizes.length).toBeGreaterThan(0);
+    for (const { width, height } of sizes) {
+      expect(width).toBeLessThanOrEqual(MAX_TEXTURE_SIZE);
+      expect(height).toBeLessThanOrEqual(MAX_TEXTURE_SIZE);
+    }
+    const { width, height } = sizes[sizes.length - 1];
+    expect(width * height).toBeGreaterThanOrEqual(texture.getCapacity() * 3);
+  });
+
+  test("keeps the texture within MAX_TEXTURE_SIZE after growing", () => {
+    const { gl, sizes } = createLimitedGL();
+    const texture = new TestDataTexture(gl);
+
+    for (let i = 0; i < 1025; i++) texture.allocate(`item${i}`);
+
+    expect(sizes.length).toBeGreaterThan(1);
+    for (const { width, height } of sizes) {
+      expect(width).toBeLessThanOrEqual(MAX_TEXTURE_SIZE);
+      expect(height).toBeLessThanOrEqual(MAX_TEXTURE_SIZE);
+    }
+    const { width, height } = sizes[sizes.length - 1];
+    expect(width * height).toBeGreaterThanOrEqual(texture.getCapacity() * 2);
   });
 });
