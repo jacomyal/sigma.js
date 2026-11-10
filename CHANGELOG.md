@@ -1,5 +1,12 @@
 # sigma.js - changelog:
 
+## 4.0.6
+
+### Bug fixes
+
+- [#1565](https://github.com/jacomyal/sigma.js/issues/1565) - Replaces the hardcoded 4096 texture width cap with the context `MAX_TEXTURE_SIZE`
+- `@sigma/node-image@4.0.2` - [#1565](https://github.com/jacomyal/sigma.js/issues/1565) - Same fix, for the image atlas size
+
 ## 4.0.5
 
 ### Bug fixes
