@@ -15,8 +15,6 @@ import { colorToArray } from "../utils";
 
 const INITIAL_CAPACITY = 1024;
 const GROWTH_FACTOR = 1.5;
-// Maximum texture width to stay within WebGL limits (4096 is widely supported)
-const MAX_TEXTURE_WIDTH = 4096;
 
 /**
  * Sentinel written to `a_nodeIndex` / `a_edgeIndex` for hidden items.
@@ -43,6 +41,7 @@ export class DataTexture {
   protected readonly TEXELS_PER_ITEM: number;
 
   protected gl: WebGL2RenderingContext;
+  protected maxTextureSize: number;
   protected texture: WebGLTexture | null = null;
   protected data: Float32Array;
   protected capacity: number;
@@ -61,6 +60,7 @@ export class DataTexture {
 
   constructor(gl: WebGL2RenderingContext, texelsPerItem: number, initialCapacity: number = INITIAL_CAPACITY) {
     this.gl = gl;
+    this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
     this.TEXELS_PER_ITEM = texelsPerItem;
     this.capacity = this.roundUpToPowerOfTwo(initialCapacity);
     const dims = this.computeTextureDimensions(this.capacity);
@@ -72,11 +72,11 @@ export class DataTexture {
 
   /**
    * Computes 2D texture dimensions for a given item capacity.
-   * Width is capped at MAX_TEXTURE_WIDTH, height grows as needed.
+   * Width is capped at MAX_TEXTURE_SIZE, height grows as needed.
    */
   protected computeTextureDimensions(itemCapacity: number): { width: number; height: number } {
     const totalTexels = itemCapacity * this.TEXELS_PER_ITEM;
-    const width = Math.min(totalTexels, MAX_TEXTURE_WIDTH);
+    const width = Math.min(totalTexels, this.maxTextureSize);
     const height = Math.ceil(totalTexels / width);
     return { width, height };
   }

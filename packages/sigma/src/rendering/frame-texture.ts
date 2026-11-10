@@ -16,8 +16,6 @@
 
 const INITIAL_CAPACITY = 1024;
 const GROWTH_FACTOR = 1.5;
-// Match DataTexture: cap width at a widely-supported limit, grow height.
-const MAX_TEXTURE_WIDTH = 4096;
 
 export interface FrameTextureOptions {
   /** Floats stored per item: 1 -> R32F, 4 -> RGBA32F. */
@@ -27,6 +25,7 @@ export interface FrameTextureOptions {
 
 export class FrameTexture {
   private gl: WebGL2RenderingContext;
+  private maxTextureSize: number;
   private channels: 1 | 4;
   private texture: WebGLTexture | null = null;
   private framebuffer: WebGLFramebuffer | null = null;
@@ -43,6 +42,7 @@ export class FrameTexture {
     }
 
     this.gl = gl;
+    this.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
     this.channels = options.channels;
     this.capacity = this.roundUpToPowerOfTwo(options.initialCapacity ?? INITIAL_CAPACITY);
     const dims = this.computeDimensions(this.capacity);
@@ -56,7 +56,7 @@ export class FrameTexture {
   }
 
   private computeDimensions(capacity: number): { width: number; height: number } {
-    const width = Math.min(capacity, MAX_TEXTURE_WIDTH);
+    const width = Math.min(capacity, this.maxTextureSize);
     const height = Math.ceil(capacity / width);
     return { width, height };
   }
